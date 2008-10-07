@@ -1,0 +1,175 @@
+<project name="DocFetcher" default="deploy.all" basedir=".">
+	
+	<target name="init">
+		<tstamp/>
+		<property name="appname" value="DocFetcher"/>
+		<property name="package" value="net.sourceforge.docfetcher"/>
+		<property name="version" value="0.9.5"/>
+		<property name="deploy.name" value="${appname}-${version}"/>
+		<property name="jar.name" value="${package}_${version}.jar"/>
+		<property name="linux.archive" value="docfetcher_${version}_linux_gtk"/>
+		<property name="build.tmp" location="build/tmp"/>
+		<property name="build.tmp.deploy" location="${build.tmp}/${deploy.name}"/>
+		
+		<condition property="isWindows">
+			<os family="windows"/>
+		</condition>
+		<condition property="isLinux">
+			<os name="linux"/>
+		</condition>
+		
+		<fixcrlf file="resources/ChangeLog.txt" eol="crlf"/>
+		<fixcrlf file="resources/Readme.txt" eol="crlf"/>
+		<fixcrlf srcdir="resources/licenses" eol="crlf"/>
+	</target>
+	
+	<target name="clean" depends="init"
+		description="Deletes the build resources.">
+		<delete dir="build"/>
+	</target>
+	
+	<target name="compile" depends="init, clean"
+		description="Compiles the source files and places the output in a jar file in build">
+		<taskdef resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties">
+			<classpath>
+				<pathelement path="aspectjtools.jar"/>
+			</classpath>
+		</taskdef>
+		<iajc sourceRoots="src" destDir="${build.tmp}" source="1.5"
+			sourceRootCopyFilter="**/*.java, **/*.aj">
+			<classpath>
+				<fileset dir="lib" includes="**/*.jar"/>
+			</classpath>
+		</iajc>
+		<jar destfile="build/${jar.name}" basedir="${build.tmp}">
+			<manifest>
+				<attribute name="Main-Class" value="${package}.${appname}"/>
+			</manifest>
+		</jar>
+		<delete dir="${build.tmp}"/>
+	</target>
+	
+	<target name="deploy.linux" depends="compile"
+		description="Build standalone Linux release">
+		<mkdir dir="${build.tmp.deploy}/lib"/>
+		<copy todir="${build.tmp.deploy}/lib">
+			<fileset dir="lib" includes="**/*.jar, **/*.so" excludes="**/*win32*.jar"/>
+			<filelist dir="build" files="${jar.name}"/>
+		</copy>
+		<copy todir="${build.tmp.deploy}">
+			<fileset dir="resources" excludes="**/*.exe, **/*.bat, **/*~"/>
+		</copy>
+		<fixcrlf eol="lf" srcdir="${build.tmp.deploy}" includes="**/*.txt, **/*README*, **/*license*"/>
+		<tar destfile="build/${linux.archive}.tar">
+			<tarfileset dir="${build.tmp}" mode="755">
+				<include name="**/*.sh"/>
+			</tarfileset>
+			<tarfileset dir="${build.tmp}">
+				<exclude name="**/*.sh"/>
+			</tarfileset>
+		</tar>
+		<gzip zipfile="build/${linux.archive}.tar.gz" src="build/${linux.archive}.tar"/>
+		<delete dir="${build.tmp}"/>
+		<delete file="build/${linux.archive}.tar"/>
+	</target>
+	
+	<target name="deploy.linux.deb" depends="compile"
+		description="Build debian package for Linux">
+		<mkdir dir="${build.tmp}/usr"/>
+		<copy todir="${build.tmp}/usr/share/docfetcher/lib">
+			<fileset dir="lib" includes="**/*.jar, **/*.so" excludes="**/*win32*.jar"/>
+			<filelist dir="build" files="${jar.name}"/>
+		</copy>
+		<copy todir="${build.tmp}/usr/share/docfetcher">
+			<fileset dir="debian" includes="**/*.sh"/>
+		</copy>
+		<copy todir="${build.tmp}/usr/share/docfetcher/icons">
+			<fileset dir="resources/icons"/>
+		</copy>
+		<copy todir="${build.tmp}/usr/share/doc/docfetcher">
+			<fileset dir="resources" includes="**/*.txt"/>
+			<filterchain>
+				<fixcrlf eol="lf"/>
+			</filterchain>
+		</copy>
+		<copy todir="${build.tmp}/usr/share/doc/docfetcher">
+			<fileset dir="resources/help"/>
+		</copy>
+		<copy todir="${build.tmp}/usr/share/doc/docfetcher/licenses">
+			<fileset dir="resources/licenses"/>
+			<filterchain>
+				<fixcrlf eol="lf"/>
+			</filterchain>
+		</copy>
+		<copy todir="${build.tmp}/usr/share/applications">
+			<filelist dir="debian" files="docfetcher.desktop"/>
+		</copy>
+		<copy todir="${build.tmp}/usr/share/menu">
+			<filelist dir="debian" files="docfetcher.menu"/>
+		</copy>
+		<copy todir="${build.tmp}/usr/share/pixmaps">
+			<filelist dir="debian" files="docfetcher64.png"/>
+			<globmapper from="docfetcher64.png" to="docfetcher.png"/>
+		</copy>
+		<taskdef resource="org/vafer/jdeb/ant/antlib.xml">
+			<classpath>
+				<pathelement path="jdeb-0.7.jar"/>
+			</classpath>
+		</taskdef>
+		<jdeb destfile="build/docfetcher_${version}_all.deb" control="debian/control">
+			<data src="${build.tmp}"/>
+		</jdeb>
+		<delete dir="${build.tmp}"/>
+	</target>
+	
+	<target name="deploy.windows" depends="compile"
+		description="Build standalone Windows release">
+		<mkdir dir="${build.tmp.deploy}/lib"/>
+		<copy todir="${build.tmp.deploy}/lib">
+			<fileset dir="lib" includes="**/*.jar, **/*.dll" excludes="**/*linux*.jar"/>
+			<filelist dir="build" files="${jar.name}"/>
+		</copy>
+		<copy todir="${build.tmp.deploy}">
+			<fileset dir="resources" excludes="**/*.sh, **/*~"/>
+		</copy>
+		<zip destfile="build/docfetcher_${version}_win32.zip" basedir="${build.tmp}"/>
+		<delete dir="${build.tmp}"/>
+	</target>
+	
+	<target name="deploy.source" depends="compile"
+		description="Build the source release">
+		<mkdir dir="${build.tmp}/${appname}"/>
+		<copy todir="${build.tmp}/${appname}">
+			<fileset dir=".">
+				<exclude name="bin/**"/>
+				<exclude name="build/**"/>
+				<exclude name="aspectjtools.jar"/>
+				<exclude name="user.properties"/>
+			</fileset>
+		</copy>
+		<zip destfile="build/docfetcher_${version}_src.zip" basedir="${build.tmp}"/>
+		<delete dir="${build.tmp}"/>
+	</target>
+	
+	<target name="deploy.all" depends="deploy.linux, deploy.linux.deb, deploy.windows, deploy.source"
+		description="Build for all supported end users"/>
+	
+	<target name="run.linux" if="isLinux">
+		<antcall target="deploy.linux"/>
+		<gunzip src="build/${linux.archive}.tar.gz"/>
+		<untar src="build/${linux.archive}.tar" dest="build"/>
+		<delete file="build/${linux.archive}.tar"/>
+		<chmod file="build/${deploy.name}/${appname}.sh" perm="+x"/>
+		<exec dir="build/${deploy.name}" executable="./${appname}.sh" spawn="true"/>
+	</target>
+	
+	<target name="run.windows" if="isWindows">
+		<antcall target="deploy.windows"/>
+		<unzip src="build/docfetcher_${version}_win32.zip" dest="build"/>
+		<exec executable="build/${deploy.name}/${appname}.exe"/>
+	</target>
+	
+	<target name="run" depends="init, run.linux, run.windows"
+		description="Compiles and runs the application (OS is detected automatically)"/>
+	
+</project>

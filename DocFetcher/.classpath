@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="bin" path="src">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher-0.9.5/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/FontBox-0.1.0-dev.jar"/>
+	<classpathentry kind="lib" path="lib/jnotify-0.91.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher 0.9.5/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl1_3.2.0.v200606220026.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl2_3.2.0.v200606220026.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl2a_3.2.0.v200606220026.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt.nlBidi_3.2.0.v200606220026.jar"/>
+	<classpathentry kind="lib" path="lib/PDFBox-0.7.3.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.1-FINAL-20080629.jar"/>
+	<classpathentry kind="lib" path="lib/poi-scratchpad-3.1-FINAL-20080629.jar"/>
+	<classpathentry kind="lib" path="lib/jericho-html-2.6.jar"/>
+	<classpathentry kind="lib" path="lib/odf-utils-20051129.jar"/>
+	<classpathentry kind="lib" path="lib/chm4j.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher 0.9.5/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/lucene-core-2.3.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/media/truecrypt1/Software/Java Libraries/lucene-2.3.2.zip!/lucene-2.3.2/docs/api"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.commands_3.4.0.I20080509-2000.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.4.0.v20080421-2006.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface_3.4.0.I20080606-1300.jar" sourcepath="/media/Daten/eclipse-3.4-linux/plugins/org.eclipse.jface.source_3.4.0.I20080606-1300.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.4.0.v20080605-1900.jar"/>
+	<classpathentry kind="lib" path="lib/swt-3.4-linux-gtk.jar" sourcepath="/media/Daten/eclipse-3.4-linux/plugins/org.eclipse.swt.gtk.linux.x86.source_3.4.0.v3448f.jar"/>
+	<classpathentry kind="lib" path="lib/aspectjrt.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

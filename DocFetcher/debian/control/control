@@ -1,0 +1,14 @@
+Package: docfetcher
+Version: 0.9.5
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Tran Nam Quang <qforce@web.de>
+Depends: sun-java5-jre | sun-java6-jre | java2-runtime
+Homepage: http://docfetcher.sourceforge.net
+Description: Find documents that contain specific keywords
+ DocFetcher is a desktop search application: It allows you to perform fast searches for all documents in a given set of folders that contain certain keywords. - You can think of it as Google for your local document repository.
+ .
+ The program runs on GTK-based desktop environments (e.g. GNOME). It is recommended to use the Java Runtime Environments from Sun instead of alternative implementations, both for compatibility and performance reasons.
+ .
+ For more information, visit: http://docfetcher.sourceforge.net
