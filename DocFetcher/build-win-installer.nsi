@@ -1,11 +1,13 @@
 ; This script should be run _after_ the build script, because
 ; the latter fixes EOL issues in the text files. 
 
+!define VERSION 0.9.5.1
+
 SetCompress force
 SetCompressor /SOLID lzma
-Name "DocFetcher 0.9.5"
+Name "DocFetcher ${VERSION}"
 XPStyle on
-OutFile build\docfetcher_0.9.5_win32-setup.exe
+OutFile build\docfetcher_${VERSION}_win32_setup.exe
 InstallDir $PROGRAMFILES\DocFetcher
 Page directory
 Page instfiles
@@ -35,9 +37,23 @@ FunctionEnd
 Section "DocFetcher"
 	; Copy files
     SetOutPath $INSTDIR
-    File /r /x *.sh /x *~ /x user.properties resources\*.*
+    File resources\DocFetcher.exe
+    File resources\DocFetcher.bat
+    File build\temp_${VERSION}\ChangeLog.txt
+    File build\temp_${VERSION}\Readme.txt
+	
+	SetOutPath $INSTDIR\licenses
+	File /r /x .svn resources\licenses\*.*
+    
+    SetOutPath $INSTDIR\help
+    File /r /x DocFetcher_Manual.html /x .svn resources\help\*.*
+    File build\temp_${VERSION}\DocFetcher_Manual.html
+    
+    SetOutPath $INSTDIR\icons
+    File /r /x .svn resources\icons\*.*
+    
     SetOutPath $INSTDIR\lib
-    File /x *.so /x swt-*-linux-gtk.jar lib\*.*
+    File /x *.so /x swt-*-linux-gtk.jar /x .svn lib\*.*
     File build\net.sourceforge.docfetcher_*.jar
     
     ; Uninstaller
@@ -63,7 +79,7 @@ Section "DocFetcher"
     WriteRegStr HKLM $regkey "HelpLink" $homepage
     WriteRegStr HKLM $regkey "URLUpdateInfo" $homepage
     WriteRegStr HKLM $regkey "URLInfoAbout" $homepage
-    WriteRegStr HKLM $regkey "DisplayVersion" "0.9.5"
+    WriteRegStr HKLM $regkey "DisplayVersion" "${VERSION}"
     WriteRegDWORD HKLM $regkey "NoModify" 1
     WriteRegDWORD HKLM $regkey "NoRepair" 1
 SectionEnd

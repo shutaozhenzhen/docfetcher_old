@@ -32,6 +32,8 @@ import net.sourceforge.docfetcher.util.UtilGUI;
  */
 public class ScopeRegistry implements Serializable {
 	
+	static final long serialVersionUID = 1;
+	
 	/**
 	 * Singleton instance
 	 */

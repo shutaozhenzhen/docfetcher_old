@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.view;
 
+import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -21,8 +22,11 @@ import net.sourceforge.docfetcher.util.UtilList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -47,8 +51,26 @@ public class SearchPanel extends Composite {
 	
 	public SearchPanel(Composite parent) {
 		super(parent, SWT.NONE);
-		searchBar = new Composite(this, SWT.BORDER);
-		searchBar.setLayout(new FormLayout());
+		
+		/*
+		 * On Windows, we draw our own border because 'style = SWT.BORDER' looks
+		 * awful on the classic theme (which some people still seem to use...).
+		 */
+		searchBar = new Composite(this, Const.IS_WINDOWS ? SWT.NONE : SWT.BORDER);
+		if (Const.IS_WINDOWS)
+			searchBar.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent e) {
+					Point size = searchBar.getSize();
+					e.gc.setForeground(UtilGUI.getColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+					e.gc.drawRectangle(0, 0, size.x - 1, size.y - 1);
+					e.gc.setForeground(UtilGUI.getColor(SWT.COLOR_WHITE));
+					e.gc.drawRectangle(1, 1, size.x - 3, size.y - 3);
+				}
+			});
+		FormLayout formLayout = new FormLayout();
+		if (Const.IS_WINDOWS)
+			formLayout.marginWidth = formLayout.marginHeight = 2;
+		searchBar.setLayout(formLayout);
 		
 		searchBox = new Combo(searchBar, SWT.BORDER);
 		searchBox.setVisibleItemCount(Pref.Int.SearchHistorySize.value);
@@ -132,7 +154,7 @@ public class SearchPanel extends Composite {
 		fdf.top(searchBar).bottom().applyTo(resultPanel);
 		
 		/*
-		 * Without this call, the position of the search box will be slightly
+		 * Without this call the position of the search box will be slightly
 		 * off by a few pixels to the top.
 		 */
 		layout();

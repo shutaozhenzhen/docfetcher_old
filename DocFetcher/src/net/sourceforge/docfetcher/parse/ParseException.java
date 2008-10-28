@@ -20,6 +20,8 @@ import java.io.File;
  */
 public class ParseException extends Exception {
 	
+	static final long serialVersionUID = 1;
+	
 	/**
 	 * The file the parse exception occured on.
 	 */

@@ -122,14 +122,14 @@ public class HTMLParser extends Parser {
 	}
 
 	/**
-	 * Returns the file extensions used to identify text files.
+	 * Returns the file extensions used to identify HTML files.
 	 */
 	public String[] getExtensions() {
 		return extensions;
 	}
 
 	/**
-	 * Sets the file extensions used to identify text files.
+	 * Sets the file extensions used to identify HTML files.
 	 */
 	public void setExtensions(String[] extensions) {
 		this.extensions = extensions;

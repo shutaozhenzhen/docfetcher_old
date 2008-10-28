@@ -200,7 +200,7 @@ public class PrefPage {
 	
 	private Text createTextBox(Composite parent, String label, StrArray strArrayPref) {
 		Text text = createTextBox(parent, label);
-		text.setText(UtilList.toString(strArrayPref.value, " ")); //$NON-NLS-1$
+		text.setText(UtilList.toString(" ", strArrayPref.value)); //$NON-NLS-1$
 		textBoxStrArrayMap.put(text, strArrayPref);
 		return text;
 	}
@@ -253,8 +253,8 @@ public class PrefPage {
 			String newValue = null;
 			if (entry.getKey() == exclFilterBox)
 				newValue = UtilList.toString(
-						UtilGUI.parseExclusionString(exclFilterBox.getText()),
-						" $ " //$NON-NLS-1$
+						" $ ", //$NON-NLS-1$
+						UtilGUI.parseExclusionString(exclFilterBox.getText())
 				);
 			else
 				newValue = entry.getKey().getText();
@@ -289,7 +289,7 @@ public class PrefPage {
 		for (Entry<Text, Str> entry : textBoxStrMap.entrySet())
 			entry.getKey().setText(entry.getValue().defaultValue);
 		for (Entry<Text, StrArray> entry : textBoxStrArrayMap.entrySet())
-			entry.getKey().setText(UtilList.toString(entry.getValue().defaultValue, " ")); //$NON-NLS-1$
+			entry.getKey().setText(UtilList.toString(" ", entry.getValue().defaultValue)); //$NON-NLS-1$
 	}
 
 }

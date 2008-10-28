@@ -257,9 +257,9 @@ public class IndexingTab extends Composite {
 				extensionsFromDisk = chooser.getExtensionsFromDisk();
 				
 				if (useTextExtensions)
-					textExtBox.setText(UtilList.toString(out, " ")); //$NON-NLS-1$
+					textExtBox.setText(UtilList.toString(" ", out)); //$NON-NLS-1$
 				else
-					htmlExtBox.setText(UtilList.toString(out, " ")); //$NON-NLS-1$
+					htmlExtBox.setText(UtilList.toString(" ", out)); //$NON-NLS-1$
 			}
 		});
 		
@@ -316,9 +316,9 @@ public class IndexingTab extends Composite {
 	 */
 	private void resetJobConfig() {
 		RootScope scope = job.getScope();
-		textExtBox.setText(UtilList.toString(scope.getTextExtensions(), " ")); //$NON-NLS-1$
-		htmlExtBox.setText(UtilList.toString(scope.getHtmlExtensions(), " ")); //$NON-NLS-1$
-		exclusionBox.setText(UtilList.toString(scope.getExclusionFilters(), " $ ")); //$NON-NLS-1$
+		textExtBox.setText(UtilList.toString(" ", scope.getTextExtensions())); //$NON-NLS-1$
+		htmlExtBox.setText(UtilList.toString(" ", scope.getHtmlExtensions())); //$NON-NLS-1$
+		exclusionBox.setText(UtilList.toString(" $ ", scope.getExclusionFilters())); //$NON-NLS-1$
 		checkHTMLPairing.setSelection(scope.isDetectHTMLPairs());
 	}
 	
@@ -348,9 +348,9 @@ public class IndexingTab extends Composite {
 		// Initial info messages
 		RootScope scope = job.getScope();
 		progressPanel.appendInfo(Msg.target_folder.value() + " " + scope.toString()); //$NON-NLS-1$
-		progressPanel.appendInfo(Msg.ipref_text_ext.value() + " " + UtilList.toString(scope.getTextExtensions(), " ")); //$NON-NLS-1$ //$NON-NLS-2$
-		progressPanel.appendInfo(Msg.ipref_html_ext.value() + " " + UtilList.toString(scope.getHtmlExtensions(), " ")); //$NON-NLS-1$ //$NON-NLS-2$
-		progressPanel.appendInfo(Msg.ipref_skip_regex.value() + " " + UtilList.toString(scope.getExclusionFilters(), " $ ")); //$NON-NLS-1$ //$NON-NLS-2$
+		progressPanel.appendInfo(Msg.ipref_text_ext.value() + " " + UtilList.toString(" ", scope.getTextExtensions())); //$NON-NLS-1$ //$NON-NLS-2$
+		progressPanel.appendInfo(Msg.ipref_html_ext.value() + " " + UtilList.toString(" ", scope.getHtmlExtensions())); //$NON-NLS-1$ //$NON-NLS-2$
+		progressPanel.appendInfo(Msg.ipref_skip_regex.value() + " " + UtilList.toString(" $ ", scope.getExclusionFilters())); //$NON-NLS-1$ //$NON-NLS-2$
 		progressPanel.appendInfo(Msg.html_pairing.value() + " " + (scope.isDetectHTMLPairs() ? Msg.yes.value() : Msg.no.value())); //$NON-NLS-1$
 		progressPanel.appendInfo(Msg.waiting_in_queue.value());
 		

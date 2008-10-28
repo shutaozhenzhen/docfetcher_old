@@ -90,14 +90,26 @@ public class InputDialog {
 			}
 		});
 	}
+
+	/**
+	 * If a filename has been set as the default value for this input dialog,
+	 * calling this method will set the initial selection to the filename only,
+	 * excluding the file extension.
+	 */
+	public void selectFilenameOnly() {
+		String s = text.getText();
+		int index = s.lastIndexOf('.');
+		if (index == -1) return;
+		text.setSelection(0, index);
+	}
 	
 	/**
 	 * Opens the dialog. Returns the input string or null if the dialog was
 	 * canceled.
 	 */
 	public String open() {
-		shell.open();
 		UtilGUI.centerShell(DocFetcher.getInst().getShell(), shell);
+		shell.open();
 		while (! shell.isDisposed()) {
 			if (! shell.getDisplay().readAndDispatch())
 				shell.getDisplay().sleep();

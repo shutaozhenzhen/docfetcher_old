@@ -50,8 +50,8 @@ class Serializer {
 	}
 	
 	/**
-	 * Saves the given object to disk, in the <tt>path</tt> directory. Set
-	 * <tt>path</tt> to null to store it in the application directory.
+	 * Saves the given object to disk, in the <tt>path</tt> directory. The
+	 * parameter <tt>path</tt> should not be null.
 	 * 
 	 * @throws IOException
 	 *             if the write process failed.

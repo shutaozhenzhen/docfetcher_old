@@ -30,6 +30,8 @@ import net.sourceforge.docfetcher.util.UtilList;
  */
 public class HTMLPair extends FileWrapper {
 	
+	static final long serialVersionUID = 1;
+	
 	private Modifiable folderWrapper;
 	
 	/**
@@ -99,6 +101,8 @@ public class HTMLPair extends FileWrapper {
 
 //Recursive structure that keeps track of the modified states of all files under it
 class Modifiable implements Serializable {
+	
+	static final long serialVersionUID = 1;
 	
 	private RootScope root;
 	private File file;

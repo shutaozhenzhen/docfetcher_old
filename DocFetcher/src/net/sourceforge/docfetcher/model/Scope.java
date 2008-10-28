@@ -26,6 +26,8 @@ import net.sourceforge.docfetcher.util.UtilFile;
  */
 public class Scope extends Indexable {
 	
+	static final long serialVersionUID = 1;
+	
 	/**
 	 * Event: Check state of this object has changed.
 	 */

@@ -157,13 +157,13 @@ public class Pref {
 	 */
 	private static final String checkPrefix = "Checked"; //$NON-NLS-1$
 
-	private static Map<Class, Boolean> checkedClasses = new HashMap<Class, Boolean> ();
+	private static Map<Class<? extends Object>, Boolean> checkedClasses = new HashMap<Class<? extends Object>, Boolean> ();
 
 	/**
 	 * Loads ands returns the check state of the given class object from the
 	 * preferences.
 	 */
-	public static boolean isChecked(Class clazz) {
+	public static boolean isChecked(Class<?> clazz) {
 		Boolean ret = checkedClasses.get(clazz);
 		if (ret == null)
 			throw new IllegalArgumentException("Unregistered class."); //$NON-NLS-1$
@@ -173,7 +173,7 @@ public class Pref {
 	/**
 	 * Stores a check state of the given class object in the preferences.
 	 */
-	public static void setChecked(Class clazz, boolean checked) {
+	public static void setChecked(Class<?> clazz, boolean checked) {
 		checkedClasses.put(clazz, checked);
 	}
 
@@ -207,12 +207,12 @@ public class Pref {
 			for (StrArray strArray : Pref.StrArray.values())
 				strArray.value = prop.getProperty(
 						strArray.name(),
-						UtilList.toString(strArray.defaultValue, ", ") //$NON-NLS-1$
+						UtilList.toString(", ", strArray.defaultValue) //$NON-NLS-1$
 				).split("[^\\p{Alnum}]+"); //$NON-NLS-1$
 			for (IntArray intArray : Pref.IntArray.values()) {
 				String rawValue = prop.getProperty(
 						intArray.name(),
-						UtilList.toString(intArray.defaultValue, ", ") //$NON-NLS-1$
+						UtilList.toString(", ", intArray.defaultValue) //$NON-NLS-1$
 				);
 				String[] rawValues = rawValue.trim().equals("") ? new String[0] : rawValue.split("[^\\p{Alnum}]+"); //$NON-NLS-1$ //$NON-NLS-2$
 				intArray.value = new int[rawValues.length];
@@ -248,10 +248,10 @@ public class Pref {
 		for (Str str : Pref.Str.values())
 			props.put(str.name(), str.value);
 		for (StrArray strArray : Pref.StrArray.values())
-			props.put(strArray.name(), UtilList.toString(strArray.value, ", ")); //$NON-NLS-1$
+			props.put(strArray.name(), UtilList.toString(", ", strArray.value)); //$NON-NLS-1$
 		for (IntArray intArray : Pref.IntArray.values())
-			props.put(intArray.name(), UtilList.toString(intArray.value, ", ")); //$NON-NLS-1$
-		for (Entry<Class, Boolean> checkEntry : checkedClasses.entrySet())
+			props.put(intArray.name(), UtilList.toString(", ", intArray.value)); //$NON-NLS-1$
+		for (Entry<Class<? extends Object>, Boolean> checkEntry : checkedClasses.entrySet())
 			props.put(
 					checkPrefix + checkEntry.getKey().getSimpleName(),
 					checkEntry.getValue().toString()

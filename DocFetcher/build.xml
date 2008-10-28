@@ -1,145 +1,186 @@
 <project name="DocFetcher" default="deploy.all" basedir=".">
 	
-	<target name="init">
-		<tstamp/>
+	<target name="init"
+		description="Initializes variables and deletes the build directory.">
+		<tstamp>
+			<format property="DSTAMP" pattern="yyyy-MM-dd"/>
+		</tstamp>
 		<property name="appname" value="DocFetcher"/>
 		<property name="package" value="net.sourceforge.docfetcher"/>
-		<property name="version" value="0.9.5"/>
+		<property name="version" value="0.9.5.1"/>
+		<property name="versiondir" value="build/temp_${version}"/>
 		<property name="deploy.name" value="${appname}-${version}"/>
 		<property name="jar.name" value="${package}_${version}.jar"/>
-		<property name="linux.archive" value="docfetcher_${version}_linux_gtk"/>
-		<property name="build.tmp" location="build/tmp"/>
-		<property name="build.tmp.deploy" location="${build.tmp}/${deploy.name}"/>
-		
-		<condition property="isWindows">
-			<os family="windows"/>
-		</condition>
-		<condition property="isLinux">
-			<os name="linux"/>
-		</condition>
-		
-		<fixcrlf file="resources/ChangeLog.txt" eol="crlf"/>
-		<fixcrlf file="resources/Readme.txt" eol="crlf"/>
-		<fixcrlf srcdir="resources/licenses" eol="crlf"/>
-	</target>
-	
-	<target name="clean" depends="init"
-		description="Deletes the build resources.">
+		<property name="programdir" value="build/tmp/${deploy.name}"/>
 		<delete dir="build"/>
+		<mkdir dir="build"/>
 	</target>
 	
-	<target name="compile" depends="init, clean"
+	<target name="versionize" depends="init"
+		description="Makes adjusted copies of files that contain tokens to be replaced.">
+		<mkdir dir="${versiondir}"/>
+		<copy todir="${versiondir}" flatten="true">
+			<resources>
+				<file file="resources/help/DocFetcher_Manual.html"/>
+				<file file="resources/ChangeLog.txt"/>
+				<file file="resources/Readme.txt"/>
+				<file file="debian/control/control"/>
+				<file file="debian/docfetcher.desktop"/>
+			</resources>
+			<filterset>
+				<filter token="DATE" value="${DSTAMP}"/>
+				<filter token="VERSION" value="${version}"/>
+			</filterset>
+		</copy>
+		<copy todir="${versiondir}/licenses">
+			<fileset dir="resources/licenses"/>
+		</copy>
+	</target>
+	
+	<target name="compile" depends="init"
 		description="Compiles the source files and places the output in a jar file in build">
 		<taskdef resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties">
 			<classpath>
 				<pathelement path="aspectjtools.jar"/>
 			</classpath>
 		</taskdef>
-		<iajc sourceRoots="src" destDir="${build.tmp}" source="1.5"
+		<iajc sourceRoots="src" destDir="build/tmp" source="1.5"
 			sourceRootCopyFilter="**/*.java, **/*.aj">
 			<classpath>
 				<fileset dir="lib" includes="**/*.jar"/>
 			</classpath>
 		</iajc>
-		<jar destfile="build/${jar.name}" basedir="${build.tmp}">
+		<jar destfile="build/${jar.name}" basedir="build/tmp">
 			<manifest>
 				<attribute name="Main-Class" value="${package}.${appname}"/>
 			</manifest>
 		</jar>
-		<delete dir="${build.tmp}"/>
+		<delete dir="build/tmp"/>
+	</target>
+
+	<target name="fixcrlf.windows" depends="versionize">
+		<fixcrlf file="${versiondir}/ChangeLog.txt" eol="crlf"/>
+		<fixcrlf file="${versiondir}/Readme.txt" eol="crlf"/>
+		<fixcrlf srcdir="${versiondir}/licenses" eol="crlf"/>
 	</target>
 	
-	<target name="deploy.linux" depends="compile"
+	<target name="fixcrlf.linux" depends="versionize">
+		<fixcrlf file="${versiondir}/ChangeLog.txt" eol="lf"/>
+		<fixcrlf file="${versiondir}/Readme.txt" eol="lf"/>
+		<fixcrlf srcdir="${versiondir}/licenses" eol="lf"/>
+	</target>
+	
+	<target name="deploy.linux" depends="compile, fixcrlf.linux"
 		description="Build standalone Linux release">
-		<mkdir dir="${build.tmp.deploy}/lib"/>
-		<copy todir="${build.tmp.deploy}/lib">
+		<copy todir="${programdir}/lib">
 			<fileset dir="lib" includes="**/*.jar, **/*.so" excludes="**/*win32*.jar"/>
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
-		<copy todir="${build.tmp.deploy}">
-			<fileset dir="resources" excludes="**/*.exe, **/*.bat, **/*~"/>
+		<copy todir="${programdir}" flatten="true">
+			<resources>
+				<file file="resources/DocFetcher.sh"/>
+				<file file="resources/user.properties"/>
+				<file file="${versiondir}/ChangeLog.txt"/>
+				<file file="${versiondir}/Readme.txt"/>
+			</resources>
 		</copy>
-		<fixcrlf eol="lf" srcdir="${build.tmp.deploy}" includes="**/*.txt, **/*README*, **/*license*"/>
+		<copy todir="${programdir}/icons">
+			<fileset dir="resources/icons"/>
+		</copy>
+		<copy todir="${programdir}/licenses">
+			<fileset dir="${versiondir}/licenses"/>
+		</copy>
+		<copy todir="${programdir}/help/DocFetcher_Manual_files">
+			<fileset dir="resources/help/DocFetcher_Manual_files"/>
+		</copy>
+		<copy file="${versiondir}/DocFetcher_Manual.html" todir="${programdir}/help"/>
+		<property name="linux.archive" value="docfetcher_${version}_linux_gtk"/>
 		<tar destfile="build/${linux.archive}.tar">
-			<tarfileset dir="${build.tmp}" mode="755">
+			<tarfileset dir="build/tmp" mode="755">
 				<include name="**/*.sh"/>
 			</tarfileset>
-			<tarfileset dir="${build.tmp}">
+			<tarfileset dir="build/tmp">
 				<exclude name="**/*.sh"/>
 			</tarfileset>
 		</tar>
 		<gzip zipfile="build/${linux.archive}.tar.gz" src="build/${linux.archive}.tar"/>
-		<delete dir="${build.tmp}"/>
+		<delete dir="build/tmp"/>
 		<delete file="build/${linux.archive}.tar"/>
 	</target>
 	
-	<target name="deploy.linux.deb" depends="compile"
+	<target name="deploy.linux.deb" depends="compile, fixcrlf.linux"
 		description="Build debian package for Linux">
-		<mkdir dir="${build.tmp}/usr"/>
-		<copy todir="${build.tmp}/usr/share/docfetcher/lib">
+		<copy todir="build/tmp/usr/share/docfetcher/lib">
 			<fileset dir="lib" includes="**/*.jar, **/*.so" excludes="**/*win32*.jar"/>
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
-		<copy todir="${build.tmp}/usr/share/docfetcher">
+		<copy todir="build/tmp/usr/share/docfetcher">
 			<fileset dir="debian" includes="**/*.sh"/>
 		</copy>
-		<copy todir="${build.tmp}/usr/share/docfetcher/icons">
+		<copy todir="build/tmp/usr/share/docfetcher/icons">
 			<fileset dir="resources/icons"/>
 		</copy>
-		<copy todir="${build.tmp}/usr/share/doc/docfetcher">
-			<fileset dir="resources" includes="**/*.txt"/>
-			<filterchain>
-				<fixcrlf eol="lf"/>
-			</filterchain>
+		<copy todir="build/tmp/usr/share/doc/docfetcher">
+			<fileset dir="${versiondir}" includes="**/*.txt"/>
 		</copy>
-		<copy todir="${build.tmp}/usr/share/doc/docfetcher">
-			<fileset dir="resources/help"/>
+		<copy todir="build/tmp/usr/share/doc/docfetcher">
+			<fileset dir="resources/help" excludes="DocFetcher_Manual.html"/>
+			<filelist dir="${versiondir}" files="DocFetcher_Manual.html"/>
 		</copy>
-		<copy todir="${build.tmp}/usr/share/doc/docfetcher/licenses">
-			<fileset dir="resources/licenses"/>
-			<filterchain>
-				<fixcrlf eol="lf"/>
-			</filterchain>
+		<copy todir="build/tmp/usr/share/doc/docfetcher/licenses">
+			<fileset dir="${versiondir}/licenses"/>
 		</copy>
-		<copy todir="${build.tmp}/usr/share/applications">
-			<filelist dir="debian" files="docfetcher.desktop"/>
+		<copy todir="build/tmp/usr/share/applications">
+			<filelist dir="${versiondir}" files="docfetcher.desktop"/>
 		</copy>
-		<copy todir="${build.tmp}/usr/share/menu">
+		<copy todir="build/tmp/usr/share/menu">
 			<filelist dir="debian" files="docfetcher.menu"/>
 		</copy>
-		<copy todir="${build.tmp}/usr/share/pixmaps">
+		<copy todir="build/tmp/usr/share/pixmaps">
 			<filelist dir="debian" files="docfetcher64.png"/>
 			<globmapper from="docfetcher64.png" to="docfetcher.png"/>
+		</copy>
+		<copy todir="build/control">
+			<fileset dir="debian/control" excludes="**/control"/>
+			<filelist dir="${versiondir}" files="control"/>
 		</copy>
 		<taskdef resource="org/vafer/jdeb/ant/antlib.xml">
 			<classpath>
 				<pathelement path="jdeb-0.7.jar"/>
 			</classpath>
 		</taskdef>
-		<jdeb destfile="build/docfetcher_${version}_all.deb" control="debian/control">
-			<data src="${build.tmp}"/>
+		<jdeb destfile="build/docfetcher_${version}_all.deb" control="build/control">
+			<data src="build/tmp"/>
 		</jdeb>
-		<delete dir="${build.tmp}"/>
+		<delete dir="build/tmp"/>
+		<delete dir="build/control"/>
 	</target>
 	
-	<target name="deploy.windows" depends="compile"
+	<target name="deploy.windows" depends="compile, fixcrlf.windows"
 		description="Build standalone Windows release">
-		<mkdir dir="${build.tmp.deploy}/lib"/>
-		<copy todir="${build.tmp.deploy}/lib">
+		<copy todir="${programdir}/lib">
 			<fileset dir="lib" includes="**/*.jar, **/*.dll" excludes="**/*linux*.jar"/>
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
-		<copy todir="${build.tmp.deploy}">
-			<fileset dir="resources" excludes="**/*.sh, **/*~"/>
+		<copy todir="${programdir}">
+			<fileset dir="resources" includes="icons/*, **/*.bat, **/*.exe, user.properties"/>
+			<fileset dir="${versiondir}" includes="**/*.txt"/>
 		</copy>
-		<zip destfile="build/docfetcher_${version}_win32.zip" basedir="${build.tmp}"/>
-		<delete dir="${build.tmp}"/>
+		<copy todir="${programdir}/help">
+			<fileset dir="resources/help" excludes="DocFetcher_Manual.html"/>
+			<filelist dir="${versiondir}" files="DocFetcher_Manual.html"/>
+		</copy>
+		<copy todir="${programdir}/licenses">
+			<fileset dir="${versiondir}/licenses"/>
+		</copy>
+		<zip destfile="build/docfetcher_${version}_win32.zip" basedir="build/tmp"/>
+		<delete dir="build/tmp"/>
 	</target>
 	
 	<target name="deploy.source" depends="compile"
 		description="Build the source release">
-		<mkdir dir="${build.tmp}/${appname}"/>
-		<copy todir="${build.tmp}/${appname}">
+		<mkdir dir="build/tmp/${appname}"/>
+		<copy todir="build/tmp/${appname}">
 			<fileset dir=".">
 				<exclude name="bin/**"/>
 				<exclude name="build/**"/>
@@ -147,29 +188,11 @@
 				<exclude name="user.properties"/>
 			</fileset>
 		</copy>
-		<zip destfile="build/docfetcher_${version}_src.zip" basedir="${build.tmp}"/>
-		<delete dir="${build.tmp}"/>
+		<zip destfile="build/docfetcher_${version}_src.zip" basedir="build/tmp"/>
+		<delete dir="build/tmp"/>
 	</target>
 	
 	<target name="deploy.all" depends="deploy.linux, deploy.linux.deb, deploy.windows, deploy.source"
 		description="Build for all supported end users"/>
-	
-	<target name="run.linux" if="isLinux">
-		<antcall target="deploy.linux"/>
-		<gunzip src="build/${linux.archive}.tar.gz"/>
-		<untar src="build/${linux.archive}.tar" dest="build"/>
-		<delete file="build/${linux.archive}.tar"/>
-		<chmod file="build/${deploy.name}/${appname}.sh" perm="+x"/>
-		<exec dir="build/${deploy.name}" executable="./${appname}.sh" spawn="true"/>
-	</target>
-	
-	<target name="run.windows" if="isWindows">
-		<antcall target="deploy.windows"/>
-		<unzip src="build/docfetcher_${version}_win32.zip" dest="build"/>
-		<exec executable="build/${deploy.name}/${appname}.exe"/>
-	</target>
-	
-	<target name="run" depends="init, run.linux, run.windows"
-		description="Compiles and runs the application (OS is detected automatically)"/>
 	
 </project>

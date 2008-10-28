@@ -41,16 +41,12 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
@@ -66,8 +62,6 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -80,19 +74,7 @@ import org.eclipse.swt.widgets.Tree;
 public class ScopeGroup extends GroupWrapper {
 	
 	private CheckboxTreeViewer viewer;
-	private MenuManager contextMenu;
-	private Action removeIndexAction;
-	private Action updateIndexAction;
-	private Action rebuildIndexAction;
-	private Action checkFlatAction;
-	private Action uncheckFlatAction;
-	private Action openDirectoryAction;
-	private Action listDocumentsAction;
-	private Action createSubfolderAction;
-	private Action renameFolderAction;
-	private Action deleteFolderAction;
-	private Action pasteIntoFolderAction;
-	private ISelectionChangedListener selChangedListener;
+	private ViewerMenuManager viewerMenu;
 
 	public ScopeGroup(Composite parent) {
 		super(parent);
@@ -101,9 +83,30 @@ public class ScopeGroup extends GroupWrapper {
 		viewer = new CheckboxTreeViewer(group, SWT.BORDER | SWT.MULTI);
 		initViewer();
 		initDragAndDrop();
-		contextMenu = new MenuManager();
-		viewer.getTree().setMenu(contextMenu.createContextMenu(viewer.getTree()));
-		initContextMenu();
+		
+		viewerMenu = new ViewerMenuManager(viewer);
+		viewerMenu.setRootChecker(new ViewerMenuManager.RootChecker() {
+			public boolean isRoot(Object obj) {
+				return obj instanceof RootScope;
+			}
+		});
+		viewerMenu.addUnmanagedAction(new CreateIndexAction(), Key.Insert);
+		viewerMenu.addSeparator();
+		viewerMenu.addRootAction(new UpdateIndexAction(), Key.Update);
+		viewerMenu.addRootAction(new RebuildIndexAction(), null);
+		viewerMenu.addSeparator();
+		viewerMenu.addRootAction(new RemoveIndexAction(), Key.Delete);
+		viewerMenu.addSeparator();
+		viewerMenu.addNonEmptyAction(new CheckFlatAction(true), null);
+		viewerMenu.addNonEmptyAction(new CheckFlatAction(false), null);
+		viewerMenu.addSeparator();
+		viewerMenu.addNonEmptyAction(new OpenDirectoryAction(), Key.Enter);
+		viewerMenu.addRootAction(new ListDocumentsAction(), null);
+		viewerMenu.addSingleElementAction(new CreateSubfolderAction(), Key.ShiftInsert);
+		viewerMenu.addSingleElementAction(new RenameFolderAction(), Key.Rename);
+		viewerMenu.addNonEmptyAction(new DeleteFolderAction(), Key.ShiftDelete);
+		viewerMenu.addSingleElementAction(new PasteIntoFolderAction(), Key.Paste);
+		viewerMenu.setManagedActionsEnabled(false);
 
 		// Update self on add/remove in scope registry
 		ScopeRegistry.load().getEvtRegistryChanged().add(new IObserver() {
@@ -121,20 +124,14 @@ public class ScopeGroup extends GroupWrapper {
 		viewer.getTree().addFocusListener(new FocusAdapter() {
 			public void focusLost(FocusEvent e) {
 				((Tree) e.widget).deselectAll();
+				
 				/*
-				 * Manual deselection won't fire a selection changed event, so
-				 * we have to it ourselves.
+				 * We have to deactivate the context menu entries manually since
+				 * the deselectAll call will not cause a SelectionChangedEvent.
 				 */
-				selChangedListener.selectionChanged(
-						new SelectionChangedEvent(
-								viewer,
-								viewer.getSelection()
-						)
-				);
+				viewerMenu.setManagedActionsEnabled(false);
 			}
 		});
-		
-		viewer.getTree().addKeyListener(new ScopeGroupKeys());
 		
 		viewer.setContentProvider(new ITreeContentProvider() {
 			public Object[] getElements(Object inputElement) {
@@ -166,11 +163,7 @@ public class ScopeGroup extends GroupWrapper {
 			}
 		});
 		
-		viewer.setSorter(new ViewerSorter() {
-			public int compare(Viewer viewer, Object e1, Object e2) {
-				return ((Indexable) e1).compareTo((Indexable) e2);
-			}
-		});
+		viewer.setSorter(new ViewerSorter());
 		
 		/*
 		 * Because the check states of the viewer items are maintained manually,
@@ -273,74 +266,6 @@ public class ScopeGroup extends GroupWrapper {
 	}
 	
 	/**
-	 * Fills the context menu of the ScopeGroup.
-	 */
-	private void initContextMenu() {
-		// This listener sets the enabled state of the context menu entries according to the current selection
-		viewer.addSelectionChangedListener(selChangedListener = new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				StructuredSelection sel = (StructuredSelection) event.getSelection();
-				List<RootScope> candidates = new ArrayList<RootScope> (sel.size());
-				Iterator it = sel.iterator();
-				while (it.hasNext()) {
-					Object item = it.next();
-					if (item instanceof RootScope) // Only enable action for RootScopes (not for other Scopes)
-						candidates.add((RootScope) item);
-				}
-				setRootEnabled(candidates.size() > 0);
-				setNonEmptySelectionEnabled(! sel.isEmpty());
-				setOneElementSelectedEnabled(sel.size() == 1);
-			}
-			private void setRootEnabled(boolean enabled) {
-				updateIndexAction.setEnabled(enabled);
-				rebuildIndexAction.setEnabled(enabled);
-				removeIndexAction.setEnabled(enabled);
-				listDocumentsAction.setEnabled(enabled);
-				
-			}
-			private void setNonEmptySelectionEnabled(boolean enabled) {
-				checkFlatAction.setEnabled(enabled);
-				uncheckFlatAction.setEnabled(enabled);
-				openDirectoryAction.setEnabled(enabled);
-				deleteFolderAction.setEnabled(enabled);
-			}
-			private void setOneElementSelectedEnabled(boolean enabled) {
-				createSubfolderAction.setEnabled(enabled);
-				pasteIntoFolderAction.setEnabled(enabled);
-				renameFolderAction.setEnabled(enabled);
-			}
-		});
-		
-		// Create context menu entries
-		contextMenu.add(new CreateIndexAction());
-		contextMenu.add(new Separator());
-		contextMenu.add(updateIndexAction = new UpdateIndexAction());
-		contextMenu.add(rebuildIndexAction = new RebuildIndexAction());
-		contextMenu.add(new Separator());
-		contextMenu.add(removeIndexAction = new RemoveIndexAction());
-		contextMenu.add(new Separator());
-		contextMenu.add(checkFlatAction = new CheckFlatAction(true));
-		contextMenu.add(uncheckFlatAction = new CheckFlatAction(false));
-		contextMenu.add(new Separator());
-		contextMenu.add(openDirectoryAction = new OpenDirectoryAction());
-		contextMenu.add(listDocumentsAction = new ListDocumentsAction());
-		contextMenu.add(new Separator());
-		contextMenu.add(createSubfolderAction = new CreateSubfolderAction());
-		contextMenu.add(renameFolderAction = new RenameFolderAction());
-		contextMenu.add(deleteFolderAction = new DeleteFolderAction());
-		contextMenu.add(pasteIntoFolderAction = new PasteIntoFolderAction());
-		
-		// Disable actions on startup
-		Action[] actions = new Action[] {
-				updateIndexAction, rebuildIndexAction, removeIndexAction,
-				checkFlatAction, uncheckFlatAction,
-				openDirectoryAction, listDocumentsAction, createSubfolderAction,
-				renameFolderAction, deleteFolderAction, pasteIntoFolderAction};
-		for (Action action : actions)
-			action.setEnabled(false);
-	}
-	
-	/**
 	 * Sets the RootScopes to be displayed in this widget. If you want all
 	 * viewer elements to have the same check state, use
 	 * <tt>setScopes(boolean, RootScopes[])</tt> instead, because the latter
@@ -413,7 +338,7 @@ public class ScopeGroup extends GroupWrapper {
 	public RootScope[] getRootSelection() {
 		StructuredSelection sel = (StructuredSelection) viewer.getSelection();
 		List<RootScope> selRootScopes = new ArrayList<RootScope> (sel.size());
-		Iterator it = sel.iterator();
+		Iterator<?> it = sel.iterator();
 		while (it.hasNext()) {
 			Object item = it.next();
 			if (item instanceof RootScope) // Only enable action for RootScopes (not for other Scopes)
@@ -448,53 +373,6 @@ public class ScopeGroup extends GroupWrapper {
 	}
 	
 	/**
-	 * Activates context menu entries through keyboard shortcuts.
-	 */
-	private class ScopeGroupKeys extends KeyAdapter {
-		public void keyPressed(KeyEvent e) {
-			Key key = Key.getKey(e.stateMask, e.keyCode);
-			if (key == null) return;
-			switch (key) {
-			case Insert:
-				IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
-				if (! indexingBox.addJobFromDialog())
-					indexingBox.close();
-				else
-					indexingBox.open();
-				break;
-			case Update:
-				if (updateIndexAction.isEnabled())
-					updateIndexAction.run();
-				break;
-			case Delete: 
-				if (removeIndexAction.isEnabled())
-					removeIndexAction.run();
-				break;
-			case Enter:
-				if (openDirectoryAction.isEnabled())
-					openDirectoryAction.run();
-				break;
-			case ShiftInsert:
-				if (createSubfolderAction.isEnabled())
-					createSubfolderAction.run();
-			case Rename:
-				if (renameFolderAction.isEnabled())
-					renameFolderAction.run();
-				break;
-			case ShiftDelete:
-				if (deleteFolderAction.isEnabled())
-					deleteFolderAction.run();
-				break;
-			case Paste:
-				if (pasteIntoFolderAction.isEnabled())
-					pasteIntoFolderAction.run();
-				break;
-			default: break;
-			}
-		}
-	}
-	
-	/**
 	 * Returns all <tt>Scope</tt>s in the given array of <tt>Scope</tt>s whose
 	 * corresponding directories still exist. Shows a warning message if some of
 	 * them don't exist anymore.
@@ -510,12 +388,11 @@ public class ScopeGroup extends GroupWrapper {
 				missing.add(scope);
 		}
 		if (! missing.isEmpty()) {
-			String items = "\n" + UtilList.toString(missing, "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			String items = "\n" + UtilList.toString("\n", missing); //$NON-NLS-1$ //$NON-NLS-2$
 			UtilGUI.showWarningMsg(Msg.folders_not_found_title.value(), Msg.folders_not_found.value() + items);
 		}
 		return existing.toArray(new Scope[existing.size()]);
 	}
-		
 	
 	/**
 	 * Action to add scopes to the search scope.
@@ -603,7 +480,7 @@ public class ScopeGroup extends GroupWrapper {
 		
 		public void run() {
 			IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
-			Iterator it = sel.iterator();
+			Iterator<?> it = sel.iterator();
 			Event.hold();
 			while (it.hasNext())
 				((Scope) it.next()).setChecked(checked);
@@ -800,7 +677,7 @@ public class ScopeGroup extends GroupWrapper {
 			});
 			
 			// Ask user to confirm operation
-			String msg = Msg.delete_folder_q.value() + Const.LS + UtilList.toString(scopeList, Const.LS);
+			String msg = Msg.delete_folder_q.value() + Const.LS + UtilList.toString(Const.LS, scopeList);
 			int ans = UtilGUI.showConfirmMsg(null, msg);
 			if (ans != SWT.OK) return;
 			

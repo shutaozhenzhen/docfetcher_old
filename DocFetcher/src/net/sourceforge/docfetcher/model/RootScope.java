@@ -39,6 +39,8 @@ import org.apache.lucene.index.IndexWriter;
  */
 public class RootScope extends Scope {
 	
+	static final long serialVersionUID = 1;
+	
 	/**
 	 * The Lucene Analyzer used.
 	 */

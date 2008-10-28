@@ -25,8 +25,8 @@ import net.sourceforge.docfetcher.util.UtilList;
  */
 public class ParserRegistry {
 
-	// Static use only
 	private ParserRegistry() {
+		// Static use only
 	}
 
 	/**
@@ -159,7 +159,8 @@ public class ParserRegistry {
 
 	/**
 	 * Sets which text file extensions should be used when selecting parsers for
-	 * given files.
+	 * given files. The caller should call <tt>resetExtensions()</tt> at the end
+	 * of the parse process.
 	 */
 	public static void setTextExtensions(String[] extensions) {
 		textParser.setExtensions(extensions);
@@ -167,7 +168,8 @@ public class ParserRegistry {
 
 	/**
 	 * Sets which HTML file extensions should be used when determining whether a
-	 * given file is an HTML file.
+	 * given file is an HTML file. The caller should call
+	 * <tt>resetExtensions()</tt> at the end of the parse process.
 	 */
 	public static void setHTMLExtensions(String[] extensions) {
 		htmlParser.setExtensions(extensions);

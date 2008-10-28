@@ -150,7 +150,7 @@ public class ProgressPanel extends Composite {
 		DocFetcher.getInst().getClipboard().setContents(
 				new Object[] {
 						filePaths,
-						UtilList.toString(filePaths, Const.LS)
+						UtilList.toString(Const.LS, filePaths)
 				},
 				types
 		);

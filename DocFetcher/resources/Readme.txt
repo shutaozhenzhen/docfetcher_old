@@ -1,4 +1,4 @@
-DocFetcher 0.9.5 Readme
+DocFetcher @VERSION@ Readme
 ===========================================
 
 DocFetcher is an Open Source desktop search application: It allows you to perform fast searches for all documents in a given set of folders that contain certain keywords. - You can think of it as Google for your local document repository.

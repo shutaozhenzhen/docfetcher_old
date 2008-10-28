@@ -19,6 +19,8 @@ import net.sourceforge.docfetcher.Const;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  * An enumeration for type-safe access to image files.
@@ -30,6 +32,7 @@ public enum Icon {
 	DOCFETCHER16 ("docfetcher16.png"), //$NON-NLS-1$
 	DOCFETCHER32 ("docfetcher32.png"), //$NON-NLS-1$
 	DOCFETCHER48 ("docfetcher48.png"), //$NON-NLS-1$
+	DOCFETCHER_SYSTRAY_LINUX ("docfetcher24_pink_bg.png"), //$NON-NLS-1$
 	
 	FILE ("file.gif"), //$NON-NLS-1$
 	BROWSER ("browser.gif"), //$NON-NLS-1$
@@ -69,11 +72,21 @@ public enum Icon {
 		for (int i = 0; i < iconFiles.length; i++) {
 			String name = iconFiles[i].getName();
 			ImageDescriptor descriptor = null;
-			try {
-				descriptor = ImageDescriptor.createFromURL(iconFiles[i].toURI().toURL());
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
+			
+			// Special treatment for Linux system tray icon: All its pink pixels must be made transparent
+			if (name.equals(DOCFETCHER_SYSTRAY_LINUX.filename)) {
+				ImageData imageData = new ImageData(iconFiles[i].getAbsolutePath());
+				imageData.transparentPixel = imageData.palette.getPixel(new RGB(255, 0, 255));
+				descriptor = ImageDescriptor.createFromImageData(imageData);
 			}
+			else {
+				try {
+					descriptor = ImageDescriptor.createFromURL(iconFiles[i].toURI().toURL());
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			imageRegistry.put(name, descriptor);
 		}
 	}

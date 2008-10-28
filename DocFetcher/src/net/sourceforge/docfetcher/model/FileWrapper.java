@@ -25,6 +25,8 @@ import net.sourceforge.docfetcher.parse.ParserRegistry;
  */
 public class FileWrapper extends Indexable {
 	
+	static final long serialVersionUID = 1;
+	
 	protected long lastModified;
 	
 	/**

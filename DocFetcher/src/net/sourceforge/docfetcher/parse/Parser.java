@@ -30,7 +30,10 @@ public abstract class Parser implements Comparable<Parser> {
 	public final Event evtCheckStateChanged = new Event();
 	
 	/**
-	 * Creates a document object from the given file.
+	 * Creates a document object from the given file. By default, this method
+	 * makes a call to <tt>renderText</tt>. Subclassers may reimplement it for
+	 * efficiency reasons. The output does not need be in a humanly readable
+	 * format, since all of it will be digested by the indexing engine anyway.
 	 * 
 	 * @throws ParseException
 	 *             if the parse process failed.
@@ -40,7 +43,9 @@ public abstract class Parser implements Comparable<Parser> {
 	}
 	
 	/**
-	 * Creates a String object from the given file.
+	 * Creates a String object from the given file. The returned string should
+	 * be in a humanly readable format (e.g. with line breaks), since it will be
+	 * shown in the text preview panel.
 	 * 
 	 * @throws ParseException
 	 *             if the parse process failed.
@@ -50,7 +55,7 @@ public abstract class Parser implements Comparable<Parser> {
 	/**
 	 * Returns a short, descriptive term for the type of files supported by this
 	 * parser, e.g. "HTML", "Plain Text" or "PDF". This is what the user will
-	 * see in the ParserGroup widget.
+	 * see in the file type panel.
 	 */
 	public abstract String getFileType();
 	
@@ -62,14 +67,14 @@ public abstract class Parser implements Comparable<Parser> {
 	public abstract String[] getExtensions();
 	
 	/**
-	 * Returns whether this parser is checked in the ParserGroup widget.
+	 * Returns whether this parser is checked in the file type panel.
 	 */
 	public boolean isChecked() {
 		return Pref.isChecked(getClass());
 	}
 	
 	/**
-	 * Sets whether this parser should be checked in the ParserGroup widget.
+	 * Sets whether this parser should be checked in the file type panel.
 	 */
 	public void setChecked(boolean checked) {
 		Pref.setChecked(getClass(), checked);

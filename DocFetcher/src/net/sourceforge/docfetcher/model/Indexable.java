@@ -23,6 +23,8 @@ import java.io.Serializable;
  */
 public class Indexable implements Serializable, Comparable<Indexable> {
 	
+	static final long serialVersionUID = 1;
+	
 	/**
 	 * The parent representation object.
 	 */

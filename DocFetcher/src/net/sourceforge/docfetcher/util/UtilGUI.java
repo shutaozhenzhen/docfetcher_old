@@ -297,9 +297,10 @@ public class UtilGUI {
 	}
 	
 	/**
-	 * Applying this method on the given widget will cause the all in it to be
-	 * selected if the user clicks on it after leaving another part of the GUI
-	 * or another program. The widget must be a Combo or a Text.
+	 * Applying this method on the given widget will cause all the text in it to
+	 * be selected if the user clicks on it after coming back from another part
+	 * of the GUI or another program. The widget must be a Combo or a Text
+	 * widget.
 	 */
 	public static void selectAllOnFocus(Control text) {
 		new SelectAllOnFocus(text);

@@ -221,7 +221,7 @@ public privileged aspect SearchAction {
 					results[i] = new ResultDocument(hits.doc(i), hits.score(i));
 				
 				// Get search terms (for term highlighting in the preview panel)
-				Set termsSet = new HashSet();
+				Set<Object> termsSet = new HashSet<Object>();
 				query = multiSearcher.rewrite(query);
 				query.extractTerms(termsSet);
 				final String[] terms = new String[termsSet.size()];

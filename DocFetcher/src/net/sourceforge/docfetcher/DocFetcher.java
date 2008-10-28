@@ -155,6 +155,13 @@ public class DocFetcher extends ApplicationWindow {
 		else
 			shell.setLocation(shellX, shellY);
 		
+		shell.setMaximized(Pref.Bool.ShellMaximized.value);
+
+		// Set sash weights
+		// Note: This must be done AFTER setting the maximization state of the main shell!
+		sashHorizontal.setWeights(Pref.IntArray.SashHorizontalWeights.value);
+		sashLeft.setWeights(Pref.IntArray.SashLeftWeights.value);
+		
 		/*
 		 * FIXME On GTK Linux (GNOME 2.22.3), when the user changes the shell
 		 * size and closes the program, on the next launch the shell size will
@@ -188,7 +195,6 @@ public class DocFetcher extends ApplicationWindow {
 				Icon.DOCFETCHER48.getImage(),
 		});
 		
-		shell.setMaximized(Pref.Bool.ShellMaximized.value);
 		super.configureShell(shell);
 		
 		// Replace shell minimization with sending it to the system tray
@@ -224,10 +230,6 @@ public class DocFetcher extends ApplicationWindow {
 		filterPanel.setVisible(Pref.Bool.ShowFilterPanel.value);
 		parserGroup.setParsers(ParserRegistry.getParsers());
 		scopeGroup.setScopes(true, scopeReg.getEntries());
-		
-		// Set sash weights
-		sashHorizontal.setWeights(Pref.IntArray.SashHorizontalWeights.value);
-		sashLeft.setWeights(Pref.IntArray.SashLeftWeights.value);
 		
 		/*
 		 * Enabling the sash weight handler must be delayed using a Thread;
@@ -277,7 +279,6 @@ public class DocFetcher extends ApplicationWindow {
 		return filterPanel.getVisible();
 	}
 	
-	
 	/**
 	 * Returns the application's clipboard.
 	 */
@@ -289,13 +290,13 @@ public class DocFetcher extends ApplicationWindow {
 		if (clipboard != null && ! clipboard.isDisposed())
 			clipboard.dispose();
 		
+		Pref.Bool.FirstLaunch.value = false;
+		Pref.Bool.ShellMaximized.value = getShell().getMaximized();
+		
 		// Store sash weights
 		Pref.IntArray.SashHorizontalWeights.value = sashHorizontal.getWeights();
 		Pref.IntArray.SashLeftWeights.value = sashLeft.getWeights();
 		mainPanel.saveWeights();
-
-		Pref.Bool.FirstLaunch.value = false;
-		Pref.Bool.ShellMaximized.value = getShell().getMaximized();
 		
 		// Save preferences and registries
 		try {
@@ -416,7 +417,14 @@ public class DocFetcher extends ApplicationWindow {
 		// Create and configure tray item
 		trayItem = new TrayItem (tray, SWT.NONE);
 		trayItem.setToolTipText(Const.APP_NAME);
-		trayItem.setImage(Icon.DOCFETCHER16.getImage());
+		
+		// Set system tray icon
+		if (Const.IS_LINUX)
+			// On Linux, the default 16x16px image would be too small and lack transparency
+			trayItem.setImage(Icon.DOCFETCHER_SYSTRAY_LINUX.getImage());
+		else
+			trayItem.setImage(Icon.DOCFETCHER16.getImage());
+		
 		final Menu trayMenu = new Menu(shell, SWT.POP_UP);
 		MenuItem restoreItem = new MenuItem(trayMenu, SWT.PUSH);
 		MenuItem closeItem = new MenuItem(trayMenu, SWT.PUSH);

@@ -21,6 +21,8 @@ import java.io.File;
  */
 public class FileAlreadyExistsException extends Exception {
 	
+	static final long serialVersionUID = 1;
+	
 	/**
 	 * The existing destination file that caused the move/copy operation to
 	 * fail.

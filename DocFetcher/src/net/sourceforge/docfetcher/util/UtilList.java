@@ -72,7 +72,7 @@ public class UtilList {
 	 * to strings and concatenating these strings using <code>separator</code>
 	 * as the separator character, which usually is a ", " or a line separator.
 	 */
-	public static String toString(int[] intArray, String separator) {
+	public static String toString(String separator, int... intArray) {
 		if (intArray.length == 0) return ""; //$NON-NLS-1$
 		StringBuffer sb = new StringBuffer();
 		for (int i : intArray)
@@ -86,7 +86,7 @@ public class UtilList {
 	 * strings, with <code>separator</code> as the separator character, which
 	 * usually is a ", " or a line separator.
 	 */
-	public static String toString(Object[] objects, String separator) {
+	public static <T> String toString(String separator, T... objects) {
 		if (objects.length == 0) return ""; //$NON-NLS-1$
 		StringBuffer sb = new StringBuffer();
 		for (Object object : objects)
@@ -100,7 +100,7 @@ public class UtilList {
 	 * strings, with <code>separator</code> as the separator character, which
 	 * usually is a ", " or a line separator.
 	 */
-	public static String toString(Collection<? extends Object> list, String separator) {
+	public static String toString(String separator, Collection<? extends Object> list) {
 		if (list.size() == 0) return ""; //$NON-NLS-1$
 		StringBuffer sb = new StringBuffer();
 		for (Object object : list)
@@ -111,7 +111,7 @@ public class UtilList {
 	/**
 	 * Creates a list for the given array.
 	 */
-	public static <T> List<T> toList(T[] objects) {
+	public static <T> List<T> toList(T... objects) {
 		List<T> list = new ArrayList<T> (objects.length);
 		for (T t : objects)
 			list.add(t);
@@ -234,6 +234,19 @@ public class UtilList {
 				parts.remove(parts.size() - 1);
 		}
 		return parts.toArray(new String[parts.size()]);
+	}
+	
+	/**
+	 * Reverses the elements in the given array.
+	 */
+	public static <T> void reverse(T... list) {
+		int j = list.length - 1;
+		for (int i = 0; i < list.length / 2; i++) {
+			T temp = list[i];
+			list[i] = list[j];
+			list[j] = temp;
+			j--;
+		}
 	}
 
 }

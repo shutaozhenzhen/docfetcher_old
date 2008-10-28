@@ -1,3 +1,15 @@
+@DATE@ - DocFetcher @VERSION@
+---------------------------------------------
+Bugfixes:
+  * The width of the filter panel became smaller if the program was terminated in maximized state.
+  * The maximization state of the program window was not restored correctly on restart.
+  * On Linux, the system tray icon was too small and lacked transparency.
+
+Changes:
+  * Some minor changes to the manual.
+  * On Windows, the GUI is much easier on the eyes now when the Windows classic theme is used.
+
+
 2008-10-06 - DocFetcher 0.9.5
 ---------------------------------------------
 Features:

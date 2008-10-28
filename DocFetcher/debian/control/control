@@ -1,5 +1,5 @@
 Package: docfetcher
-Version: 0.9.5
+Version: @VERSION@
 Section: utils
 Priority: optional
 Architecture: all

@@ -41,6 +41,8 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -98,7 +100,26 @@ public class PreviewPanel extends Composite {
 	public PreviewPanel(Composite parent) {
 		super(parent, SWT.NONE);
 
-		previewBar = new Composite(this, SWT.BORDER);
+		/*
+		 * On Windows, we draw our own border because 'style = SWT.BORDER' looks
+		 * awful on the classic theme (which some people still seem to use...).
+		 */
+		previewBar = new Composite(this, Const.IS_WINDOWS ? SWT.NONE : SWT.BORDER);
+		if (Const.IS_WINDOWS)
+			previewBar.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent e) {
+					Point size = previewBar.getSize();
+					e.gc.setForeground(UtilGUI.getColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+					e.gc.drawRectangle(0, 0, size.x - 1, size.y - 1);
+					e.gc.setForeground(UtilGUI.getColor(SWT.COLOR_WHITE));
+					e.gc.drawRectangle(1, 1, size.x - 3, size.y - 3);
+				}
+			});
+		FormLayout formLayout = new FormLayout();
+		if (Const.IS_WINDOWS)
+			formLayout.marginWidth = formLayout.marginHeight = 2;
+		previewBar.setLayout(formLayout);
+		
 		occurrenceCounter = new Text(previewBar, SWT.BORDER | SWT.SINGLE | SWT.CENTER | SWT.READ_ONLY);
 		occurrenceCounter.setBackground(UtilGUI.getColor(SWT.COLOR_WIDGET_BACKGROUND));
 		occurrenceCounter.setToolTipText(Msg.occurrence_count.value());
@@ -135,7 +156,6 @@ public class PreviewPanel extends Composite {
 		previewPosBt.setToolTipText(Msg.change_preview_pos.value());
 
 		// Toolbar layout
-		previewBar.setLayout(new FormLayout());
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.setMargin(0).top().bottom().right().applyTo(generalToolBar);
 		
