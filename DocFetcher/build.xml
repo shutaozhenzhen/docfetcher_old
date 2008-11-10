@@ -24,8 +24,8 @@
 				<file file="resources/help/DocFetcher_Manual.html"/>
 				<file file="resources/ChangeLog.txt"/>
 				<file file="resources/Readme.txt"/>
-				<file file="resources/debian/control/control"/>
-				<file file="resources/debian/docfetcher.desktop"/>
+				<file file="resources/deb/control/control"/>
+				<file file="resources/deb/docfetcher.desktop"/>
 			</resources>
 			<filterset>
 				<filter token="DATE" value="${DSTAMP}"/>
@@ -77,7 +77,7 @@
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher">
-			<fileset dir="resources/debian" includes="**/*.sh"/>
+			<fileset dir="resources/deb" includes="**/*.sh"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher/icons">
 			<fileset dir="resources/icons"/>
@@ -96,14 +96,14 @@
 			<filelist dir="${versiondir}" files="docfetcher.desktop"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/menu">
-			<filelist dir="resources/debian" files="docfetcher.menu"/>
+			<filelist dir="resources/deb" files="docfetcher.menu"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/pixmaps">
-			<filelist dir="resources/debian" files="docfetcher64.png"/>
+			<filelist dir="resources/deb" files="docfetcher64.png"/>
 			<globmapper from="docfetcher64.png" to="docfetcher.png"/>
 		</copy>
 		<copy todir="build/control">
-			<fileset dir="resources/debian/control" excludes="**/control"/>
+			<fileset dir="resources/deb/control" excludes="**/control"/>
 			<filelist dir="${versiondir}" files="control"/>
 		</copy>
 		<taskdef resource="org/vafer/jdeb/ant/antlib.xml">
