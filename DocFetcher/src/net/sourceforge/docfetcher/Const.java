@@ -54,11 +54,6 @@ public class Const {
 	public static final int DIALOG_STYLE = SWT.PRIMARY_MODAL | SWT.DIALOG_TRIM | SWT.MIN | SWT.MAX | SWT.RESIZE;
 	
 	/**
-	 * The name of this application.
-	 */
-	public static final String APP_NAME = "DocFetcher"; //$NON-NLS-1$
-	
-	/**
 	 * Default margin for Group widgets.
 	 */
 	public static final int GROUP_MARGIN = 5;
@@ -84,21 +79,24 @@ public class Const {
 	public static final String LS = System.getProperty("line.separator"); //$NON-NLS-1$
 	
 	/**
-	 * Name or path of the properties file where the preferences are stored.
-	 * Whether it's a name or a full path depends on whether DocFetcher was
-	 * installed as a standalone or as an installed version.
+	 * Whether this instance of DocFetcher was installed on the system or not.
 	 */
-	public static final String USER_PROPERTIES_PATH;
+	public static final Boolean isPortable;
 	
 	/**
-	 * Path of the folder where the ScopeRegistry.ser file and the index folders
-	 * will be stored. If the folder lies inside the program folder, it will be
-	 * a relative path, if not, an absolute path.
+	 * The file where the preferences are stored.
 	 */
-	public static final String INDEX_PARENT_PATH;
+	public static final File USER_PROPERTIES_FILE;
 	
 	/**
-	 * @see net.sourceforge.docfetcher.Const#INDEX_PARENT_PATH
+	 * Name of the properties file where the preferences are stored.
+	 */
+	public static final String USER_PROPERTIES_FILENAME = "user.properties"; //$NON-NLS-1$
+	
+	/**
+	 * The folder where the ScopeRegistry.ser file and the index folders will be
+	 * stored. If the folder lies inside the program folder, it will have a
+	 * relative path, if not, then an absolute path.
 	 */
 	public static final File INDEX_PARENT_FILE;
 	
@@ -120,14 +118,14 @@ public class Const {
 	 * used to store the application data.
 	 */
 	static {
-		String propsFilename = "user.properties"; //$NON-NLS-1$
-		File propFile = new File(propsFilename);
+		File propFile = new File(USER_PROPERTIES_FILENAME);
 		
-		// Standalone version
+		// Portable version
 		if (propFile.exists() && propFile.isFile()) {
-			USER_PROPERTIES_PATH = propsFilename;
-			INDEX_PARENT_PATH = "indexes"; //$NON-NLS-1$
+			USER_PROPERTIES_FILE = propFile;
+			INDEX_PARENT_FILE = new File("indexes"); //$NON-NLS-1$
 			MANUAL_PATH = "help"; //$NON-NLS-1$
+			isPortable = true;
 		}
 		// Installed version
 		else {
@@ -136,12 +134,12 @@ public class Const {
 				appDataPath = System.getenv("APPDATA") + FS + "DocFetcher"; //$NON-NLS-1$ //$NON-NLS-2$
 			else if (IS_LINUX)
 				appDataPath = System.getProperty("user.home") + FS + ".docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
-			USER_PROPERTIES_PATH = appDataPath + FS + propsFilename;
-			INDEX_PARENT_PATH = appDataPath;
+			USER_PROPERTIES_FILE = new File(appDataPath, USER_PROPERTIES_FILENAME);
+			INDEX_PARENT_FILE = new File(appDataPath);
 			MANUAL_PATH = IS_WINDOWS ? "help" : "/usr/share/doc/docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
 			new File(appDataPath).mkdirs();
+			isPortable = false;
 		}
-		INDEX_PARENT_FILE = new File(INDEX_PARENT_PATH);
 	}
 	
 	/**

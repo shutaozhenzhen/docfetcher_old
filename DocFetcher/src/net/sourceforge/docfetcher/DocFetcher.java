@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import net.sourceforge.docfetcher.Event.IObserver;
 import net.sourceforge.docfetcher.dev.ExceptionHandler;
-import net.sourceforge.docfetcher.enumeration.Font;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -74,6 +73,7 @@ import org.eclipse.swt.widgets.TrayItem;
 public class DocFetcher extends ApplicationWindow {
 	
 	private static DocFetcher docFetcher;
+	public static String appName;
 	private Composite filterPanel;
 	private SashForm sashHorizontal;
 	private SashForm sashLeft;
@@ -95,11 +95,15 @@ public class DocFetcher extends ApplicationWindow {
 	
 	private DocFetcher() {
 		super(null);
-		Display.setAppName(Const.APP_NAME);
 		addStatusLine();
 		
 		// Load preferences and scope registry
 		Pref.load();
+		appName = Pref.Str.AppName.value;
+		if (appName.trim().equals("")) //$NON-NLS-1$
+			appName = "DocFetcher"; //$NON-NLS-1$
+		
+		Display.setAppName(DocFetcher.appName);
 		scopeReg = ScopeRegistry.load();
 		
 		// Remove scope registry entries whose index folders don't exist anymore
@@ -112,7 +116,7 @@ public class DocFetcher extends ApplicationWindow {
 		 * Wipe out unregistered index folders (possibly from older
 		 * installations or program crashes).
 		 */
-		File[] indexDirs = UtilFile.getSubDirs(new File(Const.INDEX_PARENT_PATH));
+		File[] indexDirs = UtilFile.getSubDirs(Const.INDEX_PARENT_FILE);
 		for (File indexDir : indexDirs)
 			if (! scopeReg.containsIndexDir(indexDir) && indexDir.getName().matches(".*_[0-9]+")) //$NON-NLS-1$
 				UtilFile.delete(indexDir, true);
@@ -124,7 +128,7 @@ public class DocFetcher extends ApplicationWindow {
 				if (shell == null) return;
 				int cnt = scopeReg.getSubmittedJobs().length;
 				String prefix = Msg.jobs.format(cnt) + " - "; //$NON-NLS-1$
-				shell.setText((cnt == 0 ? "" : prefix) + Const.APP_NAME); //$NON-NLS-1$
+				shell.setText((cnt == 0 ? "" : prefix) + DocFetcher.appName); //$NON-NLS-1$
 			}
 		});
 		
@@ -188,7 +192,7 @@ public class DocFetcher extends ApplicationWindow {
 	}
 	
 	protected void configureShell(final Shell shell) {
-		shell.setText(Const.APP_NAME);
+		shell.setText(DocFetcher.appName);
 		shell.setImages(new Image[] {
 				Icon.DOCFETCHER16.getImage(),
 				Icon.DOCFETCHER32.getImage(),
@@ -207,7 +211,6 @@ public class DocFetcher extends ApplicationWindow {
 	
 	protected Control createContents(Composite parent) {
 		clipboard = new Clipboard(getShell().getDisplay());
-		Font.initialize();
 		
 		// Create widgets
 		Composite topContainer = new Composite(parent, SWT.NONE);
@@ -416,7 +419,7 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// Create and configure tray item
 		trayItem = new TrayItem (tray, SWT.NONE);
-		trayItem.setToolTipText(Const.APP_NAME);
+		trayItem.setToolTipText(DocFetcher.appName);
 		
 		// Set system tray icon
 		if (Const.IS_LINUX)

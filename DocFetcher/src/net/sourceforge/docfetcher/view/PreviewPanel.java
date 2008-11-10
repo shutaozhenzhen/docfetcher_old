@@ -398,7 +398,7 @@ public class PreviewPanel extends Composite {
 					+ Msg.preview_limit_hint.format(new Object[] {
 							maxLength,
 							Pref.Int.PreviewLimit.name(),
-							Const.USER_PROPERTIES_PATH
+							Const.USER_PROPERTIES_FILENAME
 					}) + "]"; //$NON-NLS-1$
 				final boolean exceeded = text.length() > maxLength;
 				if (text.length() > maxLength)

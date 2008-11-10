@@ -10,7 +10,7 @@ Classpath
 ==============================
 Custom classpath: checked
 Main class: net.sourceforge.docfetcher.DocFetcher
-Classpath: lib\*.jar
+Classpath: lib\*.jar (+ lib\windows\*.jar for the portable version)
 
 JRE
 ==============================

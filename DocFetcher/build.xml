@@ -24,8 +24,8 @@
 				<file file="resources/help/DocFetcher_Manual.html"/>
 				<file file="resources/ChangeLog.txt"/>
 				<file file="resources/Readme.txt"/>
-				<file file="debian/control/control"/>
-				<file file="debian/docfetcher.desktop"/>
+				<file file="resources/debian/control/control"/>
+				<file file="resources/debian/docfetcher.desktop"/>
 			</resources>
 			<filterset>
 				<filter token="DATE" value="${DSTAMP}"/>
@@ -57,12 +57,6 @@
 		</jar>
 		<delete dir="build/tmp"/>
 	</target>
-
-	<target name="fixcrlf.windows" depends="versionize">
-		<fixcrlf file="${versiondir}/ChangeLog.txt" eol="crlf"/>
-		<fixcrlf file="${versiondir}/Readme.txt" eol="crlf"/>
-		<fixcrlf srcdir="${versiondir}/licenses" eol="crlf"/>
-	</target>
 	
 	<target name="fixcrlf.linux" depends="versionize">
 		<fixcrlf file="${versiondir}/ChangeLog.txt" eol="lf"/>
@@ -70,42 +64,10 @@
 		<fixcrlf srcdir="${versiondir}/licenses" eol="lf"/>
 	</target>
 	
-	<target name="deploy.linux" depends="compile, fixcrlf.linux"
-		description="Build standalone Linux release">
-		<copy todir="${programdir}/lib">
-			<fileset dir="lib" includes="**/*.jar, **/*.so" excludes="**/*win32*.jar"/>
-			<filelist dir="build" files="${jar.name}"/>
-		</copy>
-		<copy todir="${programdir}" flatten="true">
-			<resources>
-				<file file="resources/DocFetcher.sh"/>
-				<file file="resources/user.properties"/>
-				<file file="${versiondir}/ChangeLog.txt"/>
-				<file file="${versiondir}/Readme.txt"/>
-			</resources>
-		</copy>
-		<copy todir="${programdir}/icons">
-			<fileset dir="resources/icons"/>
-		</copy>
-		<copy todir="${programdir}/licenses">
-			<fileset dir="${versiondir}/licenses"/>
-		</copy>
-		<copy todir="${programdir}/help/DocFetcher_Manual_files">
-			<fileset dir="resources/help/DocFetcher_Manual_files"/>
-		</copy>
-		<copy file="${versiondir}/DocFetcher_Manual.html" todir="${programdir}/help"/>
-		<property name="linux.archive" value="docfetcher_${version}_linux_gtk"/>
-		<tar destfile="build/${linux.archive}.tar">
-			<tarfileset dir="build/tmp" mode="755">
-				<include name="**/*.sh"/>
-			</tarfileset>
-			<tarfileset dir="build/tmp">
-				<exclude name="**/*.sh"/>
-			</tarfileset>
-		</tar>
-		<gzip zipfile="build/${linux.archive}.tar.gz" src="build/${linux.archive}.tar"/>
-		<delete dir="build/tmp"/>
-		<delete file="build/${linux.archive}.tar"/>
+	<target name="fixcrlf.windows" depends="versionize">
+		<fixcrlf file="${versiondir}/ChangeLog.txt" eol="crlf"/>
+		<fixcrlf file="${versiondir}/Readme.txt" eol="crlf"/>
+		<fixcrlf srcdir="${versiondir}/licenses" eol="crlf"/>
 	</target>
 	
 	<target name="deploy.linux.deb" depends="compile, fixcrlf.linux"
@@ -115,7 +77,7 @@
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher">
-			<fileset dir="debian" includes="**/*.sh"/>
+			<fileset dir="resources/debian" includes="**/*.sh"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher/icons">
 			<fileset dir="resources/icons"/>
@@ -134,14 +96,14 @@
 			<filelist dir="${versiondir}" files="docfetcher.desktop"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/menu">
-			<filelist dir="debian" files="docfetcher.menu"/>
+			<filelist dir="resources/debian" files="docfetcher.menu"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/pixmaps">
-			<filelist dir="debian" files="docfetcher64.png"/>
+			<filelist dir="resources/debian" files="docfetcher64.png"/>
 			<globmapper from="docfetcher64.png" to="docfetcher.png"/>
 		</copy>
 		<copy todir="build/control">
-			<fileset dir="debian/control" excludes="**/control"/>
+			<fileset dir="resources/debian/control" excludes="**/control"/>
 			<filelist dir="${versiondir}" files="control"/>
 		</copy>
 		<taskdef resource="org/vafer/jdeb/ant/antlib.xml">
@@ -156,15 +118,24 @@
 		<delete dir="build/control"/>
 	</target>
 	
-	<target name="deploy.windows" depends="compile, fixcrlf.windows"
-		description="Build standalone Windows release">
+	<target name="deploy.portable" depends="compile, fixcrlf.windows"
+		description="Build portable Windows/Linux hybrid release">
 		<copy todir="${programdir}/lib">
-			<fileset dir="lib" includes="**/*.jar, **/*.dll" excludes="**/*linux*.jar"/>
+			<fileset dir="lib" includes="**/*.jar, **/*.dll, **/*.so" excludes="**/*linux*.jar, **/*win32*.jar"/>
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
+		<copy todir="${programdir}/lib/windows">
+			<fileset dir="lib" includes="**/*win32*.jar"/>
+		</copy>
+		<copy todir="${programdir}/lib/linux">
+			<fileset dir="lib" includes="**/*linux*.jar"/>
+		</copy>
 		<copy todir="${programdir}">
-			<fileset dir="resources" includes="icons/*, **/*.bat, **/*.exe, user.properties"/>
+			<fileset dir="resources" includes="icons/*, user.properties"/>
 			<fileset dir="${versiondir}" includes="**/*.txt"/>
+		</copy>
+		<copy todir="${programdir}">
+			<fileset dir="resources/portable"/>
 		</copy>
 		<copy todir="${programdir}/help">
 			<fileset dir="resources/help" excludes="DocFetcher_Manual.html"/>
@@ -173,7 +144,7 @@
 		<copy todir="${programdir}/licenses">
 			<fileset dir="${versiondir}/licenses"/>
 		</copy>
-		<zip destfile="build/docfetcher_${version}_win32.zip" basedir="build/tmp"/>
+		<zip destfile="build/docfetcher_${version}_portable.zip" basedir="build/tmp"/>
 		<delete dir="build/tmp"/>
 	</target>
 	
@@ -192,7 +163,8 @@
 		<delete dir="build/tmp"/>
 	</target>
 	
-	<target name="deploy.all" depends="deploy.linux, deploy.linux.deb, deploy.windows, deploy.source"
-		description="Build for all supported end users"/>
+	<target name="deploy.all"
+		depends="deploy.linux.deb, deploy.portable, deploy.source"
+		description="Build all, except for the Windows installer"/>
 	
 </project>

@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilGUI;
@@ -101,6 +102,7 @@ public class Pref {
 	}
 
 	public static enum Str {
+		AppName (""), //$NON-NLS-1$
 		DateFormat (""), //$NON-NLS-1$
 		ExclusionFilter (""), //$NON-NLS-1$
 		PreviewFontWin ("Verdana"), //$NON-NLS-1$
@@ -181,7 +183,7 @@ public class Pref {
 	 * Loads the preferences from the preferences file.
 	 */
 	public static void load() {
-		File propFile = new File(Const.USER_PROPERTIES_PATH);
+		File propFile = Const.USER_PROPERTIES_FILE;
 		try {
 			propFile.createNewFile();
 			FileInputStream inStream = new FileInputStream(propFile);
@@ -256,8 +258,8 @@ public class Pref {
 					checkPrefix + checkEntry.getKey().getSimpleName(),
 					checkEntry.getValue().toString()
 			);
-		FileWriter writer = new FileWriter(Const.USER_PROPERTIES_PATH, false);
-		writer.write("#" + Const.APP_NAME + " preferences" + Const.LS); //$NON-NLS-1$ //$NON-NLS-2$
+		FileWriter writer = new FileWriter(Const.USER_PROPERTIES_FILE, false);
+		writer.write("#" + DocFetcher.appName + " preferences" + Const.LS); //$NON-NLS-1$ //$NON-NLS-2$
 		writer.write("#" + "Only modify this if you know what you're doing" + Const.LS); //$NON-NLS-1$ //$NON-NLS-2$
 		writer.write("#" + new Date().toString() + Const.LS); //$NON-NLS-1$
 		String lastKey = props.lastKey();

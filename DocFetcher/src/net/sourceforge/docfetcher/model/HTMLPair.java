@@ -17,10 +17,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.parse.HTMLParser;
 import net.sourceforge.docfetcher.parse.ParseException;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilList;
 
 /**
@@ -102,7 +104,7 @@ public class HTMLPair extends FileWrapper {
 //Recursive structure that keeps track of the modified states of all files under it
 class Modifiable implements Serializable {
 	
-	static final long serialVersionUID = 1;
+	static final long serialVersionUID = 2;
 	
 	private RootScope root;
 	private File file;
@@ -111,7 +113,7 @@ class Modifiable implements Serializable {
 	
 	Modifiable (RootScope root, File file) {
 		this.root = root;
-		this.file = file;
+		this.file = UtilFile.getRelativeFile(Const.PROGRAM_FOLDER, file);
 		if (file.isDirectory()) {
 			children = new ArrayList<Modifiable> ();
 			for (File subFile : file.listFiles())

@@ -18,9 +18,8 @@ runs inside a so-called "Java Virtual Machine", which has a limit on
 the amount of RAM it's allowed to use - commonly known as the "maximum
 heap size". If the document is too big, this limit is reached, and the
 indexing fails. You can increase the limit by changing the program
-start parameters.&nbsp;The file to be modified depends on the version of DocFetcher you're running:</p><ul><li>Standalone Windows: DocFetcher.bat - in the directory to which DocFetcher was extracted.</li><li>Standalone Linux: DocFetcher.sh - in the directory to which DocFetcher was extracted.</li><li>Installed
-Windows: DocFetcher.bat - in the program folder to which DocFetcher was
-installed (e.g. "c:\program files\docfetcher").</li><li>Installed Linux: DocFetcher.sh - in /usr/share/docfetcher. You will need write permission though.</li></ul>All
+start parameters.&nbsp;The file to be modified depends on the version of DocFetcher you're running:<br></p><ul><li>Windows: DocFetcher.bat - in the program folder to which DocFetcher was
+installed (e.g. "c:\program files\docfetcher").</li><li>Linux: DocFetcher.sh - in /usr/share/docfetcher. You will need write permission though.</li><li>Portable: DocFetcher.bat and DocFetcher.sh  - in the directory to which DocFetcher was extracted.</li></ul>All
 these files end with a line that starts with&nbsp;"java -cp". Insert
 "-Xmx256m"&nbsp;between "java" and "-cp". This will increase the
 maximum heap size to 256 MB, which should be sufficient for almost all cases. Now

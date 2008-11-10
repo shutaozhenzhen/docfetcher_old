@@ -91,9 +91,8 @@ public class RootScope extends Scope {
 	 */
 	public RootScope(File file) {
 		super(null, file);
-		String indexParentPath = Const.INDEX_PARENT_PATH;
 		id = UtilFile.getUniqueID();
-		indexDir = new File(indexParentPath, file.getName() + "_" + id); //$NON-NLS-1$
+		indexDir = new File(Const.INDEX_PARENT_FILE, file.getName() + "_" + id); //$NON-NLS-1$
 	}
 
 	/**
@@ -463,14 +462,9 @@ public class RootScope extends Scope {
 				else if (ParserRegistry.getSingleFileParser(entry) != null)
 					files.add(entry);
 			}
-			else if (entry.isDirectory()) {
-				// Make sure we don't index our own files
-				if (entry.equals(Const.INDEX_PARENT_FILE) ||
-						entry.equals(Const.PROGRAM_FOLDER)) {
-					continue;
-				}
+			// Make sure we don't index the index files themselves
+			else if (entry.isDirectory() && ! entry.equals(Const.INDEX_PARENT_FILE))
 				directories.add(entry);
-			}
 		}
 
 	}

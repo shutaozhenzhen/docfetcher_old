@@ -14,6 +14,9 @@ package net.sourceforge.docfetcher.model;
 import java.io.File;
 import java.io.Serializable;
 
+import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.util.UtilFile;
+
 /**
  * A representation of a file from the document repository. It is used as a
  * "snapshot" and stored on disk so that changes in the document repository can
@@ -23,7 +26,7 @@ import java.io.Serializable;
  */
 public class Indexable implements Serializable, Comparable<Indexable> {
 	
-	static final long serialVersionUID = 1;
+	static final long serialVersionUID = 2;
 	
 	/**
 	 * The parent representation object.
@@ -40,7 +43,7 @@ public class Indexable implements Serializable, Comparable<Indexable> {
 	 * @param file The file represented by this object
 	 */
 	public Indexable(Scope parent, File file) {
-		this.file = file;
+		this.file = UtilFile.getRelativeFile(Const.PROGRAM_FOLDER, file);
 		this.parent = parent;
 		if (file == null)
 			throw new IllegalArgumentException("The file must not be null."); //$NON-NLS-1$
@@ -71,7 +74,7 @@ public class Indexable implements Serializable, Comparable<Indexable> {
 	 * @param The file represented by this object
 	 */
 	public void setFile(File file) {
-		this.file = file;
+		this.file = UtilFile.getRelativeFile(Const.PROGRAM_FOLDER, file);
 	}
 
 	public int compareTo(Indexable other) {

@@ -248,5 +248,15 @@ public class UtilList {
 			j--;
 		}
 	}
+	
+	/**
+	 * Returns if the given target string starts with one of the given prefixes.
+	 */
+	public static boolean startsWith(String target, String... prefixes) {
+		for (String prefix : prefixes)
+			if (target.startsWith(prefix))
+				return true;
+		return false;
+	}
 
 }

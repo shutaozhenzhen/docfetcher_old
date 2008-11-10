@@ -395,8 +395,7 @@ public class ScopeRegistry implements Serializable {
 	public static ScopeRegistry load() {
 		if (instance != null) return instance;
 		try {
-			File indexParentFile = new File(Const.INDEX_PARENT_PATH);
-			instance = (ScopeRegistry) Serializer.load(ScopeRegistry.class, indexParentFile);
+			instance = (ScopeRegistry) Serializer.load(ScopeRegistry.class, Const.INDEX_PARENT_FILE);
 		} catch (IOException e) {
 		} catch (ClassNotFoundException e) {
 		}
@@ -419,8 +418,7 @@ public class ScopeRegistry implements Serializable {
 	 *             if the write process failed.
 	 */
 	public void save() throws IOException {
-		File indexParentFile = new File(Const.INDEX_PARENT_PATH);
-		Serializer.save(this, indexParentFile);
+		Serializer.save(this, Const.INDEX_PARENT_FILE);
 	}
 	
 }

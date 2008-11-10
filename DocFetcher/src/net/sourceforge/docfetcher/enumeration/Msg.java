@@ -30,6 +30,7 @@ public enum Msg {
 	system_error,
 	read_error,
 	write_error,
+	write_warning,
 	yes,
 	no,
 	ok,

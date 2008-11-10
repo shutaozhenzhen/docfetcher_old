@@ -10,7 +10,7 @@
 	<classpathentry kind="lib" path="lib/FontBox-0.1.0-dev.jar"/>
 	<classpathentry kind="lib" path="lib/jnotify-0.91.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher 0.9.5/lib"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher/lib"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl1_3.2.0.v200606220026.jar"/>
@@ -24,7 +24,7 @@
 	<classpathentry kind="lib" path="lib/odf-utils-20051129.jar"/>
 	<classpathentry kind="lib" path="lib/chm4j.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher 0.9.5/lib"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher/lib"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/lucene-core-2.3.2.jar">

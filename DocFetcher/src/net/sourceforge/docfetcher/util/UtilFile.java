@@ -381,6 +381,19 @@ public class UtilFile {
 		}
 		return sum;
 	}
+	
+	/**
+	 * Tries to return the file separator used in the given path (either Linux
+	 * or Windows). If the given path contains to file separator, a Windows file
+	 * separator is returned.
+	 */
+	public static String getFS(String path) {
+		if (path.contains("/")) //$NON-NLS-1$
+			return "/"; //$NON-NLS-1$
+		else if (path.contains("\\")) //$NON-NLS-1$
+			return "\\"; //$NON-NLS-1$
+		return Const.FS;
+	}
 
 	/**
 	 * Returns true if the folder given by the absolute path in <tt>dirPath</tt>
@@ -388,8 +401,9 @@ public class UtilFile {
 	 * absolute path <tt>dirOrFilePath</tt>.
 	 */
 	public static boolean contains(String dirPath, String dirOrFilePath) {
-		String[] parts1 = UtilList.split(dirPath, Const.FS, true);
-		String[] parts2 = UtilList.split(dirOrFilePath, Const.FS, true);
+		String fs = getFS(dirPath);
+		String[] parts1 = UtilList.split(dirPath, fs, true);
+		String[] parts2 = UtilList.split(dirOrFilePath, fs, true);
 		if (parts1.length >= parts2.length)
 			return false;
 		for (int i = 0; i < parts1.length; i++)
@@ -412,8 +426,9 @@ public class UtilFile {
 	 * <tt>dirOrFilePath</tt>.
 	 */
 	public static boolean containsDirect(String dirPath, String dirOrFilePath) {
-		String[] parts1 = UtilList.split(dirPath, Const.FS, true);
-		String[] parts2 = UtilList.split(dirOrFilePath, Const.FS, true);
+		String fs = getFS(dirPath);
+		String[] parts1 = UtilList.split(dirPath, fs, true);
+		String[] parts2 = UtilList.split(dirOrFilePath, fs, true);
 		if (parts1.length + 1 != parts2.length)
 			return false;
 		for (int i = 0; i < parts1.length; i++)
@@ -421,41 +436,69 @@ public class UtilFile {
 				return false;
 		return true;
 	}
-
+	
 	/**
-	 * Returns the path component of the absolute path <tt>fileOrDirPath</tt>
-	 * relative to its (direct or indirect) parent <tt>parentPath</tt>. Example:
-	 * If <tt>parentPath</tt> is "/media/mydevice/" and <tt>fileOrDirPath</tt>
-	 * is "/media/mydevice/mydocuments/mydoc.html", then
-	 * "mydocuments/mydoc.html" is returned. <p>
-	 * The method returns null if <tt>parentPath</tt> is not the parent of
-	 * <tt>fileOrDirPath</tt>.
+	 * If <tt>fileOrDir</tt> is a file inside the folder <tt>parentFile</tt>,
+	 * this method returns a file object whose path is relative to
+	 * <tt>parentFile</tt>.
+	 * <p>
+	 * Example: If the path of <tt>parentFile</tt> is "/media/mydevice/" and the
+	 * path of <tt>fileOrDir</tt> is "/media/mydevice/mydocuments/mydoc.html",
+	 * then a file whose path is "mydocuments/mydoc.html" is returned.
+	 * <p>
+	 * The method returns <tt>fileOrDir</tt> itself if that file is not
+	 * contained in <tt>parentFile</tt> or if <tt>parentFile</tt> is not a
+	 * directory.
 	 */
-	public static String getRelPath(String parentPath, String fileOrDirPath) {
-		if (! UtilFile.contains(parentPath, fileOrDirPath))
-			return null;
-		String relPath = fileOrDirPath.substring(parentPath.length());
-		if (relPath.startsWith(Const.FS))
-			return relPath.substring(1);
-		return relPath;
+	public static File getRelativeFile(File parentFile, File fileOrDir) {
+		if (! parentFile.isDirectory() || ! contains(parentFile, fileOrDir))
+			return fileOrDir;
+		int beginIndex = parentFile.getAbsolutePath().length() + 1;
+		return new File(fileOrDir.getAbsolutePath().substring(beginIndex));
 	}
 
 	/**
-	 * Returns an absolute path for the given relative file path, assuming the
-	 * latter is given relative to the current working directory. The result
-	 * won't be correct if the given path string is absolute.
+	 * Returns the path component of the absolute path <tt>fileOrDirPath</tt>
+	 * relative to its (direct or indirect) parent <tt>parentPath</tt>.
+	 * <p>
+	 * Example: If <tt>parentPath</tt> is "/media/mydevice/" and
+	 * <tt>fileOrDirPath</tt> is "/media/mydevice/mydocuments/mydoc.html", then
+	 * "mydocuments/mydoc.html" is returned.
+	 * <p>
+	 * The method returns <tt>fileOrDirPath</tt> itself if <tt>parentPath</tt>
+	 * is not the parent of <tt>fileOrDirPath</tt>.
 	 */
-	public static String getAbsPath(String relativePath) {
-		return UtilFile.join(Const.USER_DIR, relativePath);
+	public static String getRelativePath(String parentPath, String fileOrDirPath) {
+		if (! UtilFile.contains(parentPath, fileOrDirPath))
+			return fileOrDirPath;
+		String relPath = fileOrDirPath.substring(parentPath.length());
+		/*
+		 * Remove preceding file separator; both Linux and Windows file
+		 * separators can occur here if we're running the Linux-Windows hybrid
+		 * version of DocFetcher.
+		 */
+		if (UtilList.startsWith(relPath, Const.FS, "/", "\\")) //$NON-NLS-1$ //$NON-NLS-2$
+			return relPath.substring(1);
+		return relPath;
+	}
+	
+	/**
+	 * Returns the path of <tt>file</tt> relative to the current working directory.
+	 * 
+	 * @see #getRelativePath(String, String)
+	 */
+	public static String getRelativePath(File file) {
+		return getRelativePath(Const.PROGRAM_FOLDER.getAbsolutePath(), file.getAbsolutePath());
 	}
 
 	/**
 	 * Returns the concatenation of two filepath strings.
 	 */
 	public static String join(String parentPath, String childPath) {
-		if (! parentPath.endsWith(Const.FS))
-			parentPath += Const.FS;
-		if (! childPath.startsWith(Const.FS))
+		String fs = getFS(parentPath);
+		if (! parentPath.endsWith(fs))
+			parentPath += fs;
+		if (! childPath.startsWith(fs))
 			return parentPath + childPath;
 		return parentPath + childPath.substring(1);
 	}

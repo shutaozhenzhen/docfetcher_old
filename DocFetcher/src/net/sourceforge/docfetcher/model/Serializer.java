@@ -25,7 +25,7 @@ import java.io.ObjectOutputStream;
  * 
  * @author Tran Nam Quang
  */
-class Serializer {
+public class Serializer {
 
 	/**
 	 * Loads and returns the serialized instance of the given class if one was

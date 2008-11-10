@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.model;
 
 import java.io.File;
 
+import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilFile;
@@ -136,11 +137,11 @@ public class Document {
 	public Document setFile(File file) {
 		if (file == null)
 			throw new IllegalArgumentException("The document file must not be null."); //$NON-NLS-1$
-		this.file = file;
+		this.file = UtilFile.getRelativeFile(Const.PROGRAM_FOLDER, file);
 		luceneDoc.removeFields(lastModified);
 		luceneDoc.removeFields(path);
 		luceneDoc.add(new Field(lastModified, String.valueOf(file.lastModified()), Store.YES, Index.NO));
-		luceneDoc.add(new Field(path, file.getAbsolutePath(), Store.YES, Index.NO));
+		luceneDoc.add(new Field(path, UtilFile.getRelativePath(file), Store.YES, Index.NO));
 		return this;
 	}
 	
