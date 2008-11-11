@@ -12,7 +12,7 @@
 <body style="max-width: 640px; margin-left: auto; margin-right: auto; font-family: Helvetica; font-style: normal; font-variant: normal; font-weight: normal; font-size: 95%; line-height: normal; font-size-adjust: none; font-stretch: normal;">
 <div id="main" style="margin-bottom: 30px;">
 <h1><span style="font-family: monospace;"></span>
-Building DocFetcher<br></h1><ul><li>There are two ways to build all releases except for the Windows installer: If you want to build them inside
+Building DocFetcher<br></h1><ul><li>There are two ways to build all releases <span style="font-style: italic;">except</span> for the Windows installer: If you want to build them inside
 Eclipse, you first have to import DocFetcher as a new
 project into your Eclipse workspace by following the steps described in
 the&nbsp;section&nbsp;"Setting up DocFetcher in Eclipse". The second option is to
@@ -26,7 +26,7 @@ the newly created DocFetcher project. Now you should be able to run the
 Ant build script.</li><li>To build the Windows installer, boot into Windows, install <a href="http://nsis.sourceforge.net/">NSIS</a>
 and
 execute build-win-installer.nsi. Important: The NSIS script must be run
-after running the Ant script, because the source code cannot be
+<span style="font-style: italic;">after</span> running the Ant script, because the source code cannot be
 compiled with NSIS alone.</li><li>The output of both build scripts will go to the build folder (which will be created if it doesn't exist).</li><li>To
 increment the version number of DocFetcher, update the line "!define
 VERSION ???" at the beginning of the NSIS script and the line
@@ -59,23 +59,28 @@ in the Eclipse preferences you can set the JDK compliance level to
 1.5.0. With a 1.6.0 compliance level Eclipse may refuse to compile the
 program.</li>
 <li>Set up the referenced libraries. Make sure the correct SWT
-library is on the classpath (there's two of them, one for Windows and
-one for Linux).</li>
+library is on the classpath. There's two of them, <span style="font-family: monospace;">swt-xxx-win32.jar</span> and <span style="font-family: monospace;">swt-xxx-linux-gtk.jar</span>.
+If you're running on Windows, the first one should be on the classpath,
+for Linux, it's the second one. It won't work if you have both of them
+on the classpath.</li><ul><li>To remove a library from the classpath,
+right-click on the appropriate jar file under the entry "Referenced
+Libraries" in Eclipse's "Package" panel and select <span style="font-family: monospace;">Build Path &gt; Remove from Build Path</span>.</li><li>To add a library to the classpath, right-click on the jar file in the lib folder (also on the "Package" panel) and select <span style="font-family: monospace;">Build Path &gt; Add to Build Path</span>.</li></ul>
 <li>Create a new run configuration: <span style="font-family: monospace;">Run &gt; Run
 Configurations...</span>.
 The working directory of this configuration has to be set to
-DocFetcher/bin (instead of DocFetcher), because the application will
-look for the icons folder, which is located inside DocFetcher/bin. Now
-try to run DocFetcher with this run configuration.</li>
-<li>If you're able to compile, but can't run
-and instead get an error message like "Exception in main", without a
-stacktrace, disable the custom ExceptionHandler by changing the first
-line in <span style="font-family: monospace;">net.sourceforge.docfetcher.DocFetcher.main</span> to this: <span style="font-family: monospace;"><span style="font-family: Helvetica;">E</span>xceptionHandler.setEnabled(false);</span></li><li>If you see this error message: "<span style="font-family: monospace;">Exception in thread "main" java.lang.UnsatisfiedLinkError: no
+<span style="font-family: monospace;">DocFetcher/bin</span> (instead of <span style="font-family: monospace;">DocFetcher</span>), because the application will
+look for the icons folder, which is located inside <span style="font-family: monospace;">DocFetcher/bin</span>. Now
+try to run DocFetcher with this run configuration.</li><li>If you see an error message resembling this one: "<span style="font-family: monospace;">Exception in thread "main" java.lang.UnsatisfiedLinkError: no
 swt-gtk-3448 or swt-gtk in swt.library.path, java.library.path or the
-jar file</span>" that means you haven't put the correct SWT library on your classpath.</li></ul><h1>What's inside the all the folders</h1><ul><li>project root: This file, the build scripts and files related to the build scripts (i.e. Ant tasks).</li><li>src: The source code.</li><li>resources: Everything that will be shipped with the release builds.</li><ul><li>deb: Files related to the debian package.</li><li>help: The manual.</li><li>icons: The image files used by the program.</li><li>licenses: License information for all libraries used.</li><li>portable: Files related to the portable version.</li><li>windows: Files related to the Windows version.</li></ul><li>build:
+jar file</span>" that means you haven't put the correct SWT library on your classpath.</li></ul><h1>What's inside&nbsp;all the folders</h1><ul><li>project root: This file, the build scripts and files related to the build scripts (i.e. Ant tasks).</li><li>src: The source code.</li><li>resources: Everything that will be shipped with the release builds.</li><ul><li>deb: Files related to the debian package.</li><li>help: The manual.</li><li>icons: The image files used by the program.</li><li>licenses: License information for all libraries used.</li><li>portable: Files related to the portable version.</li><li>windows: Files related to the Windows version.</li></ul><li>build:
 This is where the output of the build scripts goes to. Warning: Don't
 put anything of value into this folder, it will be deleted when running
-the Ant build script.</li><li>dev: Development related resources, such as Python scripts and SVG vector graphic files.</li><li>lib: All libraries used by DocFetcher, including native libraries.</li><li>website: The files the <a href="http://docfetcher.sourceforge.net/">project website</a> consists of.</li></ul></div>
+the Ant build script.</li><li>dev:
+Development related resources, such as Python scripts and&nbsp;vector
+graphics.&nbsp;The Python scripts should be run from a command prompt
+and are used for analyzing and safely manipulating certain parts
+of&nbsp;the source code. Each of them contains some descriptive lines
+at the beginning.</li><li>lib: All libraries used by DocFetcher, including native libraries (*.so and *.dll).</li><li>website: The files the <a href="http://docfetcher.sourceforge.net/">project website</a> consists of.</li></ul></div>
 <div class="footer" style="border-top: 3px solid gray; color: rgb(128, 128, 128); text-align: center; padding-top: 10px;">DocFetcher
 Developer Readme - Copyright (c) 2007-2008 Tran Nam Quang
 </div>

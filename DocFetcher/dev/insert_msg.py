@@ -1,5 +1,15 @@
 #! /usr/bin/python
 
+'''
+Inserts a new message entry into the class net.sourceforge.docfetcher.enumeration.Msg
+and into all resource bundle files. The insertion position can be specified with an
+existing message entry and a prefix "after" or "before".
+
+Usage examples:
+insert_msg.py after some_entry new_entry
+insert_msg.py before some_entry new_entry
+'''
+
 import sys, os, os.path
 from os.path import join, split
 

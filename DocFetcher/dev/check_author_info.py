@@ -1,11 +1,11 @@
 #! /usr/bin/python
 
-import os, os.path, re
-from os.path import join, split
-
 """
 This script searches for source files that do not contain an '@author' tag.
 """
+
+import os, os.path, re
+from os.path import join, split
 
 # Go up one level
 project_root = split(os.getcwd())[0]

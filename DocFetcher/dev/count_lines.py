@@ -1,5 +1,9 @@
 #! /usr/bin/python
 
+'''
+Simple script for counting source code lines.
+'''
+
 import os
 from os.path import join, split
 

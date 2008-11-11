@@ -1,3 +1,5 @@
+These are the settings used for creating a Windows launcher with Launch4J.
+
 Basic
 ==============================
 Jar runtime path: lib\
@@ -10,7 +12,8 @@ Classpath
 ==============================
 Custom classpath: checked
 Main class: net.sourceforge.docfetcher.DocFetcher
-Classpath: lib\*.jar (+ lib\windows\*.jar for the portable version)
+Classpath: lib\*.jar
+	(lib\windows\*.jar in addition to that for the portable version)
 
 JRE
 ==============================

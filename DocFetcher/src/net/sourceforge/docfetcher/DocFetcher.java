@@ -86,7 +86,6 @@ public class DocFetcher extends ApplicationWindow {
 	private FSEventHandler fsEventHandler;
 
 	public static void main(String[] args) {
-		ExceptionHandler.setEnabled(true);
 		docFetcher = new DocFetcher();
 		docFetcher.setBlockOnOpen(true);
 		docFetcher.open();
@@ -263,6 +262,13 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// Move text cursor to search box
 		mainPanel.focusSearchBox();
+		
+		/*
+		 * Do this at the end so developers can see a stacktrace in the Eclipse
+		 * console if they haven't set up the run configuration appropriately.
+		 */
+		ExceptionHandler.setEnabled(true);
+		
 		return topContainer;
 	}
 	
