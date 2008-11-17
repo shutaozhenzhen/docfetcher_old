@@ -1,0 +1,21 @@
+These are the settings used for creating a Windows launcher with Launch4J.
+
+Basic
+==============================
+Jar runtime path: lib\
+Don't wrap the jar, launch only: checked
+Icon: (Path to ico-file)
+Change dir: .
+Java download URL: http://java.com
+
+Classpath
+==============================
+Custom classpath: checked
+Main class: net.sourceforge.docfetcher.DocFetcher
+Classpath: lib\*.jar
+	(lib\windows\*.jar in addition to that for the portable version)
+
+JRE
+==============================
+Min JRE version: 1.5.0
+JVM options: -Djava.library.path="lib"
