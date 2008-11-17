@@ -28,8 +28,10 @@ import net.sourceforge.docfetcher.util.UtilFile;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.MultiReader;
 
 /**
  * An object representation for top-level-directories in the search scope.
@@ -69,11 +71,11 @@ public class RootScope extends Scope {
 	
 	private boolean detectHTMLPairs = true;
 	
-	private String[] textExtensions = Pref.StrArray.TextExtensions.value;
+	private String[] textExtensions = Pref.StrArray.TextExtensions.value();
 	
-	private String[] htmlExtensions = Pref.StrArray.HTMLExtensions.value;
+	private String[] htmlExtensions = Pref.StrArray.HTMLExtensions.value();
 	
-	private String[] exclusionFilters = Pref.Str.ExclusionFilter.value.split("\\s*\\$+\\s*"); //$NON-NLS-1$
+	private String[] exclusionFilters = Pref.Str.ExclusionFilter.value().split("\\s*\\$+\\s*"); //$NON-NLS-1$
 	
 	private List<ParseException> parseExceptions = new ArrayList<ParseException> ();
 	
@@ -570,6 +572,29 @@ public class RootScope extends Scope {
 	 */
 	public void setFinishedWithErrors(boolean finishedWithErrors) {
 		this.finishedWithErrors = finishedWithErrors || ! parseExceptions.isEmpty();
+	}
+	
+	/**
+	 * Returns all documents under the given <tt>RootScope</tt>s.
+	 */
+	public static ResultDocument[] listDocuments(RootScope[] rootScopes) {
+		try {
+			IndexReader[] readers = new IndexReader[rootScopes.length];
+			for (int i = 0; i < rootScopes.length; i++)
+				readers[i] = IndexReader.open(rootScopes[i].getIndexDir());
+			MultiReader multiReader = new MultiReader(readers);
+			ResultDocument[] docs = new ResultDocument[multiReader.numDocs()];
+			for (int i = 0; i < multiReader.numDocs(); i++)
+				docs[i] = new ResultDocument(multiReader.document(i), 0);
+			multiReader.close();
+			return docs;
+		} catch (CorruptIndexException e) {
+			e.printStackTrace();
+			return new ResultDocument[0];
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ResultDocument[0];
+		}
 	}
 
 }

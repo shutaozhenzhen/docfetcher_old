@@ -145,13 +145,13 @@ public class PreviewPanel extends Composite {
 		ToolItem helpBt = new ToolItem(generalToolBar, SWT.FLAT);
 		helpBt.setImage(Icon.HELP.getImage());
 		helpBt.setToolTipText(Msg.open_manual.value());
-		helpBt.setSelection(Pref.Bool.ShowWelcomePage.value);
+		helpBt.setSelection(Pref.Bool.ShowWelcomePage.getValue());
 		final ToolItem htmlPreviewBt = new ToolItem(generalToolBar, SWT.FLAT | SWT.CHECK);
 		htmlPreviewBt.setImage(Icon.BROWSER.getImage());
-		htmlPreviewBt.setSelection(Pref.Bool.PreviewHTML.value);
+		htmlPreviewBt.setSelection(Pref.Bool.PreviewHTML.getValue());
 		htmlPreviewBt.setToolTipText(Msg.use_embedded_html_viewer.value());
 		final ToolItem previewPosBt = new ToolItem(generalToolBar, SWT.FLAT);
-		Icon previewPosBtIcon = Pref.Bool.PreviewBottom.value ? Icon.ATTACH_RIGHT : Icon.ATTACH_BOTTOM;
+		Icon previewPosBtIcon = Pref.Bool.PreviewBottom.getValue() ? Icon.ATTACH_RIGHT : Icon.ATTACH_BOTTOM;
 		previewPosBt.setImage(previewPosBtIcon.getImage());
 		previewPosBt.setToolTipText(Msg.change_preview_pos.value());
 
@@ -218,16 +218,15 @@ public class PreviewPanel extends Composite {
 
 		htmlPreviewBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Pref.Bool.PreviewHTML.value = htmlPreviewBt.getSelection();
-				if (parser instanceof HTMLParser) // Only refresh preview panel for HTML documents
+				Pref.Bool.PreviewHTML.setValue(htmlPreviewBt.getSelection());				if (parser instanceof HTMLParser) // Only refresh preview panel for HTML documents
 					setFile(file, parser, true);
 			}
 		});
 
 		previewPosBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Pref.Bool.PreviewBottom.value = ! Pref.Bool.PreviewBottom.value;
-				Icon previewPosBtIcon = Pref.Bool.PreviewBottom.value ? Icon.ATTACH_RIGHT : Icon.ATTACH_BOTTOM;
+				Pref.Bool.PreviewBottom.setValue(! Pref.Bool.PreviewBottom.getValue());
+				Icon previewPosBtIcon = Pref.Bool.PreviewBottom.getValue() ? Icon.ATTACH_RIGHT : Icon.ATTACH_BOTTOM;
 				previewPosBt.setImage(previewPosBtIcon.getImage());
 			}
 		});
@@ -346,7 +345,7 @@ public class PreviewPanel extends Composite {
 		downBt.setEnabled(terms.length != 0);
 
 		// Use the HTML browser
-		if (Pref.Bool.PreviewHTML.value) {
+		if (Pref.Bool.PreviewHTML.getValue()) {
 			final BrowserPanel browser = browserProvider.getBrowser(previewPanel, browserToolBar, parser);
 			if (browser != null) {
 				browser.addProgressListener(new ProgressAdapter() {
@@ -393,7 +392,7 @@ public class PreviewPanel extends Composite {
 					return; // Another preview request had been started while we were parsing
 				
 				// Apply character limit
-				int maxLength = Pref.Int.PreviewLimit.value;
+				int maxLength = Pref.Int.PreviewLimit.value();
 				final String msg = "...\n\n\n[" //$NON-NLS-1$
 					+ Msg.preview_limit_hint.format(new Object[] {
 							maxLength,
@@ -432,7 +431,7 @@ public class PreviewPanel extends Composite {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						textViewer.setText(fText);
-						setHighlighting(Pref.Bool.HighlightSearchTerms.value);
+						setHighlighting(Pref.Bool.HighlightSearchTerms.getValue());
 						occurrenceCounter.setText(Integer.toString(ranges.length / 2));
 						if (exceeded)
 							textViewer.append(msg);

@@ -27,7 +27,7 @@ public abstract class Parser implements Comparable<Parser> {
 	/**
 	 * Event: Changes in the check state of this parser.
 	 */
-	public final Event evtCheckStateChanged = new Event();
+	public final Event<Parser> evtCheckStateChanged = new Event<Parser> ();
 	
 	/**
 	 * Creates a document object from the given file. By default, this method
@@ -78,7 +78,7 @@ public abstract class Parser implements Comparable<Parser> {
 	 */
 	public void setChecked(boolean checked) {
 		Pref.setChecked(getClass(), checked);
-		evtCheckStateChanged.fireUpdate();
+		evtCheckStateChanged.fireUpdate(this);
 	}
 	
 	public int compareTo(Parser o) {

@@ -133,7 +133,7 @@ Section "un.Uninstall"
 	Delete $INSTDIR\Readme.txt
     Delete $INSTDIR\hs_err_pid*.log
     
-	Delete $INSTDIR\help\DocFetcher_Manual.html
+	Delete $INSTDIR\help\DocFetcher_Manual*.html
 	RMDir /r $INSTDIR\help\DocFetcher_Manual_files
     RMDir $INSTDIR\help
     

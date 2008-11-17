@@ -59,7 +59,7 @@ public class IndexingTab extends Composite {
 	private Text htmlExtBox;
 	private Text exclusionBox;
 	private Button checkHTMLPairing;
-	private ProgressPanel progressPanel;
+	ProgressPanel progressPanel;
 	private List<ParseException> errorCache = new ArrayList<ParseException> ();
 	private Set<String> extensionsFromDisk; // Caching file extensions so we need to load them only once
 	

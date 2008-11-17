@@ -18,9 +18,10 @@ import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.Serializer;
 
 /**
- * This aspect checks if the paths DocFetcher wants to write to are writable. If not, it
- * disables some of the disk writing operations in order to avoid annoying pop-up messages,
- * which typically occur if the user has put a portable version of DocFetcher on a CD-ROM.
+ * This aspect checks if the paths DocFetcher wants to write to are writable. If
+ * not, it disables some of the disk writing operations in order to avoid
+ * annoying pop-up messages, which typically occur if the user has put a
+ * portable version of DocFetcher on a CD-ROM.
  * 
  * @author Tran Nam Quang
  */

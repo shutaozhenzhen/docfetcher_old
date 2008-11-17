@@ -89,12 +89,12 @@ public class Const {
 	public static final File USER_PROPERTIES_FILE;
 	
 	/**
-	 * Name of the properties file where the preferences are stored.
+	 * Name of the file where the preferences are stored.
 	 */
 	public static final String USER_PROPERTIES_FILENAME = "user.properties"; //$NON-NLS-1$
 	
 	/**
-	 * The folder where the ScopeRegistry.ser file and the index folders will be
+	 * The folder where the ScopeRegistry.ser file and the index folders are
 	 * stored. If the folder lies inside the program folder, it will have a
 	 * relative path, if not, then an absolute path.
 	 */

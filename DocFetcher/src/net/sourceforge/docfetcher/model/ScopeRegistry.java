@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,12 +26,27 @@ import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MultiSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Searchable;
+
 /**
  * A registry for managing registered scopes.
  * 
  * @author Tran Nam Quang
  */
 public class ScopeRegistry implements Serializable {
+	
+	// Setting this avoids errors when searching for very generic search terms like "*?".
+	static {
+		BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+	}
 	
 	static final long serialVersionUID = 1;
 	
@@ -62,17 +78,17 @@ public class ScopeRegistry implements Serializable {
 	/**
 	 * Event: Changes in the indexing queue.
 	 */
-	private transient Event evtQueueChanged = new Event();
+	private transient Event<ScopeRegistry> evtQueueChanged = new Event<ScopeRegistry> ();
 	
 	/**
 	 * Event: The list of registered <tt>RootScope</tt>'s has changed.
 	 */
-	private transient Event evtRegistryRootChanged = new Event();
+	private transient Event<ScopeRegistry>  evtRegistryRootChanged = new Event<ScopeRegistry> ();
 	
 	/**
 	 * Event: Changes somewhere down the registry.
 	 */
-	private transient Event evtRegistryChanged = new Event();
+	private transient Event<ScopeRegistry> evtRegistryChanged = new Event<ScopeRegistry> ();
 	
 	/**
 	 * Singleton constructor
@@ -82,21 +98,21 @@ public class ScopeRegistry implements Serializable {
 	/**
 	 * Event: Changes in the indexing queue.
 	 */
-	public Event getEvtQueueChanged() {
+	public Event<ScopeRegistry> getEvtQueueChanged() {
 		return evtQueueChanged;
 	}
 	
 	/**
 	 * Event: The list of registered <tt>RootScope</tt>s has changed.
 	 */
-	public Event getEvtRegistryRootChanged() {
+	public Event<ScopeRegistry> getEvtRegistryRootChanged() {
 		return evtRegistryRootChanged;
 	}
 	
 	/**
 	 * Event: Changes somewhere down the registry.
 	 */
-	public Event getEvtRegistryChanged() {
+	public Event<ScopeRegistry> getEvtRegistryChanged() {
 		return evtRegistryChanged;
 	}
 	
@@ -225,8 +241,8 @@ public class ScopeRegistry implements Serializable {
 		for (RootScope rootScope : scopes)
 			if (rootScopes.remove(rootScope))
 				rootScope.deleteIndex();
-		evtRegistryRootChanged.fireUpdate();
-		evtRegistryChanged.fireUpdate();
+		evtRegistryRootChanged.fireUpdate(this);
+		evtRegistryChanged.fireUpdate(this);
 	}
 	
 	/**
@@ -237,13 +253,13 @@ public class ScopeRegistry implements Serializable {
 	 */
 	public void addJob(Job newJob) {
 		indexingJobs.add(newJob);
-		newJob.evtReadyStateChanged.add(new Event.IObserver() {
-			public void update() {
-				evtQueueChanged.fireUpdate();
+		newJob.evtReadyStateChanged.add(new Event.Listener<Job> () {
+			public void update(Job job) {
+				evtQueueChanged.fireUpdate(ScopeRegistry.this);
 				startNextJob();
 			}
 		});
-		evtQueueChanged.fireUpdate();
+		evtQueueChanged.fireUpdate(this);
 		startNextJob();
 	}
 	
@@ -301,7 +317,7 @@ public class ScopeRegistry implements Serializable {
 			return;
 		}
 		
-		evtQueueChanged.fireUpdate();
+		evtQueueChanged.fireUpdate(this);
 		indexingThread = new Thread() {
 			public void run() {
 				try {
@@ -326,16 +342,16 @@ public class ScopeRegistry implements Serializable {
 					}
 					else if (addToReg && ! intersectsEntry(currentScope) && ! interrupted) {
 						rootScopes.add(currentScope);
-						evtRegistryRootChanged.fireUpdate();
+						evtRegistryRootChanged.fireUpdate(ScopeRegistry.this);
 					}
-					evtRegistryChanged.fireUpdate();
+					evtRegistryChanged.fireUpdate(ScopeRegistry.this);
 				} catch (FileNotFoundException e) {
 					// Nothing; appropriate measures will be taken by aspects
 				} finally {
 					indexingThread = null;
 					indexingJobs.remove(currentJob);
 					currentJob = null;
-					evtQueueChanged.fireUpdate();
+					evtQueueChanged.fireUpdate(ScopeRegistry.this);
 					startNextJob();
 				}
 			}
@@ -371,7 +387,7 @@ public class ScopeRegistry implements Serializable {
 			
 			indexingThread.interrupt(); // thread will continue with the next entry
 		}
-		evtQueueChanged.fireUpdate();
+		evtQueueChanged.fireUpdate(this);
 	}
 	
 	/**
@@ -385,7 +401,7 @@ public class ScopeRegistry implements Serializable {
 		indexingJobs.clear();
 		currentJob = null;
 		indexingThread = null;
-		evtQueueChanged.fireUpdate();
+		evtQueueChanged.fireUpdate(this);
 	}
 	
 	/**
@@ -404,9 +420,9 @@ public class ScopeRegistry implements Serializable {
 		}
 		else {
 			instance.indexingJobs = new ArrayList<Job> ();
-			instance.evtQueueChanged = new Event();
-			instance.evtRegistryRootChanged = new Event();
-			instance.evtRegistryChanged = new Event();
+			instance.evtQueueChanged = new Event<ScopeRegistry> ();
+			instance.evtRegistryRootChanged = new Event<ScopeRegistry> ();
+			instance.evtRegistryChanged = new Event<ScopeRegistry> ();
 		}
 		return instance;
 	}
@@ -419,6 +435,77 @@ public class ScopeRegistry implements Serializable {
 	 */
 	public void save() throws IOException {
 		Serializer.save(this, Const.INDEX_PARENT_FILE);
+	}
+	
+	/**
+	 * Performs a search on all indexes for <tt>searchString</tt> and returns an
+	 * array of results. Term strings for highlighting in the preview panel will
+	 * be inserted into the provided <tt>terms</tt> list.
+	 * 
+	 * @throws SearchException
+	 *             Thrown if no indexes have been created yet, if the
+	 *             <tt>searchString</tt> is invalid, or if an IOException
+	 *             occurred.
+	 */
+	public ResultDocument[] search(String searchString, List<String> terms) throws SearchException {
+		MultiSearcher multiSearcher = null;
+		try {
+			// Build a lucene query object
+			Query query = new QueryParser(
+					Document.contents,
+					RootScope.analyzer
+			).parse(searchString);
+
+			// Check that all indexes still exist
+			for (RootScope rootScope : rootScopes)
+				if (! rootScope.getIndexDir().exists())
+					throw new SearchException(Msg.folders_not_found.value() + "\n" + //$NON-NLS-1$
+							rootScope.getIndexDir().getAbsolutePath());
+			
+			// Perform search
+			Searchable[] searchables = new Searchable[rootScopes.size()];
+			int i = 0;
+			for (RootScope rootScope : rootScopes)
+				searchables[i++] = new IndexSearcher(rootScope.getIndexDir().getAbsolutePath());
+			multiSearcher = new MultiSearcher(searchables);
+			Hits hits = multiSearcher.search(query);
+			
+			// Process results 
+			final ResultDocument[] results = new ResultDocument[hits.length()];
+			for (i = 0; i < results.length; i++)
+				results[i] = new ResultDocument(hits.doc(i), hits.score(i));
+			
+			// Get search terms (for term highlighting in the preview panel)
+			Set<Object> termsSet = new HashSet<Object>();
+			query = multiSearcher.rewrite(query);
+			query.extractTerms(termsSet);
+			for (Object term : termsSet)
+				terms.add(((Term) term).text());
+			
+			return results;
+		}
+		catch (final ParseException e) {
+			throw new SearchException(Msg.invalid_query.value() + "\n" + e.getLocalizedMessage()); //$NON-NLS-1$
+		}
+		catch (final IOException e) {
+			throw new SearchException(e.getLocalizedMessage());
+		}
+		finally {
+			if (multiSearcher != null) {
+				try {
+					multiSearcher.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public class SearchException extends Exception {
+		static final long serialVersionUID = 1;
+		public SearchException(String msg) {
+			super(msg);
+		}
 	}
 	
 }

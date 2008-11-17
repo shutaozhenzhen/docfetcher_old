@@ -31,7 +31,7 @@ public class Scope extends Indexable {
 	/**
 	 * Event: Check state of this object has changed.
 	 */
-	public static final Event checkStateChanged = new Event();
+	public static final Event<Scope> checkStateChanged = new Event<Scope> ();
 
 	/**
 	 * The set of files in the directory represented by this class. Only
@@ -117,7 +117,7 @@ public class Scope extends Indexable {
 	 */
 	public void setChecked(boolean checked) {
 		this.unchecked = ! checked;
-		checkStateChanged.fireUpdate();
+		checkStateChanged.fireUpdate(this);
 	}
 
 	/**

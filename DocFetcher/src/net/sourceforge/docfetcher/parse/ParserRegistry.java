@@ -82,7 +82,7 @@ public class ParserRegistry {
 	 */
 	public static Parser getParser(File file) {
 		String ext = UtilFile.getExtension(file);
-		if (UtilList.containsEquality(Pref.StrArray.HTMLExtensions.value, ext))
+		if (UtilList.containsEquality(Pref.StrArray.HTMLExtensions.value(), ext))
 			return htmlParser;
 		for (Parser parser : fileParsers)
 			/*
@@ -180,8 +180,8 @@ public class ParserRegistry {
 	 * corresponding settings in the preferences.
 	 */
 	public static void resetExtensions() {
-		textParser.setExtensions(Pref.StrArray.TextExtensions.value);
-		htmlParser.setExtensions(Pref.StrArray.HTMLExtensions.value);
+		textParser.setExtensions(Pref.StrArray.TextExtensions.value());
+		htmlParser.setExtensions(Pref.StrArray.HTMLExtensions.value());
 	}
 
 }

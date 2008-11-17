@@ -26,7 +26,7 @@ import net.sourceforge.docfetcher.enumeration.Pref;
  */
 public class TextParser extends Parser {
 	
-	private String[] extensions = Pref.StrArray.TextExtensions.value;
+	private String[] extensions = Pref.StrArray.TextExtensions.value();
 	
 	public String renderText(File file) throws ParseException {
 		Reader reader = null;

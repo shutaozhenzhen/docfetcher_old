@@ -10,6 +10,7 @@ Warning: This script cannot handle special characters in the new name,
 such as German umlauts.
 It is strongly recommended to make a project backup before running
 this script.
+Expected parameters: oldname newname
 """
 
 # Get command line arguments

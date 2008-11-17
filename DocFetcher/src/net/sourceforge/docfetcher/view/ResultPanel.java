@@ -23,6 +23,7 @@ import java.util.TreeSet;
 
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
+import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -55,6 +56,8 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -81,19 +84,16 @@ import org.eclipse.swt.widgets.TableColumn;
  */
 public class ResultPanel extends Composite {
 	
-	/**
-	 * The TableViewer internally used.
-	 */
+	public final Event<ResultPanel> evtVisibleItemsChanged = new Event<ResultPanel> ();
+	public final Event<ResultPanel> evtSelectionChanged = new Event<ResultPanel> ();
+	
+	/** The TableViewer internally used. */
 	private TableViewer viewer;
 	
-	/**
-	 * All results; flat and unfiltered.
-	 */
+	/** All results; flat and unfiltered. */
 	private ResultDocument[] results;
 	
-	/**
-	 * The total number of result items visible on all result pages.
-	 */
+	/** The total number of visible result items. */
 	private int visibleResultCount = 0;
 	
 	/**
@@ -119,9 +119,6 @@ public class ResultPanel extends Composite {
 	 */
 	private ResultSorter resultSorter = new ResultSorter(ResultProperty.SCORE, false);
 
-	/**
-	 * Constructs a new instance of this class.
-	 */
 	public ResultPanel(Composite parent) {
 		super(parent, SWT.NONE);
 		setLayout(new FillLayout());
@@ -142,15 +139,13 @@ public class ResultPanel extends Composite {
 			}
 			// Store column order in preferences
 			public void controlMoved(ControlEvent e) {
-				Pref.IntArray.ResultColumnOrder.value = viewer.getTable().getColumnOrder();
-			}
+				Pref.IntArray.ResultColumnOrder.setValue(viewer.getTable().getColumnOrder());			}
 			// Store column widths in preferences
 			public void controlResized(ControlEvent e) {
 				TableColumn[] columns = viewer.getTable().getColumns();
-				if (Pref.IntArray.ResultColumnWidths.value.length != columns.length)
-					Pref.IntArray.ResultColumnWidths.value = new int[columns.length];
-				for (int i = 0; i < columns.length; i++)
-					Pref.IntArray.ResultColumnWidths.value[i] = columns[i].getWidth();
+				if (Pref.IntArray.ResultColumnWidths.value().length != columns.length)
+					Pref.IntArray.ResultColumnWidths.setValue(new int[columns.length]);				for (int i = 0; i < columns.length; i++)
+					Pref.IntArray.ResultColumnWidths.value()[i] = columns[i].getWidth();
 			}
 		}
 		ColumnListener columnListener = new ColumnListener();
@@ -174,12 +169,12 @@ public class ResultPanel extends Composite {
 		}
 		
 		// Load alternative column order from preferences if there is one
-		int[] resultColumnOrder = Pref.IntArray.ResultColumnOrder.value;
+		int[] resultColumnOrder = Pref.IntArray.ResultColumnOrder.value();
 		if (properties.length == resultColumnOrder.length)
 			viewer.getTable().setColumnOrder(resultColumnOrder);
 		
 		// Set column widths
-		int[] resultColumnWidths = Pref.IntArray.ResultColumnWidths.value;
+		int[] resultColumnWidths = Pref.IntArray.ResultColumnWidths.value();
 		TableColumn[] columns = viewer.getTable().getColumns();
 		if (properties.length == resultColumnWidths.length) {
 			for (int i = 0; i < columns.length; i++) {
@@ -258,23 +253,28 @@ public class ResultPanel extends Composite {
 			}
 		});
 		
-		// Disable context menu items if selection is empty
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent arg0) {
+				// Disable context menu items if selection is empty
 				boolean hasSelection = ! viewer.getSelection().isEmpty();
 				openItem.setEnabled(hasSelection);
 				openParentItem.setEnabled(hasSelection);
 				copyItem.setEnabled(hasSelection);
 				deleteItem.setEnabled(hasSelection);
+				
+				// Update result panel and status line
+				evtSelectionChanged.fireUpdate(ResultPanel.this);
 			}
 		});
+		
+		viewer.getTable().addKeyListener(new ResultPanelNavigator());
+		viewer.getTable().addKeyListener(new SortSelector());
 	}
 	
 	/**
 	 * Displays the given results on this ResultPanel, possibly filtering out
 	 * some items. Displays a blank page when the given result is null or an
-	 * empty array. The <tt>query</tt> parameter is the search string that
-	 * produced this result.
+	 * empty array.
 	 */
 	public void setResults(ResultDocument... results) {
 		if (results == null || results.length == 0) {
@@ -290,6 +290,7 @@ public class ResultPanel extends Composite {
 		pageIndex = 0;
 		viewer.setInput(resultPages[0]);
 		viewer.getTable().setTopIndex(0);
+		evtVisibleItemsChanged.fireUpdate(this);
 	}
 	
 	/**
@@ -348,7 +349,7 @@ public class ResultPanel extends Composite {
 		Arrays.sort(sortedInput, resultSorter);
 		
 		// Split flat array into array of arrays
-		int maxSize = Pref.Int.MaxResults.value;
+		int maxSize = Pref.Int.MaxResults.value();
 		if (maxSize < 1)
 			throw new IllegalStateException("Maximum number of results per page cannot be smaller than 1."); //$NON-NLS-1$
 		int nPages = (int) Math.ceil((double) sortedInput.length / (double) maxSize);
@@ -371,6 +372,7 @@ public class ResultPanel extends Composite {
 		pageIndex = Math.max(0, pageIndex - 1);
 		viewer.setInput(resultPages[pageIndex]);
 		viewer.getTable().setTopIndex(0);
+		evtVisibleItemsChanged.fireUpdate(this);
 	}
 	
 	/**
@@ -383,6 +385,7 @@ public class ResultPanel extends Composite {
 		pageIndex = Math.min(pageIndex + 1, maxIndex);
 		viewer.setInput(resultPages[pageIndex]);
 		viewer.getTable().setTopIndex(0);
+		evtVisibleItemsChanged.fireUpdate(this);
 	}
 	
 	/**
@@ -408,7 +411,7 @@ public class ResultPanel extends Composite {
 	private void launchSelection() {
 		IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
 		if (sel.isEmpty()) return;
-		int openLimit = Pref.Int.OpenLimit.value;
+		int openLimit = Pref.Int.OpenLimit.value();
 		if (sel.size() > openLimit) {
 			UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
 			return;
@@ -418,7 +421,7 @@ public class ResultPanel extends Composite {
 			ResultDocument doc = (ResultDocument) it.next();
 			Program.launch(doc.getFile().getAbsolutePath());
 		}
-		if (Pref.Bool.HideOnOpen.value)
+		if (Pref.Bool.HideOnOpen.getValue())
 			DocFetcher.getInst().toSystemTray();
 	}
 	
@@ -436,14 +439,14 @@ public class ResultPanel extends Composite {
 			ResultDocument doc = (ResultDocument) it.next();
 			dirsToOpen.add(doc.getFile().getParentFile().getAbsolutePath());
 		}
-		int openLimit = Pref.Int.OpenLimit.value;
+		int openLimit = Pref.Int.OpenLimit.value();
 		if (dirsToOpen.size() > openLimit) {
 			UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
 			return;
 		}
 		for (String dir : dirsToOpen)
 			Program.launch(dir);
-		if (Pref.Bool.HideOnOpen.value)
+		if (Pref.Bool.HideOnOpen.getValue())
 			DocFetcher.getInst().toSystemTray();
 	}
 	
@@ -515,7 +518,7 @@ public class ResultPanel extends Composite {
 				emptyParents.add(parent);
 		} 
 		
-		FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.value, scopesToUpdate);
+		FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), scopesToUpdate);
 		
 		// Update indexes, but silently
 		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
@@ -813,7 +816,7 @@ public class ResultPanel extends Composite {
 			File file = result.getFile();
 			boolean launched = Program.launch(file.getAbsolutePath());
 			if (launched) {
-				if (Pref.Bool.HideOnOpen.value)
+				if (Pref.Bool.HideOnOpen.getValue())
 					DocFetcher.getInst().toSystemTray();
 			}
 			else {
@@ -862,6 +865,74 @@ public class ResultPanel extends Composite {
 		
 		public static ResultProperty get(int index) {
 			return ResultProperty.values()[index];
+		}
+		
+	}
+	
+	/**
+	 * Handler for result panel related keys.
+	 */
+	class ResultPanelNavigator extends KeyAdapter {
+		
+		public void keyPressed(KeyEvent e) {
+			Key key = Key.getKey(e.stateMask, e.keyCode);
+			if (key == null) return;
+			
+			Table table = (Table) e.widget;
+			int rowIndex = table.getSelectionIndex();
+			
+			switch (key) {
+			case Up:
+				rowIndex = Math.max(0, rowIndex - 1);
+				// This won't cause a selection event, therefore we have to call the event handler manually
+				table.setSelection(rowIndex);
+				evtSelectionChanged.fireUpdate(ResultPanel.this);
+				break;
+			case Down:
+				rowIndex = Math.min(table.getItemCount() - 1, rowIndex + 1);
+				// This won't cause a selection event, therefore we have to call the event handler manually
+				table.setSelection(rowIndex);
+				evtSelectionChanged.fireUpdate(ResultPanel.this);
+				break;
+			case Arrow_Left:
+				e.doit = false; // fall through
+			case Left:
+				previousPage();
+				break;
+			case Arrow_Right:
+				e.doit = false; // fall through
+			case Right:
+				nextPage();
+				break;
+			case Copy:
+				copySelectionToClipboard();
+				break;
+			case Delete:
+				deleteSelection();
+				break;
+			}
+		}		
+		
+	}
+	
+	/**
+	 * This class handles sorting of results by a specific column
+	 * using keyboard shortcuts.
+	 */
+	class SortSelector extends KeyAdapter {
+		
+		public void keyPressed(KeyEvent e) {
+			if (e.stateMask != SWT.ALT) return;
+			int key = 0;
+			try {
+				key = Integer.valueOf(String.valueOf((char) e.keyCode));
+			} catch (NumberFormatException e1) {
+				return;
+			}
+			int columnCount = viewer.getTable().getColumnCount();
+			if (key == 0) key = 10;
+			if (key > columnCount || key < 1 || key > 10) return;
+			sortItems(ResultProperty.get(key - 1));
 		}
 		
 	}

@@ -63,7 +63,7 @@ public class IndexingBox {
 	private Shell shell;
 	private CTabFolder tabFolder;
 	private ToolItem addButton;
-	private Event.IObserver regObserver;
+	private Event.Listener<ScopeRegistry> regObserver;
 	private IndexingTab activeTab;
 	private DirectoryDialog directoryDialog;
 	
@@ -125,8 +125,8 @@ public class IndexingBox {
 
 		// Synchronize tabs to items in the indexing queue
 		ScopeRegistry.load().getEvtQueueChanged().add(
-				regObserver = new Event.IObserver() {
-					public void update() {
+				regObserver = new Event.Listener<ScopeRegistry> () {
+					public void update(ScopeRegistry scopeReg) {
 						onQueueChanged();
 					}
 				});
@@ -137,8 +137,8 @@ public class IndexingBox {
 				if (shell.getMaximized())
 					return;
 				Point size = shell.getSize();
-				Pref.Int.IndexingBoxWidth.value = size.x;
-				Pref.Int.IndexingBoxHeight.value = size.y;
+				Pref.Int.IndexingBoxWidth.setValue(size.x);
+				Pref.Int.IndexingBoxHeight.setValue(size.y);
 			}
 		});
 	}
@@ -218,9 +218,9 @@ public class IndexingBox {
 		
 		ScopeRegistry.load().addJob(newJob); // Must be done after the previous line
 		tabFolder.setSelection(tabItem);
-		newJob.evtReadyStateChanged.add(new Event.IObserver() {
-			public void update() {
-				if (newJob.isReadyForIndexing())
+		newJob.evtReadyStateChanged.add(new Event.Listener<Job> () {
+			public void update(Job job) {
+				if (job.isReadyForIndexing())
 					tabItem.setImage(Icon.WALK_TREE.getImage());
 				switchToNextWaitingTab();
 			}
@@ -358,8 +358,8 @@ public class IndexingBox {
 	 * Opens the indexing box.
 	 */
 	public void open() {
-		int width = Pref.Int.IndexingBoxWidth.value;
-		int height = Pref.Int.IndexingBoxHeight.value;
+		int width = Pref.Int.IndexingBoxWidth.value();
+		int height = Pref.Int.IndexingBoxHeight.value();
 		shell.setSize(width, height);
 		UtilGUI.centerShell((Shell) shell.getParent(), shell);
 		shell.setMinimized(false); // In case the user had minimized the shell previously

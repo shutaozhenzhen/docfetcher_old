@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.Map.Entry;
 
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
+import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilGUI;
@@ -56,8 +58,19 @@ public class Pref {
 		HighlightSearchTerms (true),
 		;
 
+		public final Event<Boolean> evtChanged = new Event<Boolean> ();
 		public final boolean defaultValue;
-		public boolean value;
+		private boolean value;
+		
+		public boolean getValue() {
+			return value;
+		}
+		
+		public void setValue(boolean value) {
+			if (this.value == value) return;
+			this.value = value;
+			evtChanged.fireUpdate(value);
+		}
 
 		Bool(boolean defaultValue) {
 			this.defaultValue = defaultValue;
@@ -89,8 +102,19 @@ public class Pref {
 		ErrorPathColWidth (500),
 		;
 
+		public final Event<Integer> evtChanged = new Event<Integer> ();
 		public final int defaultValue;
-		public int value;
+		private int value;
+		
+		public int value() {
+			return value;
+		}
+		
+		public void setValue(int value) {
+			if (this.value == value) return;
+			this.value = value;
+			evtChanged.fireUpdate(value);
+		}
 
 		Int(int defaultValue) {
 			this.defaultValue = defaultValue;
@@ -111,8 +135,19 @@ public class Pref {
 		PreviewFontMonoLinux ("Monospace"), //$NON-NLS-1$
 		;
 
+		public final Event<String> evtChanged = new Event<String> ();
 		public final String defaultValue;
-		public String value;
+		private String value;
+		
+		public String value() {
+			return value;
+		}
+		
+		public void setValue(String value) {
+			if (this.value == value) return;
+			this.value = value;
+			evtChanged.fireUpdate(value);
+		}
 
 		Str(String defaultValue) {
 			this.defaultValue = defaultValue;
@@ -130,8 +165,19 @@ public class Pref {
 		ResultColumnWidths (new int[0]),
 		;
 
+		public final Event<int[]> evtChanged = new Event<int[]> ();
 		public final int[] defaultValue;
-		public int[] value;
+		private int[] value;
+		
+		public int[] value() {
+			return value;
+		}
+		
+		public void setValue(int... value) {
+			if (Arrays.equals(this.value, value)) return;
+			this.value = value;
+			evtChanged.fireUpdate(value);
+		}
 
 		IntArray(int... defaultValue) {
 			this.defaultValue = defaultValue;
@@ -143,8 +189,19 @@ public class Pref {
 		TextExtensions ("txt", "nfo"), //$NON-NLS-1$ //$NON-NLS-2$
 		;
 
+		public final Event<String[]> evtChanged = new Event<String[]> ();
 		public final String[] defaultValue;
-		public String[] value;
+		private String[] value;
+		
+		public String[] value() {
+			return value;
+		}
+		
+		public void setValue(String... value) {
+			if (Arrays.equals(this.value, value)) return;
+			this.value = value;
+			evtChanged.fireUpdate(value);
+		}
 
 		StrArray(String... defaultValue) {
 			this.defaultValue = defaultValue;

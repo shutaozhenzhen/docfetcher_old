@@ -74,8 +74,8 @@ public class PrefPage {
 		shell.setText(Msg.preferences.value());
 		shell.setLayout(new FormLayout());
 		shell.setSize(
-				Pref.Int.PrefPageWidth.value,
-				Pref.Int.PrefPageHeight.value
+				Pref.Int.PrefPageWidth.value(),
+				Pref.Int.PrefPageHeight.value()
 		);
 		if (shellX == -1 || shellY == -1)
 			UtilGUI.centerShell(parentShell, shell);
@@ -87,9 +87,7 @@ public class PrefPage {
 				shellX = pos.x;
 				shellY = pos.y;
 				Point size = shell.getSize();
-				Pref.Int.PrefPageWidth.value = size.x;
-				Pref.Int.PrefPageHeight.value = size.y;
-			}
+				Pref.Int.PrefPageWidth.setValue(size.x);				Pref.Int.PrefPageHeight.setValue(size.y);			}
 		});
 		
 		Composite container = new Composite(shell, SWT.NONE);
@@ -178,7 +176,7 @@ public class PrefPage {
 		final Button checkBt = new Button(parent, SWT.CHECK);
 		checkBt.setText(label);
 		checkBt.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, true, false, 2, 1));
-		checkBt.setSelection(boolPref.value);
+		checkBt.setSelection(boolPref.getValue());
 		checkBtMap.put(checkBt, boolPref);
 		return checkBt;
 	}
@@ -193,21 +191,21 @@ public class PrefPage {
 	
 	private Text createTextBox(Composite parent, String label, Str strPref) {
 		Text text = createTextBox(parent, label);
-		text.setText(strPref.value);
+		text.setText(strPref.value());
 		textBoxStrMap.put(text, strPref);
 		return text;
 	}
 	
 	private Text createTextBox(Composite parent, String label, StrArray strArrayPref) {
 		Text text = createTextBox(parent, label);
-		text.setText(UtilList.toString(" ", strArrayPref.value)); //$NON-NLS-1$
+		text.setText(UtilList.toString(" ", strArrayPref.value())); //$NON-NLS-1$
 		textBoxStrArrayMap.put(text, strArrayPref);
 		return text;
 	}
 	
 	private Text createTextBox(Composite parent, String label, Int intPref) {
 		Text text = createTextBox(parent, label);
-		text.setText(Integer.toString(intPref.value));
+		text.setText(Integer.toString(intPref.value()));
 		textBoxIntMap.put(text, intPref);
 		text.addVerifyListener(new VerifyListener() {
 			public void verifyText(VerifyEvent e) {
@@ -225,7 +223,7 @@ public class PrefPage {
 				throw new NumberFormatException();
 		} catch (NumberFormatException e) {
 			UtilGUI.showWarningMsg(null, Msg.pref_max_results_range.format(Integer.MAX_VALUE));
-			maxResultsBox.setText(Integer.toString(Math.max(1, Pref.Int.MaxResults.value)));
+			maxResultsBox.setText(Integer.toString(Math.max(1, Pref.Int.MaxResults.value())));
 			return;
 		}
 		
@@ -237,15 +235,15 @@ public class PrefPage {
 		 */
 		for (Entry<Button, Bool> entry : checkBtMap.entrySet()) {
 			boolean newValue = entry.getKey().getSelection();
-			if (entry.getValue().value != newValue) {
-				entry.getValue().value = newValue;
+			if (entry.getValue().getValue() != newValue) {
+				entry.getValue().setValue(newValue);
 				changed = true;
 			}
 		}
 		for (Entry<Text, Int> entry : textBoxIntMap.entrySet()) {
 			int newValue = Integer.parseInt(entry.getKey().getText());
-			if (entry.getValue().value != newValue) {
-				entry.getValue().value = newValue;
+			if (entry.getValue().value() != newValue) {
+				entry.getValue().setValue(newValue);
 				changed = true;
 			}
 		}
@@ -258,15 +256,15 @@ public class PrefPage {
 				);
 			else
 				newValue = entry.getKey().getText();
-			if (! entry.getValue().value.equals(newValue)) {
-				entry.getValue().value = newValue;
+			if (! entry.getValue().value().equals(newValue)) {
+				entry.getValue().setValue(newValue);
 				changed = true;
 			}
 		}
 		for (Entry<Text, StrArray> entry : textBoxStrArrayMap.entrySet()) {
 			String[] newValue = entry.getKey().getText().split("[^\\p{Alnum}]+"); //$NON-NLS-1$
-			if (! Arrays.equals(entry.getValue().value, newValue)) {
-				entry.getValue().value = newValue;
+			if (! Arrays.equals(entry.getValue().value(), newValue)) {
+				entry.getValue().setValue(newValue);
 				changed = true;
 			}
 		}

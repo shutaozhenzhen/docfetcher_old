@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.sourceforge.docfetcher.dev.ExceptionHandler;
+import net.sourceforge.docfetcher.ExceptionHandler;
 import net.sourceforge.docfetcher.enumeration.Msg;
 
 import org.apache.poi.hslf.extractor.PowerPointExtractor;

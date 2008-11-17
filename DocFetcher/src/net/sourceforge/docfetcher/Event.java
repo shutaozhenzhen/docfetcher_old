@@ -11,7 +11,10 @@
 
 package net.sourceforge.docfetcher;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.swt.widgets.Display;
@@ -20,62 +23,110 @@ import org.eclipse.swt.widgets.Display;
  * An event class that provides a much simpler alternative to the Observer
  * pattern: Instead of adding methods like addListener, removeListener, etc. to
  * each class one wants to listen to, this class can simply be added as a field.
- * Moreover, the entire event system can be temporarily disabled used the hold()
- * and flush() methods, which is useful for avoiding mass notification when a
- * lot of changes are made to an observed object.
+ * <p>
+ * Moreover, the entire event system can be temporarily disabled using the
+ * static hold() and flush() methods, which is useful for avoiding mass
+ * notification when a lot of changes are made to an observed object.
+ * <p>
+ * The additional type parameter T of this class specifies the type of the event
+ * data object that is transmitted on notifications.
  * 
  * @author Tran Nam Quang
  */
-public class Event {
+public class Event<T> {
 	
-	public interface IObserver {
-		public void update();
+	public interface Listener<T> {
+		public void update(T eventData);
 	}
 	
-	private static Set<IObserver> cachedObservers = new HashSet<IObserver> ();
+	private Set<Listener<T>> observers = new HashSet<Listener<T>> ();
+	private List<T> eventCache = new ArrayList<T> ();
 	
-	private static boolean hold = false;
-	
-	private Set<IObserver> observers = new HashSet<IObserver> ();
-	
-	public void add(IObserver observer) {
+	public void add(Listener<T> observer) {
 		observers.add(observer);
 	}
 	
-	public void remove(IObserver observer) {
+	public void addAll(Collection<Listener<T>> observers) {
+		this.observers.addAll(observers);
+	}
+	
+	
+	public void remove(Listener<T> observer) {
 		observers.remove(observer);
 	}
 	
-	public void fireUpdate() {
-		if (! hold)
-			delayNotification(observers);
-		else
-			cachedObservers.addAll(observers);
+	public void removeAllObservers() {
+		observers.clear();
 	}
 	
+	public Set<Listener<T>> getObservers() {
+		return observers;
+	}
+	
+	public void fireUpdate(final T eventData) {
+		if (hold == 0) {
+			if (Display.getCurrent() != null || Display.getDefault() == null) {
+				for (Listener<T> observer : new HashSet<Listener<T>> (observers))
+					observer.update(eventData);
+			}
+			else {
+				Display.getDefault().syncExec(new Runnable() {
+					public void run() {
+						for (Listener<T> observer : new HashSet<Listener<T>> (observers))
+							observer.update(eventData);
+					}
+				});
+			}
+		}
+		else {
+			eventCache.add(eventData);
+			needsFlushing.add(this);
+		}
+	}
+	
+	private void flushCache() {
+		for (T eventData : new ArrayList<T> (eventCache))
+			for (Listener<T> observer : new HashSet<Listener<T>> (observers))
+				observer.update(eventData);
+		eventCache.clear();
+	}
+	
+	private static int hold = 0;
+	private static Set<Event<?>> needsFlushing = new HashSet<Event<?>> ();
+	
+	/**
+	 * Temporarily puts the entire event system into a 'caching mode', meaning
+	 * that subsequent notification requests caused by changes on the observed
+	 * objects will be delayed until <tt>flush</tt> is called. Each
+	 * <tt>hold</tt> must be followed by a <tt>flush</tt> some time later.
+	 * <p>
+	 * Calls to <tt>hold</tt> and <tt>flush</tt> can be nested, so you could,
+	 * for example, call <tt>hold</tt> three times, and then <tt>flush</tt>
+	 * three times.
+	 */
 	public static void hold() {
-		hold = true;
+		hold++;
 	}
 	
+	/**
+	 * @see #hold()
+	 */
 	public static void flush() {
-		hold = false;
-		delayNotification(cachedObservers);
-		cachedObservers.clear();
-	}
-	
-	private static void delayNotification(final Set<IObserver> observers) {
-		if (Display.getCurrent() != null) {
-			for (IObserver observer : observers)
-				observer.update();
+		hold = Math.max(0, hold - 1);
+		if (hold > 0) return;
+		if (Display.getCurrent() != null || Display.getDefault() == null) {
+			for (Event<?> event : new HashSet<Event<?>> (needsFlushing))
+				event.flushCache();
 		}
 		else {
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
-					for (IObserver observer : observers)
-						observer.update();
+					for (Event<?> event : new HashSet<Event<?>> (needsFlushing))
+						event.flushCache();
 				}
 			});
 		}
+		needsFlushing.clear();
 	}
 
 }

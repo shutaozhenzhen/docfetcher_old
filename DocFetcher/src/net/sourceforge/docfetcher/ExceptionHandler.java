@@ -9,7 +9,7 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.dev;
+package net.sourceforge.docfetcher;
 
 import java.io.IOException;
 import java.io.OutputStream;

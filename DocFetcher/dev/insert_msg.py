@@ -8,10 +8,16 @@ existing message entry and a prefix "after" or "before".
 Usage examples:
 insert_msg.py after some_entry new_entry
 insert_msg.py before some_entry new_entry
+
+The values of the entries inserted into the properties files can be modified via the
+variable props_default_value (e.g. new_entry=$TODO$).
 '''
 
-import sys, os, os.path
+import sys, os, os.path, re
 from os.path import join, split
+
+# The default value for the entries inserted into the properties files
+props_default_value = "$TODO$"
 
 # Get command line arguments
 if len(sys.argv) != 4:
@@ -43,7 +49,7 @@ for index, line in enumerate(msg_file):
 	if inside_msg_list:
 		if entry_name + ',' in line.strip():
 			doit = True
-		if new_entry_name in line.strip():
+		if re.match(new_entry_name + r'\s*,.*', line.strip()):
 			print 'Potential duplicate of new entry found in Msg.java, line %i.' % (index + 1)
 			msg_file.close()
 			exit(0)
@@ -78,10 +84,10 @@ for filename in propfiles:
 		if line.startswith(entry_name + '='):
 			doit = True
 		if doit and pos_str == 'before':
-			newfile.append(new_entry_name + '=\n')
+			newfile.append(new_entry_name + '=' + props_default_value + '\n')
 		newfile.append(line)
 		if doit and pos_str == 'after':
-			newfile.append(new_entry_name + '=\n')
+			newfile.append(new_entry_name + '=' + props_default_value + '\n')
 			pos = pos + 1
 		if doit:
 			found = True

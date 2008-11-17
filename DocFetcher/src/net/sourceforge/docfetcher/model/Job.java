@@ -24,7 +24,7 @@ public class Job {
 	private boolean isReadyForIndexing;
 	private boolean addToRegistry;
 	private boolean doRebuild;
-	public final Event evtReadyStateChanged = new Event();
+	public final Event<Job> evtReadyStateChanged = new Event<Job> ();
 	
 	/**
 	 * @param scope
@@ -68,7 +68,7 @@ public class Job {
 	 */
 	public void setReadyForIndexing(boolean isReadyForIndexing) {
 		this.isReadyForIndexing = isReadyForIndexing;
-		evtReadyStateChanged.fireUpdate();
+		evtReadyStateChanged.fireUpdate(this);
 	}
 
 	/**

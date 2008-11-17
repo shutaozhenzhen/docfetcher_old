@@ -339,7 +339,7 @@ public class UtilFile {
 	 */
 	public static String getLastModified(File file) {
 		DateFormat format = null;
-		String prefDateFormat = Pref.Str.DateFormat.value;
+		String prefDateFormat = Pref.Str.DateFormat.value();
 		if (prefDateFormat.equals("")) { //$NON-NLS-1$
 			int dateStyle = DateFormat.MEDIUM;
 			int timeStyle = DateFormat.SHORT;

@@ -13,6 +13,8 @@ package net.sourceforge.docfetcher.dev;
 
 import java.io.PrintStream;
 
+import net.sourceforge.docfetcher.ExceptionHandler;
+import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
@@ -37,7 +39,7 @@ public aspect CodeConventions {
 	declare warning: call(Parser+.new(..)) && !within(ParserRegistry):
 		"Don't instantiate parsers outside the parser registry."; //$NON-NLS-1$
 	
-	declare warning: execution(boolean get*(..)):
+	declare warning: execution(boolean get*(..)) && !within(Pref.Bool):
 		"Boolean getter methods should start with 'is'."; //$NON-NLS-1$
 
 }

@@ -51,7 +51,7 @@ public class FileTransferBox {
 	public FileTransferBox(Shell parent, String title) {
 		// Create shell
 		shell = new Shell(parent, Const.DIALOG_STYLE);
-		shell.setSize(Pref.Int.IndexingBoxWidth.value, Pref.Int.IndexingBoxHeight.value);
+		shell.setSize(Pref.Int.IndexingBoxWidth.value(), Pref.Int.IndexingBoxHeight.value());
 		UtilGUI.centerShell(parent, shell);
 		FormLayout layout = new FormLayout();
 		layout.marginWidth = layout.marginHeight = 2;

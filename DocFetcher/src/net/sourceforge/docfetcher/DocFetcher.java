@@ -13,16 +13,20 @@ package net.sourceforge.docfetcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.sourceforge.docfetcher.Event.IObserver;
-import net.sourceforge.docfetcher.dev.ExceptionHandler;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.FSEventHandler;
+import net.sourceforge.docfetcher.model.ResultDocument;
 import net.sourceforge.docfetcher.model.RootScope;
+import net.sourceforge.docfetcher.model.Scope;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
+import net.sourceforge.docfetcher.model.ScopeRegistry.SearchException;
+import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
@@ -37,6 +41,7 @@ import net.sourceforge.docfetcher.view.PreviewPanel;
 import net.sourceforge.docfetcher.view.ResultPanel;
 import net.sourceforge.docfetcher.view.SashWeightHandler;
 import net.sourceforge.docfetcher.view.ScopeGroup;
+import net.sourceforge.docfetcher.view.SearchPanel;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.ApplicationWindow;
@@ -57,13 +62,13 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * The main application window.
@@ -78,12 +83,18 @@ public class DocFetcher extends ApplicationWindow {
 	private SashForm sashHorizontal;
 	private SashForm sashLeft;
 	private MainPanel mainPanel;
+	private SearchPanel searchPanel;
+	private PreviewPanel previewPanel;
+	private ResultPanel resultPanel;
 	private IndexingBox indexingBox;
 	private TrayItem trayItem;
 	private Clipboard clipboard; // must be disposed
 	
 	private ScopeRegistry scopeReg;
 	private FSEventHandler fsEventHandler;
+	private FilesizeGroup filesizeGroup;
+	private ParserGroup parserGroup;
+	private ScopeGroup scopeGroup;
 
 	public static void main(String[] args) {
 		docFetcher = new DocFetcher();
@@ -98,7 +109,7 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// Load preferences and scope registry
 		Pref.load();
-		appName = Pref.Str.AppName.value;
+		appName = Pref.Str.AppName.value();
 		if (appName.trim().equals("")) //$NON-NLS-1$
 			appName = "DocFetcher"; //$NON-NLS-1$
 		
@@ -121,18 +132,18 @@ public class DocFetcher extends ApplicationWindow {
 				UtilFile.delete(indexDir, true);
 		
 		// Hook onto scope registry and set app name according to number of jobs
-		scopeReg.getEvtQueueChanged().add(new IObserver() {
-			public void update() {
+		scopeReg.getEvtQueueChanged().add(new Event.Listener<ScopeRegistry> () {
+			public void update(ScopeRegistry scopeReg) {
 				Shell shell = getShell();
 				if (shell == null) return;
-				int cnt = scopeReg.getSubmittedJobs().length;
-				String prefix = Msg.jobs.format(cnt) + " - "; //$NON-NLS-1$
-				shell.setText((cnt == 0 ? "" : prefix) + DocFetcher.appName); //$NON-NLS-1$
+				int count = scopeReg.getSubmittedJobs().length;
+				String prefix = Msg.jobs.format(count) + " - "; //$NON-NLS-1$
+				shell.setText((count == 0 ? "" : prefix) + DocFetcher.appName); //$NON-NLS-1$
 			}
 		});
 		
 		fsEventHandler = FSEventHandler.getInst();
-		fsEventHandler.setThreadWatchEnabled(Pref.Bool.WatchFS.value);
+		fsEventHandler.setThreadWatchEnabled(Pref.Bool.WatchFS.getValue());
 	}
 	
 	public static DocFetcher getInst() {
@@ -142,8 +153,8 @@ public class DocFetcher extends ApplicationWindow {
 	protected void initializeBounds() {
 		// Set shell size
 		final Shell shell = getShell();
-		int shellWidth = Pref.Int.ShellWidth.value;
-		int shellHeight = Pref.Int.ShellHeight.value;
+		int shellWidth = Pref.Int.ShellWidth.value();
+		int shellHeight = Pref.Int.ShellHeight.value();
 		shell.setSize(shellWidth, shellHeight);
 		
 		/*
@@ -151,19 +162,19 @@ public class DocFetcher extends ApplicationWindow {
 		 * because the Util.centerShell(..) method depends on a correct shell
 		 * size.
 		 */
-		int shellX = Pref.Int.ShellX.value;
-		int shellY = Pref.Int.ShellY.value;
+		int shellX = Pref.Int.ShellX.value();
+		int shellY = Pref.Int.ShellY.value();
 		if (shellX < 0 || shellY < 0)
 			UtilGUI.centerShell(null, shell);
 		else
 			shell.setLocation(shellX, shellY);
 		
-		shell.setMaximized(Pref.Bool.ShellMaximized.value);
+		shell.setMaximized(Pref.Bool.ShellMaximized.getValue());
 
 		// Set sash weights
 		// Note: This must be done AFTER setting the maximization state of the main shell!
-		sashHorizontal.setWeights(Pref.IntArray.SashHorizontalWeights.value);
-		sashLeft.setWeights(Pref.IntArray.SashLeftWeights.value);
+		sashHorizontal.setWeights(Pref.IntArray.SashHorizontalWeights.value());
+		sashLeft.setWeights(Pref.IntArray.SashLeftWeights.value());
 		
 		/*
 		 * FIXME On GTK Linux (GNOME 2.22.3), when the user changes the shell
@@ -177,16 +188,12 @@ public class DocFetcher extends ApplicationWindow {
 				if (shell.getMaximized() || ! shell.isVisible())
 					return;  // Don't store shell position when it's maximized or invisible
 				Point pos = shell.getLocation();
-				Pref.Int.ShellX.value = pos.x;
-				Pref.Int.ShellY.value = pos.y;
-			}
+				Pref.Int.ShellX.setValue(pos.x);				Pref.Int.ShellY.setValue(pos.y);			}
 			public void controlResized(ControlEvent e) {
 				if (shell.getMaximized() || ! shell.isVisible())
 					return; // Don't store shell size when it's maximized or invisible
 				Point size = shell.getSize();
-				Pref.Int.ShellWidth.value = size.x;
-				Pref.Int.ShellHeight.value = size.y;
-			}
+				Pref.Int.ShellWidth.setValue(size.x);				Pref.Int.ShellHeight.setValue(size.y);			}
 		});
 	}
 	
@@ -217,10 +224,13 @@ public class DocFetcher extends ApplicationWindow {
 		sashHorizontal = new SashForm(topContainer, SWT.HORIZONTAL);
 		filterPanel = new Composite(sashHorizontal, SWT.NONE);
 		mainPanel = new MainPanel(sashHorizontal);
-		FilesizeGroup filesizeGroup = new FilesizeGroup(filterPanel);
+		searchPanel = mainPanel.getSearchPanel();
+		previewPanel = mainPanel.getPreviewPanel();
+		resultPanel = mainPanel.getResultPanel();
+		filesizeGroup = new FilesizeGroup(filterPanel);
 		sashLeft = new SashForm(filterPanel, SWT.VERTICAL | SWT.SMOOTH);
-		ParserGroup parserGroup = new ParserGroup(sashLeft);
-		ScopeGroup scopeGroup = new ScopeGroup(sashLeft);
+		parserGroup = new ParserGroup(sashLeft);
+		scopeGroup = new ScopeGroup(sashLeft);
 		
 		// Layout
 		filterPanel.setLayout(new FormLayout());
@@ -229,7 +239,7 @@ public class DocFetcher extends ApplicationWindow {
 		fdf.top(filesizeGroup).bottom(100, 0).applyTo(sashLeft);
 		
 		// Load settings
-		filterPanel.setVisible(Pref.Bool.ShowFilterPanel.value);
+		filterPanel.setVisible(Pref.Bool.ShowFilterPanel.getValue());
 		parserGroup.setParsers(ParserRegistry.getParsers());
 		scopeGroup.setScopes(true, scopeReg.getEntries());
 		
@@ -254,38 +264,210 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// Try to show help page
 		boolean internalBrowserAvailable = false;
-		if (Pref.Bool.ShowWelcomePage.value && Pref.Bool.ShowPreview.value)
+		if (Pref.Bool.ShowWelcomePage.getValue() && Pref.Bool.ShowPreview.getValue())
 			internalBrowserAvailable = mainPanel.showHelpPage();
 		else
 			DocFetcher.getInst().setStatus(Msg.press_help_button.format(Key.Help.toString()));
-		Pref.Bool.ShowWelcomePage.value = internalBrowserAvailable;
-		
+		Pref.Bool.ShowWelcomePage.setValue(internalBrowserAvailable);		
 		// Move text cursor to search box
 		mainPanel.focusSearchBox();
 		
 		/*
-		 * Do this at the end so developers can see a stacktrace in the Eclipse
-		 * console if they haven't set up the run configuration appropriately.
+		 * Set up preferences event hooks
+		 */
+		Pref.Bool.ShowPreview.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				mainPanel.setPreviewVisible(eventData);
+			}
+		});
+		Pref.Bool.ShowFilterPanel.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				filterPanel.setVisible(eventData);
+				sashHorizontal.layout();
+				mainPanel.setFilterButtonChecked(eventData);
+			}
+		});
+		Pref.Bool.PreviewBottom.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				mainPanel.setPreviewBottom(eventData);
+			}
+		});
+		Pref.Bool.WatchFS.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				/*
+				 * FIXME Save preferences and scope registry before we remove the watches;
+				 * on Windows that may cause a crash.
+				 */
+				if (! eventData)
+					try {
+						Pref.save();
+						ScopeRegistry.load().save();
+					} catch (IOException e) {
+					}
+				fsEventHandler.setThreadWatchEnabled(eventData);
+			}
+		});
+		Pref.Bool.HighlightSearchTerms.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				previewPanel.setHighlighting(eventData);
+			}
+		});
+		Pref.Int.MaxResults.evtChanged.add(new Event.Listener<Integer> () {
+			public void update(Integer eventData) {
+				resultPanel.refresh();
+			}
+		});
+		
+		/*
+		 * Update the result panel on changes to the values in the filesize group.
+		 */
+		class FilesizeResultFilter implements ResultPanel.ResultFilter, Event.Listener<long[]> {
+			private long minBytes = 0;
+			private long maxBytes = -1;
+			public boolean select(ResultDocument doc) {
+				long targetSize = doc.getFile().length();
+				boolean minPassed = minBytes <= targetSize;
+				boolean maxPassed = maxBytes == -1 ? true : targetSize <= maxBytes;
+				return minPassed && maxPassed;
+			}
+			public void update(long[] eventData) {
+				minBytes = eventData[0];
+				maxBytes = eventData[1];
+				resultPanel.refresh();
+			}
+		}
+		FilesizeResultFilter filesizeResultFilter = new FilesizeResultFilter();
+		resultPanel.addFilter(filesizeResultFilter);
+		filesizeGroup.evtValuesChanged.add(filesizeResultFilter);
+		
+		// Update result panel when parsers are checked/unchecked
+		Event.Listener<Parser> parserListener = new Event.Listener<Parser> () {
+			public void update(Parser parser) {
+				resultPanel.refresh();
+			}
+		};
+		for (Parser parser : ParserRegistry.getParsers())
+			parser.evtCheckStateChanged.add(parserListener);
+		
+		// Update result panel when scopes are checked/unchecked
+		Scope.checkStateChanged.add(new Event.Listener<Scope> () {
+			public void update(Scope scope) {
+				resultPanel.refresh();
+			}
+		});
+		
+		// Update result panel after removal of a RootScope
+		ScopeRegistry.load().getEvtRegistryRootChanged().add(new Event.Listener<ScopeRegistry> () {
+			public void update(ScopeRegistry eventData) {
+				resultPanel.refresh();
+			}
+		});
+		
+		// Open up preferences dialog when the preferences button is clicked
+		searchPanel.evtPrefBtClicked.add(new Event.Listener<Widget> () {
+			public void update(Widget eventData) {
+				new PrefPage(getShell());
+			}
+		});
+		
+		// Previous page button
+		searchPanel.evtLeftBtClicked.add(new Event.Listener<Widget> () {
+			public void update(Widget eventData) {
+				resultPanel.previousPage();
+			}
+		});
+		
+		// Next page button
+		searchPanel.evtRightBtClicked.add(new Event.Listener<Widget> () {
+			public void update(Widget eventData) {
+				resultPanel.nextPage();
+			}
+		});
+		
+		// Handle content changes on the result panel
+		resultPanel.evtVisibleItemsChanged.add(new Event.Listener<ResultPanel> () {
+			public void update(ResultPanel resultPanel) {
+				searchPanel.setLeftBtEnabled(resultPanel.getPageIndex() > 0);
+				searchPanel.setRightBtEnabled(resultPanel.getPageIndex() < resultPanel.getPageCount() - 1);
+				showResultStatus();
+			}
+		});
+		
+		// Selection changes in result panel change content of preview panel
+		resultPanel.evtSelectionChanged.add(new Event.Listener<ResultPanel> () {
+			public void update(ResultPanel resultPanel) {
+				ResultDocument doc = (ResultDocument) resultPanel.getSelection().getFirstElement();
+				if (doc == null) return;
+				previewPanel.setFile(doc.getFile(), doc.getParsedBy());
+				showResultStatus();
+			}
+		});
+		
+		// Handle request to list documents
+		scopeGroup.evtListDocuments.add(new Event.Listener<ResultDocument[]> () {
+			public void update(ResultDocument[] docs) {
+				resultPanel.setResults(docs);
+				previewPanel.setTerms(new String[0]);
+			}
+		});
+		
+		// Handle search requests
+		searchPanel.evtSearchRequest.add(new Event.Listener<String> () {
+			public void update(String searchString) {
+				doSearch(searchString);
+			}
+		});
+		
+		/*
+		 * Global keys
+		 */
+		Display.getDefault().addFilter(SWT.KeyDown, new Listener() {
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				/*
+				 * FIXME This line fixes a bug in SWT 3.2.2 / Windows: If the
+				 * current tab displays an SWT browser widget (e.g. this app's
+				 * manual) and the user hits a key, two key events are
+				 * triggered, one from the Browser class and one from a class
+				 * named Website. This means, for example, that if the key for
+				 * hiding/showing the search bar is pressed, its visibility
+				 * state will not change after all, because it will be
+				 * hidden/shown right after it was shown/hidden. Thus we're
+				 * intercepting key events from the Website class here. This is
+				 * done using a name check instead of 'instanceof' since this
+				 * class is not visible.
+				 */
+				if (event.widget.getClass().getSimpleName().equals("WebSite")) return; //$NON-NLS-1$
+				
+				Key key = Key.getKey(event.stateMask, event.keyCode);
+				if (key == null) return;
+				
+				// Disable global keys when the main shell is inactive
+				if (Display.getCurrent().getActiveShell() != DocFetcher.getInst().getShell()) return;
+				event.doit = false;
+				
+				switch (key) {
+				case Help: mainPanel.showHelpPage(); break;
+				case FocusSearchBox:
+				case FocusSearchBox2: searchPanel.setFocus(); break;
+				case FocusFilesizeGroup: filesizeGroup.setFocus(); break;
+				case FocusParserGroup: parserGroup.setFocus(); break;
+				case FocusScopeGroup: scopeGroup.setFocus(); break;
+				case FocusResults: resultPanel.setFocus(); break;
+				case HideFilterPanel: Pref.Bool.ShowFilterPanel.setValue(! Pref.Bool.ShowFilterPanel.getValue()); break;
+				case HidePreviewPanel: Pref.Bool.ShowPreview.setValue(! Pref.Bool.ShowPreview.getValue()); break;
+				default: event.doit = true;
+				}
+			}
+		});
+		
+		/*
+		 * We do this at the end of this method (instead of at the beginning of
+		 * main) so developers can see a stacktrace in the Eclipse console if
+		 * they haven't set up the run configuration appropriately.
 		 */
 		ExceptionHandler.setEnabled(true);
 		
 		return topContainer;
-	}
-	
-	/**
-	 * Shows or hides the search bar.
-	 */
-	public void setFilterPanelVisible(boolean show) {
-		filterPanel.setVisible(show);
-		sashHorizontal.layout();
-		mainPanel.setFilterButtonChecked(show);
-	}
-	
-	/**
-	 * Returns whether the search bar is visible.
-	 */
-	public boolean isFilterPanelVisible() {
-		return filterPanel.getVisible();
 	}
 	
 	/**
@@ -299,13 +481,9 @@ public class DocFetcher extends ApplicationWindow {
 		if (clipboard != null && ! clipboard.isDisposed())
 			clipboard.dispose();
 		
-		Pref.Bool.FirstLaunch.value = false;
-		Pref.Bool.ShellMaximized.value = getShell().getMaximized();
-		
+		Pref.Bool.FirstLaunch.setValue(false);		Pref.Bool.ShellMaximized.setValue(getShell().getMaximized());		
 		// Store sash weights
-		Pref.IntArray.SashHorizontalWeights.value = sashHorizontal.getWeights();
-		Pref.IntArray.SashLeftWeights.value = sashLeft.getWeights();
-		mainPanel.saveWeights();
+		Pref.IntArray.SashHorizontalWeights.setValue(sashHorizontal.getWeights());		Pref.IntArray.SashLeftWeights.setValue(sashLeft.getWeights());		mainPanel.saveWeights();
 		
 		// Save preferences and registries
 		try {
@@ -337,13 +515,73 @@ public class DocFetcher extends ApplicationWindow {
 			getStatusLineManager().setMessage(Icon.INFO.getImage(), msg);
 	}
 	
+	private void doSearch(final String searchString) {
+		// Disallow empty search strings
+		String errorMsg = searchPanel.checkSearchDisabled();
+		
+		// Disallow search when there are no indexes to search in
+		if (ScopeRegistry.load().getEntries().length == 0)
+			errorMsg = Msg.search_scope_empty.value();
+		
+		// Check for correct filesizes
+		errorMsg = filesizeGroup.checkSearchDisabled();
+		
+		// At least one item in the filetype table must be checked
+		if (! ParserRegistry.hasCheckedParsers())
+			errorMsg = Msg.no_filetypes_selected.value();
+		
+		if (errorMsg != null) {
+			UtilGUI.showWarningMsg(Msg.invalid_operation.value(), errorMsg);
+			return;
+		}
+		
+		/*
+		 * Get query string and check if it starts with '*' or '?'. If
+		 * so, abort with a MessageBox.
+		 */
+		if (searchString.startsWith("*") || searchString.startsWith("?")) { //$NON-NLS-1$ //$NON-NLS-2$
+			UtilGUI.showWarningMsg(
+					Msg.invalid_query_syntax.value(),
+					Msg.wildcard_first_char.value()
+			);
+			return;
+		}
+		
+		searchPanel.setSearchBoxEnabled(false);
+		new Thread() {
+			public void run() {
+				final List<String> terms = new ArrayList<String> ();
+				try {
+					final ResultDocument[] results = scopeReg.search(searchString, terms);
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							resultPanel.setResults(results);
+							previewPanel.setTerms(terms.toArray(new String[terms.size()]));
+							searchPanel.addToSearchHistory(searchString);
+						}
+					});
+				}
+				catch (SearchException e) {
+					UtilGUI.showWarningMsg(null, e.getMessage());
+				}
+				finally {
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							resultPanel.setFocus();
+							searchPanel.setSearchBoxEnabled(true);
+						}
+					});
+				}
+			}
+		}.start();
+	}
+	
 	/**
 	 * Displays a status message about the results in the currently active
 	 * result page.
 	 */
-	public void showResultStatus() {
-		// Get active result tab, clear status line if no active result tab
-		ResultPanel resultPanel = mainPanel.getResultPanel();
+	private void showResultStatus() {
+		// Get active result tab, clear status line if no result panel hasn't been created yet
 		if (resultPanel == null) {
 			setStatus(null);
 			return;
@@ -366,7 +604,7 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// More complicated message: "Results: 101-200 of 320	Page 2/4"
 		else {
-			int maxSize = Pref.Int.MaxResults.value;
+			int maxSize = Pref.Int.MaxResults.value();
 			int pageIndex = resultPanel.getPageIndex();
 			int pageCount = resultPanel.getPageCount();
 			int a = pageIndex * maxSize + 1;
@@ -413,16 +651,14 @@ public class DocFetcher extends ApplicationWindow {
 		 * workaround is to deactivate the preview panel before going to the
 		 * system tray and reactivate it when we come back.
 		 */
-		mainPanel.getPreview().setActive(false);
+		previewPanel.setActive(false);
 		
 		/*
 		 * For some reason the shell will have the wrong position without this
 		 * when brought back from system tray.
 		 */
 		Point shellPos = shell.getLocation();
-		Pref.Int.ShellX.value = shellPos.x;
-		Pref.Int.ShellY.value = shellPos.y;
-		
+		Pref.Int.ShellX.setValue(shellPos.x);		Pref.Int.ShellY.setValue(shellPos.y);		
 		// Create and configure tray item
 		trayItem = new TrayItem (tray, SWT.NONE);
 		trayItem.setToolTipText(DocFetcher.appName);
@@ -462,7 +698,7 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// Restore application when user clicks on the 'restore' item or doubleclicks on the tray icon.
 		Listener appRestorer = new Listener() {
-			public void handleEvent(Event event) {
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				restoreFromSystemTray();
 			}
 		};
@@ -485,20 +721,13 @@ public class DocFetcher extends ApplicationWindow {
 		shell.setVisible(true);
 		shell.forceActive();
 		shell.setMinimized(false);
-		mainPanel.getPreview().setActive(true);
+		previewPanel.setActive(true);
 		if (trayItem != null) {
 			trayItem.dispose();
 			trayItem = null;
 		}
-		shell.setLocation(Pref.Int.ShellX.value, Pref.Int.ShellY.value);
+		shell.setLocation(Pref.Int.ShellX.value(), Pref.Int.ShellY.value());
 		mainPanel.focusSearchBox();
-	}
-	
-	/**
-	 * Opens up the preferences dialog.
-	 */
-	public void openPrefPage() {
-		new PrefPage(getShell());
 	}
 	
 	/**
@@ -506,18 +735,6 @@ public class DocFetcher extends ApplicationWindow {
 	 */
 	public IndexingBox getIndexingBox() {
 		return indexingBox;
-	}
-	
-	public ResultPanel getResultPanel() {
-		return mainPanel.getResultPanel();
-	}
-	
-	public PreviewPanel getPreviewPanel() {
-		return mainPanel.getPreview();
-	}
-
-	public void focusSearchBox() {
-		mainPanel.focusSearchBox();
 	}
 	
 }

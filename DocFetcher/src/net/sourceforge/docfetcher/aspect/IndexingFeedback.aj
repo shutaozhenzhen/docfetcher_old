@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.aspect;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.FileWrapper;
 import net.sourceforge.docfetcher.model.RootScope;
@@ -57,7 +58,7 @@ public aspect IndexingFeedback {
 	 * Add the name of the file currently indexed to the info box.
 	 */
 	before(final File file): parsing(file) {
-		Singletons.docFetcher.getIndexingBox().appendInfo(fileCount + "\t" + file.getName()); //$NON-NLS-1$
+		DocFetcher.getInst().getIndexingBox().appendInfo(fileCount + "\t" + file.getName()); //$NON-NLS-1$
 	}
 	
 	/**
@@ -74,7 +75,7 @@ public aspect IndexingFeedback {
 	before(final ParseException e, RootScope rootScope):
 		handler(ParseException) && args(e) &&
 		cflow(indexing(rootScope)) && !withincode(* HTMLParser.merge(..)) {
-		IndexingBox indexingBox = Singletons.docFetcher.getIndexingBox();
+		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
 		indexingBox.appendInfo("### " + Msg.file_skipped.format(e.getMessage())); //$NON-NLS-1$
 		indexingBox.addError(e);
 	}
@@ -84,7 +85,7 @@ public aspect IndexingFeedback {
 	 */
 	after(final File file) returning(boolean excluded): execution(* RootScope.isExcluded(..)) && args(file) {
 		if (excluded) {
-			IndexingBox indexingBox = Singletons.docFetcher.getIndexingBox();
+			IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
 			indexingBox.appendInfo(Msg.file_skipped.format(file.getName()));
 		}
 	}
@@ -93,7 +94,7 @@ public aspect IndexingFeedback {
 	 * Handle the termination of indexing caused by missing index files.
 	 */
 	after(RootScope rootScope) throwing(FileNotFoundException e): indexing(rootScope) {
-		IndexingBox indexingBox = Singletons.docFetcher.getIndexingBox();
+		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
 		indexingBox.appendInfo(Msg.target_folder_deleted.value());
 		fileCount = 1; // Reset file counter
 	}
@@ -102,7 +103,7 @@ public aspect IndexingFeedback {
 	 * Displays an appropriate status message at the end of an indexing process if it returns normally.
 	 */
 	after(final RootScope rootScope) returning(): indexing(rootScope) {
-		IndexingBox indexingBox = Singletons.docFetcher.getIndexingBox();
+		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
 		
 		// Set message: Finished without or with errors
 		if (indexingBox.getErrors().length == 0)
@@ -124,7 +125,7 @@ public aspect IndexingFeedback {
 	 */
 	after(IndexingBox indexingBox): call(* IndexingBox.close()) && target(indexingBox) {
 		String msg = Msg.num_documents_added.format(multipleFileCount);
-		Singletons.docFetcher.setStatus(msg);
+		DocFetcher.getInst().setStatus(msg);
 		multipleFileCount = 0;
 	}
 	

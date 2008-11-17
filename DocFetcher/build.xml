@@ -21,7 +21,6 @@
 		<mkdir dir="${versiondir}"/>
 		<copy todir="${versiondir}" flatten="true">
 			<resources>
-				<file file="resources/help/DocFetcher_Manual.html"/>
 				<file file="resources/ChangeLog.txt"/>
 				<file file="resources/Readme.txt"/>
 				<file file="resources/deb/control/control"/>
@@ -31,6 +30,9 @@
 				<filter token="DATE" value="${DSTAMP}"/>
 				<filter token="VERSION" value="${version}"/>
 			</filterset>
+		</copy>
+		<copy todir="${versiondir}">
+			<fileset dir="resources/help" includes="DocFetcher_Manual*.html"/>
 		</copy>
 		<copy todir="${versiondir}/licenses">
 			<fileset dir="resources/licenses"/>
@@ -86,8 +88,8 @@
 			<fileset dir="${versiondir}" includes="**/*.txt"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/doc/docfetcher">
-			<fileset dir="resources/help" excludes="DocFetcher_Manual.html"/>
-			<filelist dir="${versiondir}" files="DocFetcher_Manual.html"/>
+			<fileset dir="resources/help" excludes="DocFetcher_Manual*.html"/>
+			<fileset dir="${versiondir}" includes="DocFetcher_Manual*.html"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/doc/docfetcher/licenses">
 			<fileset dir="${versiondir}/licenses"/>
@@ -138,8 +140,8 @@
 			<fileset dir="resources/portable"/>
 		</copy>
 		<copy todir="${programdir}/help">
-			<fileset dir="resources/help" excludes="DocFetcher_Manual.html"/>
-			<filelist dir="${versiondir}" files="DocFetcher_Manual.html"/>
+			<fileset dir="resources/help" excludes="DocFetcher_Manual*.html"/>
+			<fileset dir="${versiondir}" includes="DocFetcher_Manual*.html"/>
 		</copy>
 		<copy todir="${programdir}/licenses">
 			<fileset dir="${versiondir}/licenses"/>

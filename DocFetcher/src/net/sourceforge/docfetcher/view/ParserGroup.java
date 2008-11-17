@@ -99,6 +99,10 @@ public class ParserGroup extends GroupWrapper {
 		contextMenu.add(new Separator());
 		contextMenu.add(new CheckInvertAction());
 	}
+	
+	public boolean setFocus() {
+		return viewer.getControl().setFocus();
+	}
 
 	public void setParsers(Parser[] parsers) {
 		this.parsers = parsers;

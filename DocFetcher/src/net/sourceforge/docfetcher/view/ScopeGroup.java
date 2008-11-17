@@ -12,7 +12,6 @@
 package net.sourceforge.docfetcher.view;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,7 +21,6 @@ import java.util.Set;
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.Event;
-import net.sourceforge.docfetcher.Event.IObserver;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
@@ -37,9 +35,6 @@ import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.MultiReader;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -72,6 +67,8 @@ import org.eclipse.swt.widgets.Tree;
  * @author Tran Nam Quang
  */
 public class ScopeGroup extends GroupWrapper {
+	
+	public final Event<ResultDocument[]> evtListDocuments = new Event<ResultDocument[]> ();
 	
 	private CheckboxTreeViewer viewer;
 	private ViewerMenuManager viewerMenu;
@@ -109,10 +106,10 @@ public class ScopeGroup extends GroupWrapper {
 		viewerMenu.setManagedActionsEnabled(false);
 
 		// Update self on add/remove in scope registry
-		ScopeRegistry.load().getEvtRegistryChanged().add(new IObserver() {
-			public void update() {
+		ScopeRegistry.load().getEvtRegistryChanged().add(new Event.Listener<ScopeRegistry> () {
+			public void update(ScopeRegistry scopeReg) {
 				Object[] expandedElements = viewer.getExpandedElements();
-				setScopes(ScopeRegistry.load().getEntries());
+				setScopes(scopeReg.getEntries());
 				viewer.setExpandedElements(expandedElements);
 				updateVisibleCheckStates(new Object[0]);
 			}
@@ -394,6 +391,10 @@ public class ScopeGroup extends GroupWrapper {
 		return existing.toArray(new Scope[existing.size()]);
 	}
 	
+	public boolean setFocus() {
+		return viewer.getControl().setFocus();
+	}
+	
 	/**
 	 * Action to add scopes to the search scope.
 	 */
@@ -502,7 +503,7 @@ public class ScopeGroup extends GroupWrapper {
 		public void run() {
 			Scope[] scopes = getExistingSelection(getSelection());
 			if (scopes.length == 0) return;
-			int openLimit = Pref.Int.OpenLimit.value;
+			int openLimit = Pref.Int.OpenLimit.value();
 			if (scopes.length > openLimit) {
 				UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
 				return;
@@ -525,27 +526,12 @@ public class ScopeGroup extends GroupWrapper {
 			if (scopes.length == 0) return;
 			new Thread() {
 				public void run() {
-					try {
-						IndexReader[] readers = new IndexReader[scopes.length];
-						for (int i = 0; i < scopes.length; i++)
-							readers[i] = IndexReader.open(((RootScope) scopes[i]).getIndexDir());
-						MultiReader multiReader = new MultiReader(readers);
-						ResultDocument[] docs = new ResultDocument[multiReader.numDocs()];
-						for (int i = 0; i < multiReader.numDocs(); i++)
-							docs[i] = new ResultDocument(multiReader.document(i), 0);
-						multiReader.close();
-						final ResultDocument[] finalDocs = docs;
-						Display.getDefault().syncExec(new Runnable() {
-							public void run() {
-								DocFetcher.getInst().getResultPanel().setResults(finalDocs);
-								DocFetcher.getInst().getPreviewPanel().setTerms(new String[0]);
-							}
-						});
-					} catch (CorruptIndexException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					final ResultDocument[] docs = RootScope.listDocuments(getRootSelection());
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							evtListDocuments.fireUpdate(docs);
+						}
+					});
 				}
 			}.start();
 		}
@@ -581,7 +567,7 @@ public class ScopeGroup extends GroupWrapper {
 			// Create folder
 			FSEventHandler.getInst().setWatchEnabled(false, rootScope);
 			boolean success = newFolder.mkdir();
-			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.value, rootScope);
+			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
 			
 			if (! success) {
 				UtilGUI.showErrorMsg(null, Msg.create_subfolder_failed.value());
@@ -626,7 +612,7 @@ public class ScopeGroup extends GroupWrapper {
 			File newFile = new File(targetFolder.getParentFile().getAbsolutePath(), input);
 			FSEventHandler.getInst().setWatchEnabled(false, rootScope);
 			boolean success = targetFolder.renameTo(newFile);
-			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.value, rootScope);
+			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
 			if (! success) {
 				UtilGUI.showErrorMsg(null, Msg.cant_rename_folder.value());
 				return;
@@ -693,7 +679,7 @@ public class ScopeGroup extends GroupWrapper {
 				}
 				else {
 					UtilFile.delete(targetFolder, true);
-					FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.value, rootScope);
+					FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
 					jobs.add(new Job(rootScope, false, false));
 				}
 			}
@@ -767,7 +753,7 @@ public class ScopeGroup extends GroupWrapper {
 			transferBox.open();
 			transferBox.transferFiles(files, newParent);
 			
-			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.value, rootScopeToUpdate);
+			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScopeToUpdate);
 			
 			// Update indexes, but silently
 			IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();

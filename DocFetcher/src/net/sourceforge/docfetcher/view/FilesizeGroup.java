@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.view;
 
+import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Filesize;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -19,6 +20,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.FormData;
@@ -33,10 +38,21 @@ import org.eclipse.swt.widgets.Text;
  */
 public class FilesizeGroup extends GroupWrapper {
 	
+	/** Event: The minimum or maximum filesize setting has changed. */
+	public final Event<long[]> evtValuesChanged = new Event<long[]> ();
+	
 	private Text minField;
 	private Text maxField;
 	private Combo minCombo;
 	private Combo maxCombo;
+
+	/** Cache of the current minimum filesize value. */
+	private long minBytes = 0;
+	
+	/** Cache of the current minimum filesize value. */
+	private long maxBytes = -1;
+	
+	private EventRedirector evtRedirector = new EventRedirector();
 
 	public FilesizeGroup(Composite parent) {
 		/*
@@ -56,6 +72,12 @@ public class FilesizeGroup extends GroupWrapper {
 		maxCombo.setItems(comboItems);
 		minCombo.select(Filesize.KB.ordinal());
 		maxCombo.select(Filesize.KB.ordinal());
+		
+		// Redirect various modification events to the notification method
+		minField.addModifyListener(evtRedirector);
+		maxField.addModifyListener(evtRedirector);
+		evtRedirector.listenTo(minCombo);
+		evtRedirector.listenTo(maxCombo);
 		
 		// Layout
 		group.setLayout(new FormLayout());
@@ -97,6 +119,124 @@ public class FilesizeGroup extends GroupWrapper {
 		new FilesizeGroupNavigator(new Control[] {
 				minField, minCombo, maxField, maxCombo
 		});
+	}
+	
+	public boolean setFocus() {
+		return minField.setFocus();
+	}
+	
+	/**
+	 * Updates the cached minimum and maximum filesize values and refreshes all
+	 * opened result tabs.
+	 */
+	private void notifyValuesChangedListeners() {
+		// Set min/max defaults
+		long minSize = minBytes = 0;
+		long maxSize = maxBytes = -1;
+		Filesize minUnit = Filesize.Byte;
+		Filesize maxUnit = Filesize.Byte;
+		
+		// Try to change the defaults
+		try {
+			minSize = Long.parseLong(minField.getText());
+			minUnit = Filesize.valueOf(minCombo.getText());
+		} catch (Exception e) {
+			minSize = 0;
+			minUnit = Filesize.Byte;
+		}
+		try {
+			maxSize = Long.parseLong(maxField.getText());
+			maxUnit = Filesize.valueOf(maxCombo.getText());
+		} catch (Exception e) {
+			maxSize = -1;
+			maxUnit = Filesize.Byte;
+		}
+		
+		// Convert to bytes and save to cache
+		if (minSize > 0)
+			minBytes = Filesize.Byte.convert(minSize, minUnit);
+		if (maxSize != -1)
+			maxBytes = Filesize.Byte.convert(maxSize, maxUnit);
+		
+		evtValuesChanged.fireUpdate(new long[] {minBytes, maxBytes});
+	}
+	
+	/**
+	 * Finds out if the current minimum and maximum filesize values allow
+	 * performing a search. If not, an error message is returned, otherwise
+	 * returns null.
+	 */
+	public String checkSearchDisabled() {
+		try {
+			String numString1 = minField.getText();
+			String numString2 = maxField.getText();
+			int selIndex1 = minCombo.getSelectionIndex();
+			int selIndex2 = maxCombo.getSelectionIndex();
+			boolean parsable1 = ! numString1.equals("") && selIndex1 != -1; //$NON-NLS-1$
+			boolean parsable2 = ! numString2.equals("") && selIndex2 != -1; //$NON-NLS-1$
+			long num1 = parsable1 ? checkRange(numString1, selIndex1) : 0;
+			long num2 = parsable2 ? checkRange(numString2, selIndex2) : 0;
+			if (parsable1 && parsable2) {
+				num1 *= Math.pow(1024, selIndex1);
+				num2 *= Math.pow(1024, selIndex2);
+				if (num1 > num2)
+					return Msg.minsize_not_greater_maxsize.value();
+			}
+		} catch (NumberFormatException ex) {
+			return Msg.filesize_out_of_range.value();
+		}
+		return null;
+	}
+	
+	/**
+	 * Checks if the provided filesize is smaller than Long.MAX_VALUE bytes and
+	 * throws a NumberFormatException if not.
+	 * 
+	 * @param numString
+	 *            The numeric value of the filesize
+	 * @param power
+	 *            The power corresponding to the unit of the filesize. For byte,
+	 *            this is 0, for KB it's 1, for MB 2 and for GB 3.
+	 * @return The given numerical string as a long number.
+	 */
+	private long checkRange(String numString, int power) throws NumberFormatException {
+		long num = Long.parseLong(numString);
+		long max = Long.MAX_VALUE;
+		switch (power) {
+		case 0: break;
+		case 1:
+			long maxKB = Filesize.KB.convert(max, Filesize.Byte);
+			if (num <= maxKB) break;
+		case 2:
+			long maxMB = Filesize.MB.convert(max, Filesize.Byte);
+			if (num <= maxMB) break;
+		case 3:
+			long maxGB = Filesize.GB.convert(max, Filesize.Byte);
+			if (num <= maxGB) break;
+		default:
+			throw new NumberFormatException();
+		}
+		return num;
+	}
+	
+	/**
+	 * Redirects events from the text and combo widgets to
+	 * <tt>notifyValuesChangedListener</tt>.
+	 */
+	private class EventRedirector implements ModifyListener, SelectionListener {
+		public void listenTo(Combo combo) {
+			combo.addSelectionListener(this);
+			combo.addModifyListener(this);
+		}
+		public void widgetDefaultSelected(SelectionEvent e) {
+			notifyValuesChangedListeners();
+		}
+		public void widgetSelected(SelectionEvent e) {
+			notifyValuesChangedListeners();
+		}
+		public void modifyText(ModifyEvent e) {
+			notifyValuesChangedListeners();
+		}
 	}
 	
 	/**

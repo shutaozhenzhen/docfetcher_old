@@ -25,34 +25,26 @@ import org.eclipse.swt.widgets.Display;
  */
 public enum Font {
 	
-	SYSTEM_BOLD ("sysbold"), //$NON-NLS-1$
-	PREVIEW ("preview"), //$NON-NLS-1$
-	PREVIEW_MONO ("preview_mono"), //$NON-NLS-1$
+	SYSTEM_BOLD,
+	PREVIEW,
+	PREVIEW_MONO,
 	;
 	
 	private static boolean boldFontInitialized = false;
-	
-	/** An ID used to store the font in the FontRegistry. */
-	private final String ref;
-	
-	Font (String ref) {
-		this.ref = ref;
-	}
-	
 	private static FontRegistry fontRegistry = new FontRegistry();
 	
 	static {
-		fontRegistry.put(PREVIEW.ref, new FontData[] {
+		fontRegistry.put(PREVIEW.name(), new FontData[] {
 				new FontData(
-						Const.IS_WINDOWS ? Pref.Str.PreviewFontWin.value : Pref.Str.PreviewFontLinux.value,
-						Pref.Int.PreviewFontHeight.value,
+						Const.IS_WINDOWS ? Pref.Str.PreviewFontWin.value() : Pref.Str.PreviewFontLinux.value(),
+						Pref.Int.PreviewFontHeight.value(),
 						SWT.NORMAL
 				)
 		});
-		fontRegistry.put(PREVIEW_MONO.ref, new FontData[] {
+		fontRegistry.put(PREVIEW_MONO.name(), new FontData[] {
 				new FontData(
-						Const.IS_WINDOWS ? Pref.Str.PreviewFontMonoWin.value : Pref.Str.PreviewFontMonoLinux.value,
-						Pref.Int.PreviewFontHeightMono.value,
+						Const.IS_WINDOWS ? Pref.Str.PreviewFontMonoWin.value() : Pref.Str.PreviewFontMonoLinux.value(),
+						Pref.Int.PreviewFontHeightMono.value(),
 						SWT.NORMAL
 				)
 		});
@@ -72,10 +64,10 @@ public enum Font {
 			FontData sysFD = Display.getDefault().getSystemFont().getFontData()[0];
 			String sysFDName = sysFD.getName();
 			int sysFDHeight = sysFD.getHeight();
-			fontRegistry.put(SYSTEM_BOLD.ref, new FontData[] {new FontData(sysFDName, sysFDHeight, SWT.BOLD)});
+			fontRegistry.put(SYSTEM_BOLD.name(), new FontData[] {new FontData(sysFDName, sysFDHeight, SWT.BOLD)});
 			boldFontInitialized = true;
 		}
-		return fontRegistry.get(ref);
+		return fontRegistry.get(this.name());
 	}
 
 }

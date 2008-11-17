@@ -34,7 +34,7 @@ import au.id.jericho.lib.html.StartTag;
  */
 public class HTMLParser extends Parser {
 
-	private String[] extensions = Pref.StrArray.HTMLExtensions.value;
+	private String[] extensions = Pref.StrArray.HTMLExtensions.value();
 
 	public Document parse(File file) throws ParseException {
 		return parse(file, null);

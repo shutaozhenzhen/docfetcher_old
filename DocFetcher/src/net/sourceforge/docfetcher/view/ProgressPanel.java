@@ -15,6 +15,7 @@ import java.io.File;
 
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
+import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
@@ -53,7 +54,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class ProgressPanel extends Composite {
 	
-	private SashForm sash;
+	SashForm sash;
 	private Table errorTable;
 	private TableColumn errorTypeCol;
 	private TableColumn pathCol;
@@ -69,7 +70,7 @@ public class ProgressPanel extends Composite {
 		// Create group widgets
 		Group topGroup = new Group(sash, SWT.SHADOW_OUT);
 		Group bottomGroup = new Group(sash, SWT.SHADOW_OUT);
-		sash.setWeights(Pref.IntArray.SashProgressPanelWeights.value);
+		sash.setWeights(Pref.IntArray.SashProgressPanelWeights.value());
 		topGroup.setText(Msg.progress.value());
 		topGroup.setLayout(FillLayoutFactory.getInst().margin(1).create());
 		bottomGroup.setText(Msg.errors.value());
@@ -78,7 +79,7 @@ public class ProgressPanel extends Composite {
 		// Save sash weights on change
 		ControlAdapter sashWeightSaver = new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				Pref.IntArray.SashProgressPanelWeights.value = sash.getWeights();
+				Pref.IntArray.SashProgressPanelWeights.setValue(sash.getWeights());
 			}
 		};
 		topGroup.addControlListener(sashWeightSaver);
@@ -97,9 +98,9 @@ public class ProgressPanel extends Composite {
 		// Create error table columns
 		errorTypeCol = new TableColumn(errorTable, SWT.NONE);
 		pathCol = new TableColumn(errorTable, SWT.NONE);
-		errorTypeCol.setWidth(Pref.Int.ErrorTypeColWidth.value);
+		errorTypeCol.setWidth(Pref.Int.ErrorTypeColWidth.value());
 		errorTypeCol.setText(Msg.error_type.value());
-		pathCol.setWidth(Pref.Int.ErrorPathColWidth.value);
+		pathCol.setWidth(Pref.Int.ErrorPathColWidth.value());
 		pathCol.setText(Msg.property_path.value());
 		
 		// Open file associated with error item on doubleclick
@@ -125,12 +126,57 @@ public class ProgressPanel extends Composite {
 		// Save column widths on change
 		errorTypeCol.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				Pref.Int.ErrorTypeColWidth.value = errorTypeCol.getWidth();
+				Pref.Int.ErrorTypeColWidth.setValue(errorTypeCol.getWidth());
 			}
 		});
 		pathCol.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				Pref.Int.ErrorPathColWidth.value = pathCol.getWidth();
+				Pref.Int.ErrorPathColWidth.setValue(pathCol.getWidth());
+			}
+		});
+		
+		/*
+		 * When sash weight of one indexing tab changes, synchronize sash
+		 * weights of other indexing tabs with it.
+		 */
+		Pref.IntArray.SashProgressPanelWeights.evtChanged.add(new Event.Listener<int[]> () {
+			public void update(int[] eventData) {
+				for (IndexingTab tab : DocFetcher.getInst().getIndexingBox().getIndexingTabs()) {
+					if (! tab.getJob().isReadyForIndexing()) continue;
+					int[] w = tab.progressPanel.sash.getWeights();
+					int[] pref_w = eventData;
+					if (w[0] == pref_w[0] && w[1] == pref_w[1])
+						continue;
+					tab.progressPanel.sash.setWeights(pref_w);
+				}
+			}
+		});
+		
+		/*
+		 * Synchronize error type column width across indexing tabs.
+		 */
+		Pref.Int.ErrorTypeColWidth.evtChanged.add(new Event.Listener<Integer> () {
+			public void update(Integer eventData) {
+				for (IndexingTab tab : DocFetcher.getInst().getIndexingBox().getIndexingTabs()) {
+					if (! tab.getJob().isReadyForIndexing()) continue;
+					if (tab.progressPanel.errorTypeCol.getWidth() == eventData)
+						continue;
+					tab.progressPanel.errorTypeCol.setWidth(eventData);
+				}
+			}
+		});
+		
+		/*
+		 * Synchronize path column width across indexing tabs.
+		 */
+		Pref.Int.ErrorPathColWidth.evtChanged.add(new Event.Listener<Integer> () {
+			public void update(Integer eventData) {
+				for (IndexingTab tab : DocFetcher.getInst().getIndexingBox().getIndexingTabs()) {
+					if (! tab.getJob().isReadyForIndexing()) continue;
+					if (tab.progressPanel.pathCol.getWidth() == eventData)
+						continue;
+					tab.progressPanel.pathCol.setWidth(eventData);
+				}
 			}
 		});
 	}

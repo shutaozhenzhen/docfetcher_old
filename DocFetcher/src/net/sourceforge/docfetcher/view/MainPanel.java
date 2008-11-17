@@ -34,10 +34,10 @@ public class MainPanel extends Composite {
 	public MainPanel(Composite parent) {
 		super(parent, SWT.NONE);
 		setLayout(new FillLayout());
-		sash = new SashForm(this, Pref.Bool.PreviewBottom.value ? SWT.VERTICAL : SWT.HORIZONTAL);
+		sash = new SashForm(this, Pref.Bool.PreviewBottom.getValue() ? SWT.VERTICAL : SWT.HORIZONTAL);
 		searchPanel = new SearchPanel(sash);
 		previewPanel = new PreviewPanel(sash);
-		if (Pref.Bool.ShowPreview.value) {
+		if (Pref.Bool.ShowPreview.getValue()) {
 			loadSashWeights();
 			previewPanel.setActive(true);
 		}
@@ -50,8 +50,8 @@ public class MainPanel extends Composite {
 	 */
 	private void loadSashWeights() {
 		sash.setWeights(sash.getOrientation() == SWT.VERTICAL ?
-				Pref.IntArray.SashRightVerticalWeights.value :
-				Pref.IntArray.SashRightHorizontalWeights.value
+				Pref.IntArray.SashRightVerticalWeights.value() :
+				Pref.IntArray.SashRightHorizontalWeights.value()
 		);
 	}
 	
@@ -84,9 +84,8 @@ public class MainPanel extends Composite {
 			previewPanel.setActive(false);
 			sash.setMaximizedControl(searchPanel);
 		}
-		if (show != Pref.Bool.ShowPreview.value)
-			Pref.Bool.ShowPreview.value = show;
-		searchPanel.setPreviewButtonChecked(show);
+		if (show != Pref.Bool.ShowPreview.getValue())
+			Pref.Bool.ShowPreview.setValue(show);		searchPanel.setPreviewButtonChecked(show);
 	}
 	
 	/**
@@ -106,33 +105,35 @@ public class MainPanel extends Composite {
 		sash.setOrientation(bottom ? SWT.VERTICAL : SWT.HORIZONTAL);
 		if (isPreviewVisible()) {
 			if (bottom) {
-				Pref.IntArray.SashRightHorizontalWeights.value = sash.getWeights();
-				sash.setWeights(Pref.IntArray.SashRightVerticalWeights.value);
+				Pref.IntArray.SashRightHorizontalWeights.setValue(sash.getWeights());				sash.setWeights(Pref.IntArray.SashRightVerticalWeights.value());
 			}
 			else {
-				Pref.IntArray.SashRightVerticalWeights.value = sash.getWeights();
-				sash.setWeights(Pref.IntArray.SashRightHorizontalWeights.value);
+				Pref.IntArray.SashRightVerticalWeights.setValue(sash.getWeights());				sash.setWeights(Pref.IntArray.SashRightHorizontalWeights.value());
 			}
 		}
-		if (bottom != Pref.Bool.PreviewBottom.value)
-			Pref.Bool.PreviewBottom.value = bottom;
-	}
+		if (bottom != Pref.Bool.PreviewBottom.getValue())
+			Pref.Bool.PreviewBottom.setValue(bottom);	}
 	
 	/**
 	 * Save the current sash weights to the preferences.
 	 */
 	public void saveWeights() {
 		if (sash.getOrientation() == SWT.VERTICAL)
-			Pref.IntArray.SashRightVerticalWeights.value = sash.getWeights();
-		else
-			Pref.IntArray.SashRightHorizontalWeights.value = sash.getWeights();
-	}
+			Pref.IntArray.SashRightVerticalWeights.setValue(sash.getWeights());		else
+			Pref.IntArray.SashRightHorizontalWeights.setValue(sash.getWeights());	}
 	
 	/**
 	 * Bring the focus to the search box.
 	 */
 	public void focusSearchBox() {
 		searchPanel.setFocus();
+	}
+	
+	/**
+	 * Returns the search panel.
+	 */
+	public SearchPanel getSearchPanel() {
+		return searchPanel;
 	}
 	
 	/**
@@ -145,7 +146,7 @@ public class MainPanel extends Composite {
 	/**
 	 * Returns the preview panel.
 	 */
-	public PreviewPanel getPreview() {
+	public PreviewPanel getPreviewPanel() {
 		return previewPanel;
 	}
 	

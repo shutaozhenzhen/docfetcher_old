@@ -24,7 +24,7 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.Event;
-import net.sourceforge.docfetcher.dev.ExceptionHandler;
+import net.sourceforge.docfetcher.ExceptionHandler;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilList;
 import net.sourceforge.docfetcher.view.IndexingBox;
@@ -77,9 +77,9 @@ public class FSEventHandler {
 	}
 	
 	// Updates the internal RootScope-WatchID-map whenever the scope registry changes
-	Event.IObserver regChangeHandler = new Event.IObserver() {
-		public void update() {
-			List<RootScope> regEntries = ScopeRegistry.load().getEntriesList();
+	Event.Listener<ScopeRegistry> regChangeHandler = new Event.Listener<ScopeRegistry> () {
+		public void update(ScopeRegistry scopeReg) {
+			List<RootScope> regEntries = scopeReg.getEntriesList();
 			Set<RootScope> mapEntries = watchIdMap.keySet();
 			List<RootScope> addedEntries = UtilList.subtract(regEntries, mapEntries);
 			List<RootScope> removedEntries = UtilList.subtract(mapEntries, regEntries);

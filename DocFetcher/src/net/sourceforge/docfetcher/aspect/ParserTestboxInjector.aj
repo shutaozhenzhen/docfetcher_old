@@ -161,10 +161,6 @@ public aspect ParserTestboxInjector {
 		new ResultsThread(path).start();
 	}
 	
-	/*
-	 * Declaring this class explicitly instead of anonymously here makes it
-	 * easier to access the run method from another aspect.
-	 */
 	public class ResultsThread extends Thread {
 		
 		private String path;
@@ -224,10 +220,10 @@ public aspect ParserTestboxInjector {
 						infoField.setText(infos);
 					}
 				});
-			} catch (final ParseException pe) {
+			} catch (final ParseException e) {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
-						contentBox.setText("Parse Exception: " + pe.getMessage()); //$NON-NLS-1$
+						contentBox.setText("Parse Exception: " + e.getMessage()); //$NON-NLS-1$
 					}
 				});
 			} catch (Exception e) {
@@ -236,7 +232,7 @@ public aspect ParserTestboxInjector {
 						contentBox.setText("Something went really bad..."); //$NON-NLS-1$
 					}
 				});
-			} catch (OutOfMemoryError oome) {
+			} catch (OutOfMemoryError e) {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						contentBox.setText("Not enough memory!"); //$NON-NLS-1$
