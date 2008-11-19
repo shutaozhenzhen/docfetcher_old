@@ -18,6 +18,7 @@ import net.sourceforge.docfetcher.enumeration.Msg;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
@@ -306,4 +307,11 @@ public class UtilGUI {
 		new SelectAllOnFocus(text);
 	}
 	
+	/**
+	 * Is the KeyEvent a carriage return ?
+	 * It can be the normal one or from the keypad
+	 */
+	public static boolean isCRKey (KeyEvent e){
+		return (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR);
+	}
 }
