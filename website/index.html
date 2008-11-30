@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"><title>DocFetcher - Fast Document Search</title>
+
+<meta name="author" content="Tran Nam Quang">
+<link type="text/css" href="web.css" rel="stylesheet">
+<meta name="keywords" content="DocFetcher, desktop search, file management, search, document, retrieval, indexing, Apache Lucene">
+<meta name="description" content="Homepage of DocFetcher, a desktop search application for fast document retrieval">
+</head>
+<body>
+<div id="header"><img style="width: 750px; height: 209px;" alt="" src="docfetcher-logo.png"></div>
+<div id="page">
+<div id="menu">
+<ul id="nav-bar">
+<li id="current"><a href="index.html">Overview</a></li>
+<li><a href="download.html">Download</a></li>
+<li><a href="screenshots.html">Screenshots</a></li>
+<li><a href="about.html">More</a></li>
+</ul>
+</div>
+<div id="content">
+<h1>Description</h1>
+<p>DocFetcher is an Open Source desktop search application: It
+allows you to quickly access documents on your computer by
+typing&nbsp;keywords. - You can think of it as Google for your
+local
+document repository.&nbsp;The
+application is currently available for Windows and
+GTK-based Linux
+distributions.</p>
+<h1>How It Works</h1>
+<ul>
+<li>You specify one or more folders to make searchable, e.g.
+"C:\MyDocuments".</li>
+<li>DocFetcher
+extracts the text from all documents in "C:\MyDocuments" that it is
+able to read, e.g. HTML, MS Word&nbsp;and PDF, and stores
+the result of this processing in "index files".&nbsp;The indexing
+process
+might take a few minutes (600 documents = about 3 min.).</li>
+<li>Now you can type keywords into DocFetcher's search box,
+e.g. "fourier analysis",
+hit Enter, and DocFetcher will list all documents inside
+"C:\MyDocuments" that contain these&nbsp;words - most of the time
+in
+less than a second.</li>
+<li>What if the original document repository is
+changed? Then the index files will get out of sync with the repository,
+obviously. However: (1) DocFetcher can listen to file system events and
+automatically update its index files when it's running. (2) In
+constrast to completely (re-)building an index, an index update is
+usually a matter of seconds.<br>
+</li>
+</ul>
+<ul>
+</ul>
+<h1>Supported Document Formats</h1>
+<ul>
+<li>HTML and plain text (both customizable)</li>
+<li>Portable Document Format (pdf)<br>
+</li>
+<li>Microsoft Office&nbsp;Word (doc), Excel (xls) and
+PowerPoint (ppt)</li>
+<li>OpenOffice.org Writer, Calc, Draw and Impress</li>
+<li>Rich Text Format (rtf)</li>
+<li>AbiWord (abw, abw.gz, zabw)</li>
+<li>Microsoft Compiled HTML Help (chm)</li>
+<li>Microsoft Visio (vsd)</li>
+<li>(In the works: MS Office 2007)</li>
+</ul>
+<h1>Features</h1>
+<ul>
+<li>Detection of HTML pairs (e.g. "foo.htm" and a folder named
+"foo_files")</li>
+<li>Various
+file operations on the document repository (e.g. creating folders,
+inserting new files) can be performed through DocFetcher's interface.</li>
+<li>Customizable text and HTML file extensions (e.g. "nfo",
+"cpp", "java", "py", "shtml", and so on)</li>
+<li>Regular expression based exclusion of files from indexing</li>
+<li>Automatic index updates on changes to the indexed documents
+(optional).</li>
+<li>Preview panel with search-term highlighting and a simple
+built-in web browser</li>
+<li>Search results can be sorted and filtered by different
+criteria (filetype, filesize, path, etc.).</li>
+<li>A portable version for both Windows and Linux is available,
+which,
+amongst other things, is useful in combination with volume encryption (<a href="http://www.truecrypt.org/">TrueCrypt</a>).</li>
+</ul>
+<h1>What Some People Think About This Program...</h1>
+<table style="width: 100px; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+<tbody>
+<tr>
+<td><a href="http://www.download3000.com/download_47130.html"><img style="border: 0px solid ; width: 160px; height: 67px;" alt="Download3000.com Rating" src="rating5.png"></a></td> <td><a href="http://www.rosoftdownload.com/download/Windows/DocFetcher" title="Download From www.rosoftdownload.com"><img src="http://www.rosoftdownload.com/award/rosoftd_award_139x70.gif" alt="Download From www.rosoftdownload.com" border="0" height="70" width="139"></a></td>
+<td><a href="http://www.softpedia.com/progClean/DocFetcher-Clean-110899.html"><img style="border: 0px solid ; width: 170px; height: 116px;" alt="Softpedia 100% Clean Award" src="softpedia_free_award_f.gif"></a></td>
+</tr>
+</tbody>
+</table>
+<h1>Comparison To Other Desktop Search Applications</h1>
+Why would you use this program instead of other, more popular and even
+apparently more feature-laden desktop search applications such as
+Google Desktop Search, Copernic Desktop Search or Beagle? Here's why:
+Programs such as these can index a lot more than just documents
+(images, videos, e-mails, IM sessions, programs, etc.), and the
+author(s) of DocFetcher believe&nbsp;this is mostly a <span style="font-style: italic;">bad</span> thing, for the
+following reasons:<br>
+<ul>
+<li>Why install yet another program to search for images,
+music, videos, e-mails, etc., if you can access all of that much more
+effectively with your favorite picture browser, media player, e-mail
+client, and so on? So, no images, no music, no videos... - what's
+left?&nbsp;Documents. And that's what DocFetcher is good for. (By
+the
+way, <a href="http://www.launchy.net/">Launchy</a>
+is recommended for quickly launching start menu programs.)</li>
+<li>The real power of Google and other web search engines comes
+from
+document indexing, because it gives a very good approximation of
+the <span style="font-style: italic;">content</span>
+of a document. Indexing images or videos however isn't all that useful,
+because the real&nbsp;content of an image or a video is not
+accessible via text extraction.</li>
+<li>Now
+that we have web services such as Google Mail that allow you to
+maintain
+a central e-mail repository which can be&nbsp;accessed from any
+computer with
+internet connection, what's the point of indexing locally stored
+e-mails, other than to make life harder for both developers and users
+of desktop search applications? </li>
+<li>The bigger the search scope, the more "noise" there will be
+on the search result lists. This is why you will find that,
+when searching for documents, document-only search
+applications such as DocFetcher generally give better
+search results than those which also index
+non-document files.</li>
+<li>Less files to index = faster indexing and decreased CPU
+usage. (Don't
+you just hate it when there's always some program busily working in the
+background?)</li>
+</ul>
+Other than that, if you don't need eye candy, but want a powerful
+Open Source tool that just does what it's supposed to do and nothing
+else (e.g. violating your privacy, installing extra stuff you never
+wanted), then this program is for you!
+<ul>
+</ul>
+</div>
+<div id="footer">
+<div id="sf-logo"><a href="http://sourceforge.net/donate/index.php?group_id=197779"><img src="http://images.sourceforge.net/images/project-support.jpg" alt="Support This Project" border="0" height="32" width="88"></a><a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=197779&amp;type=2" alt="SourceForge.net Logo" border="0" height="37" width="125"></a></div>
+<div id="copyright">Copyright
+© 2008 Tran Nam Quang</div>
+</div>
+</div>
+</body></html>
