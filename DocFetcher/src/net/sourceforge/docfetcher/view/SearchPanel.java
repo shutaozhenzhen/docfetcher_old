@@ -87,8 +87,8 @@ public class SearchPanel extends Composite {
 		
 		searchBox.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				if (e.keyCode != SWT.CR && e.keyCode != SWT.KEYPAD_CR) return;
-				evtSearchRequest.fireUpdate(searchBox.getText());
+				if (UtilGUI.isCRKey(e)) 
+					evtSearchRequest.fireUpdate(searchBox.getText());
 			}
 		});
 		
