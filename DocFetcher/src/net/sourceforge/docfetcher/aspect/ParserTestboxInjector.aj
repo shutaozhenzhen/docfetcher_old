@@ -128,7 +128,7 @@ public aspect ParserTestboxInjector {
 				// Parse file denoted by the path entered in the path field when ENTER is pressed
 				pathField.addKeyListener(new KeyAdapter() {
 					public void keyPressed(KeyEvent e) {
-						if (UtilGUI.isCRKey(e)) {
+						if (e.keyCode == SWT.CR) {
 							String path = pathField.getText();
 							File file = new File(path);
 							if (file.exists())

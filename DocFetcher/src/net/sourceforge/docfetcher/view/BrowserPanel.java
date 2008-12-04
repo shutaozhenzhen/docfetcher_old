@@ -137,7 +137,7 @@ public class BrowserPanel extends Composite {
 		
 		locationBar.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				if (UtilGUI.isCRKey(e))
+				if (e.keyCode == SWT.CR)
 					browser.setUrl(locationBar.getText());
 			}
 		});

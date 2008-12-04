@@ -321,7 +321,7 @@ public class RootScope extends Scope {
 			separateChildrenHTMLUnpaired(scope, subFiles, subDirs, subHTMLPairs);
 		
 		/*
-		 * The regex-based file exclusion must be appliedafter the HTML pairing.
+		 * The regex-based file exclusion must be applied after the HTML pairing.
 		 */
 
 		// Process normal files in the current directory
@@ -333,8 +333,8 @@ public class RootScope extends Scope {
 				FileWrapper wrapper = new FileWrapper(scope, subFile);
 				writer.addDocument(wrapper.parse().getLuceneDoc());
 				scope.subFiles.add(wrapper);
-
-			} catch (ParseException e) {
+			}
+			catch (ParseException e) {
 				parseExceptions.add(e);
 			}
 		}
@@ -402,24 +402,26 @@ public class RootScope extends Scope {
 		for (File dirCandidate : tmpDirs) {
 			String dirBasename = UtilFile.getHTMLDirBasename(dirCandidate);
 
-			if (dirBasename == null) {
+			if (dirBasename == null) { // Directory is not an HTML directory
 				directories.add(dirCandidate);
-				continue;
 			}
-
-			// Find out if an unbound HTML file with a matching name exists
-			boolean foundUnboundHTMLFile = false;
-			for (HTMLPair htmlCandidate : htmlPairs) {
-				if (htmlCandidate.getHtmlFolder() == null &&
-						UtilFile.getNameNoExt(htmlCandidate.file).equals(dirBasename)) {
-					htmlCandidate.setHtmlFolder(dirCandidate);
-					foundUnboundHTMLFile = true;
-					break;
+			else {
+				// Find the HTML file that corresponds to this HTML directory
+				boolean foundUnboundHTMLFile = false;
+				for (HTMLPair htmlCandidate : htmlPairs) {
+					if (htmlCandidate.getHtmlFolder() == null &&
+							UtilFile.getNameNoExt(htmlCandidate.file).equals(dirBasename)) {
+						htmlCandidate.setHtmlFolder(dirCandidate);
+						foundUnboundHTMLFile = true;
+						break;
+					}
 				}
-			}
 
-			if (! foundUnboundHTMLFile)
-				directories.add(dirCandidate);
+				// HTML directory does not have a corresponding HTML file,
+				// therefore treat it as a regular directory
+				if (! foundUnboundHTMLFile)
+					directories.add(dirCandidate);
+			}
 		}
 	}
 	

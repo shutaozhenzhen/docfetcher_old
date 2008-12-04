@@ -224,7 +224,7 @@ public class IndexingTab extends Composite {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 			public void keyPressed(KeyEvent e) {
-				if (UtilGUI.isCRKey(e))
+				if (e.keyCode == SWT.CR)
 					runJob();
 			}
 		}

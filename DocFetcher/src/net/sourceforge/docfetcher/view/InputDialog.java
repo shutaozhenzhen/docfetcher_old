@@ -83,7 +83,7 @@ public class InputDialog {
 		
 		text.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				if (UtilGUI.isCRKey(e)) {
+				if (e.keyCode == SWT.CR) {
 					answer = text.getText();
 					shell.close();
 				}
