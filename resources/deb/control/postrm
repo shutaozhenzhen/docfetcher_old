@@ -1,3 +1,0 @@
-#!/bin/sh
-rm -f /usr/bin/docfetcher
-rm -f /usr/share/app-install/desktop/docfetcher.desktop
