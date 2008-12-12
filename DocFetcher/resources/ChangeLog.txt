@@ -7,6 +7,7 @@ Changes:
   * Manual and other documentation files updated.
   * DocFetcher won't complain if it has no write permission for its files.
   * Searches can also be started with the Enter key of the Keypad.
+  * When clicking on the buttons of the indexing configuration dialog to list file extensions, some suggestions are omitted (e.g. ".classpath"). 
 
 
 2008-10-28 - DocFetcher 0.9.5.1

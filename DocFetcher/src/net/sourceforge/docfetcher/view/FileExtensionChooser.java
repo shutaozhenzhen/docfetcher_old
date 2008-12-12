@@ -151,6 +151,7 @@ public class FileExtensionChooser {
 		thread = new Thread() {
 			public void run() {
 				if (extsFromDisk == null)
+					// This line will eat lots of cpu time
 					FileExtensionChooser.this.extsFromDisk = UtilFile.listExtensions(rootDir);
 				else
 					FileExtensionChooser.this.extsFromDisk = extsFromDisk;

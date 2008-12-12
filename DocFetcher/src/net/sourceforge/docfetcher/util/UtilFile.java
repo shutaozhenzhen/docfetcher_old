@@ -308,7 +308,8 @@ public class UtilFile {
 
 	/**
 	 * Recursively collects all file extensions under the given directory and
-	 * then sorts and returns them.
+	 * then sorts and returns them. Files with an extension, but no basename
+	 * (e.g. ".classpath") are omitted.
 	 */
 	public static Set<String> listExtensions(File rootDir) {
 		Set<String> exts = new TreeSet<String> ();
@@ -318,15 +319,20 @@ public class UtilFile {
 	
 	/**
 	 * Recursively collects all file extensions under the given directory and
-	 * puts them into the given Set.
+	 * puts them into the given Set. Files with an extension, but no basename
+	 * (e.g. ".classpath") are omitted.
 	 */
 	private static void listExtensions(Set<String> exts, File rootDir) {
 		for (File file : rootDir.listFiles()) {
 			if (Thread.currentThread().isInterrupted()) return;
 			if (file.isFile()) {
 				String ext = UtilFile.getExtension(file);
-				if (! ext.trim().equals("")) //$NON-NLS-1$
-					exts.add(ext);
+				if (ext.trim().equals("")) continue; //$NON-NLS-1$
+				
+				// skip files with extension, but no basename (e.g. ".classpath")
+				if (ext.length() + 1 == file.getName().length()) continue;
+				
+				exts.add(ext);
 			}
 			else if (file.isDirectory() && ! UtilFile.isSymLink(file))
 				listExtensions(exts, file);
