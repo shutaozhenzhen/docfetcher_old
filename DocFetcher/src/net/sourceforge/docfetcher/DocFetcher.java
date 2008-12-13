@@ -70,6 +70,9 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.swt.widgets.Widget;
 
+import com.melloware.jintellitype.HotkeyListener;
+import com.melloware.jintellitype.JIntellitype;
+
 /**
  * The main application window.
  * 
@@ -95,6 +98,8 @@ public class DocFetcher extends ApplicationWindow {
 	private FilesizeGroup filesizeGroup;
 	private ParserGroup parserGroup;
 	private ScopeGroup scopeGroup;
+
+	private static final int HOTKEY_TO_FRONT_IDX = 1;
 
 	public static void main(String[] args) {
 		docFetcher = new DocFetcher();
@@ -459,6 +464,44 @@ public class DocFetcher extends ApplicationWindow {
 				}
 			}
 		});
+
+		/*
+		 * HotKey with JIntellitype (for Windows only) 
+		 * TODO : implementation for linux with JXGrabKey
+		 */
+		if (Const.IS_WINDOWS) {
+		
+			JIntellitype.getInstance().registerHotKey(HOTKEY_TO_FRONT_IDX,
+					Key.HotKeyToFront.stateMask, Key.HotKeyToFront.keyCode);
+
+			/*
+			 * When a hotkey is pressed, we are called from JIntellitype's dll
+			 * To make actions on the UI, we must call the display to enter in
+			 * the UI thread
+			 */
+			JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
+				public void onHotKey(int hotkey_idx) {
+					switch (hotkey_idx) {
+					case HOTKEY_TO_FRONT_IDX:
+						Display.getDefault().syncExec(new Runnable() {
+							public void run() {
+								if (isInSystemTray()) {
+									restoreFromSystemTray();
+								} else {
+									Shell shell = getShell();
+									shell.setVisible(true);
+									shell.forceActive();
+								}
+							}
+						});
+						break;
+					default:
+						// future hotkeys
+					}
+
+				}
+			});
+		}
 		
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
@@ -493,6 +536,15 @@ public class DocFetcher extends ApplicationWindow {
 			UtilGUI.showErrorMsg(null, Msg.write_error.value());
 		}
 		
+		/*
+		 * Unregister HotKeys (Windows only)
+		 * 
+		 */
+		if(Const.IS_WINDOWS){
+			JIntellitype.getInstance().unregisterHotKey(HOTKEY_TO_FRONT_IDX);
+			JIntellitype.getInstance().cleanUp();
+		}
+	    
 		// On Windows, this may cause a crash, so we do this last
 		FSEventHandler.getInst().setThreadWatchEnabled(false);
 		return super.close();

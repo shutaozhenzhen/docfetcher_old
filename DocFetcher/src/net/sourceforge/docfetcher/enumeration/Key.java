@@ -13,6 +13,8 @@ package net.sourceforge.docfetcher.enumeration;
 
 import org.eclipse.swt.SWT;
 
+import com.melloware.jintellitype.JIntellitype;
+
 /**
  * An enumeration of available keyboard shortcuts.
  * <p>
@@ -55,6 +57,15 @@ public enum Key {
 	Delete (SWT.NONE, SWT.DEL),
 	ShiftInsert (SWT.SHIFT, SWT.INSERT),
 	ShiftDelete (SWT.SHIFT, SWT.DEL),
+	
+	/**
+	 * Key used by JIntellitype
+	 * The state mask can be one of MOD_ALT, MOD_CONTROL, MOD_SHIFT, MOD_WIN
+	 * There is an equivalence between java.awt.event.KeyEvent keycodes and
+	 * Windows for virtual keys
+	 * 
+	 */
+	HotKeyToFront (JIntellitype.MOD_CONTROL, java.awt.event.KeyEvent.VK_F8),
 	;
 	
 	public final int stateMask;
@@ -116,6 +127,18 @@ public enum Key {
 		case SWT.F10: key = "F10"; break; //$NON-NLS-1$
 		case SWT.F11: key = "F11"; break; //$NON-NLS-1$
 		case SWT.F12: key = "F12"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F1: key = "F1"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F2: key = "F2"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F3: key = "F3"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F4: key = "F4"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F5: key = "F5"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F6: key = "F6"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F7: key = "F7"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F8: key = "F8"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F9: key = "F9"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F10: key = "F10"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F11: key = "F11"; break; //$NON-NLS-1$
+		case java.awt.event.KeyEvent.VK_F12: key = "F12"; break; //$NON-NLS-1$
 		case SWT.PAUSE: key = "Pause"; break; //$NON-NLS-1$
 		case SWT.PRINT_SCREEN: key = "Print Screen"; break; //$NON-NLS-1$
 		case SWT.BS: key = "Backspace"; break; //$NON-NLS-1$
