@@ -13,8 +13,6 @@ package net.sourceforge.docfetcher.enumeration;
 
 import org.eclipse.swt.SWT;
 
-import com.melloware.jintellitype.JIntellitype;
-
 /**
  * An enumeration of available keyboard shortcuts.
  * <p>
@@ -59,13 +57,13 @@ public enum Key {
 	ShiftDelete (SWT.SHIFT, SWT.DEL),
 	
 	/**
-	 * Key used by JIntellitype
-	 * The state mask can be one of MOD_ALT, MOD_CONTROL, MOD_SHIFT, MOD_WIN
+	 * HotKey used by JIntellitype
+	 * The state mask can be a combinaison of ALT_DOWN_MASK, CTRL_DOWN_MASK, SHIFT_DOWN_MASK
 	 * There is an equivalence between java.awt.event.KeyEvent keycodes and
 	 * Windows for virtual keys
 	 * 
 	 */
-	HotKeyToFront (JIntellitype.MOD_CONTROL, java.awt.event.KeyEvent.VK_F8),
+	HotKeyToFront (java.awt.event.InputEvent.CTRL_DOWN_MASK, java.awt.event.KeyEvent.VK_F8),
 	;
 	
 	public final int stateMask;
