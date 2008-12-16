@@ -1,15 +1,15 @@
 package net.sourceforge.docfetcher.view;
 
 import jxgrabkey.JXGrabKey;
+import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.DocFetcher;
+import net.sourceforge.docfetcher.Event.Listener;
+import net.sourceforge.docfetcher.enumeration.Pref;
 
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-
-import net.sourceforge.docfetcher.Const;
-import net.sourceforge.docfetcher.DocFetcher;
-import net.sourceforge.docfetcher.enumeration.Key;
 
 import com.melloware.jintellitype.JIntellitype;
 
@@ -34,21 +34,22 @@ public class HotkeyListener {
 	interface HotkeyListenerImpl {
 		public void initialize(HotkeyListener listener);
 		public void registerSwingHotkey(int id, int mask, int key);
+		public void unregisterHotkey(int id);
 		public void shutdown();
 	};
 
 
-	/**
+	/*
+	 * Installs a listener on hotkey to bring the app to top
+	 * The hotkey is registred in Pref.IntArray.HotKeyToFront
 	 * 
 	 */
 	public HotkeyListener() {
-		
 		if(Const.IS_WINDOWS){
 			implementation = new HotkeyListenerWindowsImpl();
 		}else if(Const.IS_LINUX){
 			// TODO: test on linux
-			//implementation = new HotkeyListenerLinuxImpl();
-			return;
+			implementation = new HotkeyListenerLinuxImpl();
 		}else{
 			// Mac ?
 			return;
@@ -56,9 +57,19 @@ public class HotkeyListener {
 			
 		
 		implementation.initialize(this);
+		
+		Pref.IntArray.HotKeyToFront.evtChanged.add(new Listener<int[]>() {
+			public void update(int[] eventData) {
+				implementation.unregisterHotkey(HOTKEY_TO_FRONT_IDX);
+				
+				implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
+						eventData[0], eventData[1]);
+				
+			}
+		});
 
 		implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
-				Key.HotKeyToFront.stateMask, Key.HotKeyToFront.keyCode);
+				Pref.IntArray.HotKeyToFront.value()[0], Pref.IntArray.HotKeyToFront.value()[1]);
 
 		/**
 		 * uninstall hotkeys when DocFetcher shuts down 
@@ -117,10 +128,13 @@ public class HotkeyListener {
 
 		public void registerSwingHotkey(int id, int mask, int key) {
 			JIntellitype.getInstance().registerSwingHotKey(id, mask, key);
-
-
 		}
 
+		public void unregisterHotkey(int id) {
+			JIntellitype.getInstance().unregisterHotKey(id);
+		}
+
+		
 		public void shutdown() {
 			JIntellitype.getInstance().cleanUp();
 			
@@ -136,8 +150,10 @@ public class HotkeyListener {
 	class HotkeyListenerLinuxImpl implements HotkeyListenerImpl {
 
 		public void initialize(final HotkeyListener listener) {
-            System.loadLibrary("libJXGrabKey");
+			System.loadLibrary("JXGrabKey");
 			
+			JXGrabKey.setDebugOutput(true);
+
 			JXGrabKey.getInstance().addHotkeyListener(new jxgrabkey.HotkeyListener(){
 				public void onHotkey(int hotkey_idx) {
 					listener.onHotKey(hotkey_idx);
@@ -148,6 +164,9 @@ public class HotkeyListener {
 
 		public void registerSwingHotkey(int id, int mask, int key) {
 	        JXGrabKey.getInstance().registerSwingHotkey(id, mask, key);
+		}
+		public void unregisterHotkey(int id) {
+			JXGrabKey.getInstance().unregisterHotKey(id);
 		}
 
 		public void shutdown() {

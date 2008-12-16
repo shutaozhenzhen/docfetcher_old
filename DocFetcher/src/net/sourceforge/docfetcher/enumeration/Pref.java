@@ -163,7 +163,8 @@ public class Pref {
 		SashProgressPanelWeights (2, 1),
 		ResultColumnOrder (new int[0]),
 		ResultColumnWidths (new int[0]),
-		;
+		HotKeyToFront (java.awt.event.InputEvent.CTRL_MASK, java.awt.event.KeyEvent.VK_F8),
+	;
 
 		public final Event<int[]> evtChanged = new Event<int[]> ();
 		public final int[] defaultValue;

@@ -55,15 +55,6 @@ public enum Key {
 	Delete (SWT.NONE, SWT.DEL),
 	ShiftInsert (SWT.SHIFT, SWT.INSERT),
 	ShiftDelete (SWT.SHIFT, SWT.DEL),
-	
-	/**
-	 * HotKey used by JIntellitype
-	 * The state mask can be a combinaison of ALT_DOWN_MASK, CTRL_DOWN_MASK, SHIFT_DOWN_MASK
-	 * There is an equivalence between java.awt.event.KeyEvent keycodes and
-	 * Windows for virtual keys
-	 * 
-	 */
-	HotKeyToFront (java.awt.event.InputEvent.CTRL_DOWN_MASK, java.awt.event.KeyEvent.VK_F8),
 	;
 	
 	public final int stateMask;
