@@ -330,9 +330,11 @@ public class ScopeGroup extends GroupWrapper {
 	}
 	
 	/**
-	 * Returns the currently selected <tt>RootScope</tt>s.
+	 * Returns the currently selected <tt>RootScope</tt>s. Shows a warning
+	 * message if some of them don't exist anymore.
 	 */
-	public RootScope[] getRootSelection() {
+	private RootScope[] getExistingRootSelection() {
+		// Get selected RootScopes
 		StructuredSelection sel = (StructuredSelection) viewer.getSelection();
 		List<RootScope> selRootScopes = new ArrayList<RootScope> (sel.size());
 		Iterator<?> it = sel.iterator();
@@ -341,40 +343,39 @@ public class ScopeGroup extends GroupWrapper {
 			if (item instanceof RootScope) // Only enable action for RootScopes (not for other Scopes)
 				selRootScopes.add((RootScope) item);
 		}
-		return selRootScopes.toArray(new RootScope[selRootScopes.size()]);
+		
+		// Separate existing and missing RootScopes
+		if (selRootScopes.size() == 0) return new RootScope[0];
+		List<RootScope> existing = new ArrayList<RootScope> (selRootScopes.size());
+		List<RootScope> missing = new ArrayList<RootScope> (selRootScopes.size());
+		for (RootScope scope : selRootScopes) {
+			if (scope.getFile().exists())
+				existing.add(scope);
+			else
+				missing.add(scope);
+		}
+		
+		// Show warning message for missing RootScopes
+		if (! missing.isEmpty()) {
+			String items = "\n" + UtilList.toString("\n", missing); //$NON-NLS-1$ //$NON-NLS-2$
+			UtilGUI.showWarningMsg(Msg.folders_not_found_title.value(), Msg.folders_not_found.value() + items);
+		}
+		
+		return existing.toArray(new RootScope[existing.size()]);
 	}
 	
 	/**
 	 * Returns the currently selected <tt>Scope</tt>s (including the
-	 * <tt>RootScope</tt>s.)
+	 * <tt>RootScope</tt>s). Shows a warning message if some of
+	 * them don't exist anymore.
 	 */
-	public Scope[] getSelection() {
+	private Scope[] getExistingSelection() {
+		// Get selected Scopes
 		Object[] objects = ((StructuredSelection) viewer.getSelection()).toArray();
 		Scope[] scopes = new Scope[objects.length];
 		System.arraycopy(objects, 0, scopes, 0, objects.length);
-		return scopes;
-	}
-	
-	/**
-	 * Performs an index update for all selected <tt>RootScope</tt>s. It
-	 * checks whether the index folders still exist. If not, an error message is
-	 * displayed.
-	 */
-	private void updateSelectedIndexes(boolean doRebuild) {
-		Scope[] checkedScopes = getExistingSelection(getRootSelection());
-		if (checkedScopes.length == 0) return;
-		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
-		for (Scope scope : checkedScopes)
-			indexingBox.addJob(new Job((RootScope) scope, false, doRebuild));
-		indexingBox.open();
-	}
-	
-	/**
-	 * Returns all <tt>Scope</tt>s in the given array of <tt>Scope</tt>s whose
-	 * corresponding directories still exist. Shows a warning message if some of
-	 * them don't exist anymore.
-	 */
-	private Scope[] getExistingSelection(Scope[] scopes) {
+		
+		// Separate existing and missing Scopes
 		if (scopes.length == 0) return new Scope[0];
 		List<Scope> existing = new ArrayList<Scope> (scopes.length);
 		List<Scope> missing = new ArrayList<Scope> (scopes.length);
@@ -384,11 +385,28 @@ public class ScopeGroup extends GroupWrapper {
 			else
 				missing.add(scope);
 		}
+		
+		// Show warning message for missing Scopes
 		if (! missing.isEmpty()) {
 			String items = "\n" + UtilList.toString("\n", missing); //$NON-NLS-1$ //$NON-NLS-2$
 			UtilGUI.showWarningMsg(Msg.folders_not_found_title.value(), Msg.folders_not_found.value() + items);
 		}
+		
 		return existing.toArray(new Scope[existing.size()]);
+	}
+	
+	/**
+	 * Performs an index update for all selected <tt>RootScope</tt>s. It
+	 * checks whether the index folders still exist. If not, an error message is
+	 * displayed.
+	 */
+	private void updateSelectedIndexes(boolean doRebuild) {
+		RootScope[] checkedScopes = getExistingRootSelection();
+		if (checkedScopes.length == 0) return;
+		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
+		for (RootScope scope : checkedScopes)
+			indexingBox.addJob(new Job(scope, false, doRebuild));
+		indexingBox.open();
 	}
 	
 	public boolean setFocus() {
@@ -421,7 +439,7 @@ public class ScopeGroup extends GroupWrapper {
 			setAccelerator(Key.Delete.keyCode);
 		}
 		public void run() {
-			RootScope[] scopes = getRootSelection();
+			RootScope[] scopes = getExistingRootSelection();
 			/*
 			 * This check is needed because we don't want the message box to pop up
 			 * when the user hits DELETE without selecting anything.
@@ -501,7 +519,7 @@ public class ScopeGroup extends GroupWrapper {
 			setAccelerator(Key.Enter.getAccelerator());
 		}
 		public void run() {
-			Scope[] scopes = getExistingSelection(getSelection());
+			Scope[] scopes = getExistingSelection();
 			if (scopes.length == 0) return;
 			int openLimit = Pref.Int.OpenLimit.value();
 			if (scopes.length > openLimit) {
@@ -522,11 +540,11 @@ public class ScopeGroup extends GroupWrapper {
 			setText(Msg.list_docs.value());
 		}
 		public void run() {
-			final Scope[] scopes = getExistingSelection(getRootSelection());
+			final RootScope[] scopes = getExistingRootSelection();
 			if (scopes.length == 0) return;
 			new Thread() {
 				public void run() {
-					final ResultDocument[] docs = RootScope.listDocuments(getRootSelection());
+					final ResultDocument[] docs = RootScope.listDocuments(scopes);
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
 							evtListDocuments.fireUpdate(docs);
@@ -546,7 +564,7 @@ public class ScopeGroup extends GroupWrapper {
 			setAccelerator(Key.ShiftInsert.getAccelerator());
 		}
 		public void run() {
-			Scope[] scopes = getExistingSelection(getSelection());
+			Scope[] scopes = getExistingSelection();
 			if (scopes.length == 0) return;
 			RootScope rootScope = scopes[0].getRootScope();
 			File parentFolder = scopes[0].getFile();
@@ -589,7 +607,7 @@ public class ScopeGroup extends GroupWrapper {
 			setAccelerator(Key.Rename.keyCode);
 		}
 		public void run() {
-			Scope[] scopes = getExistingSelection(getSelection());
+			Scope[] scopes = getExistingSelection();
 			if (scopes.length == 0) return;
 			RootScope rootScope = scopes[0].getRootScope();
 			File targetFolder = scopes[0].getFile();
@@ -645,7 +663,7 @@ public class ScopeGroup extends GroupWrapper {
 			setAccelerator(Key.ShiftDelete.getAccelerator());
 		}
 		public void run() {
-			Scope[] scopes = getExistingSelection(getSelection());
+			Scope[] scopes = getExistingSelection();
 			if (scopes.length == 0) return;
 			final List<Scope> scopeList = UtilList.toList(scopes);
 			
@@ -700,7 +718,7 @@ public class ScopeGroup extends GroupWrapper {
 		}
 		public void run() {
 			// Get new parent directory to move the files to
-			Scope[] scopes = getExistingSelection(getSelection());
+			Scope[] scopes = getExistingSelection();
 			if (scopes.length == 0) return;
 			File newParent = scopes[0].getFile();
 			RootScope rootScopeToUpdate = scopes[0].getRootScope();

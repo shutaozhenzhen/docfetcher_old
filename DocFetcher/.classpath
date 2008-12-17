@@ -40,5 +40,6 @@
 	<classpathentry kind="lib" path="lib/aspectjrt.jar"/>
 	<classpathentry kind="lib" path="lib/jintellitype-1.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="lib/JXGrabKey.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
