@@ -24,6 +24,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.eclipse.swt.SWT;
+
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.Event;
@@ -163,7 +165,7 @@ public class Pref {
 		SashProgressPanelWeights (2, 1),
 		ResultColumnOrder (new int[0]),
 		ResultColumnWidths (new int[0]),
-		HotKeyToFront (java.awt.event.InputEvent.CTRL_MASK, java.awt.event.KeyEvent.VK_F8),
+		HotKeyToFront (SWT.CTRL, SWT.F8),
 		;
 
 		public final Event<int[]> evtChanged = new Event<int[]> ();

@@ -33,7 +33,7 @@ import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.view.FilesizeGroup;
 import net.sourceforge.docfetcher.view.FillLayoutFactory;
 import net.sourceforge.docfetcher.view.FormDataFactory;
-import net.sourceforge.docfetcher.view.HotkeyListener;
+import net.sourceforge.docfetcher.view.HotkeyHandler;
 import net.sourceforge.docfetcher.view.IndexingBox;
 import net.sourceforge.docfetcher.view.MainPanel;
 import net.sourceforge.docfetcher.view.ParserGroup;
@@ -462,7 +462,7 @@ public class DocFetcher extends ApplicationWindow {
 		});
 
 		// add hotkey support
-		new HotkeyListener();
+		new HotkeyHandler();
 
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
