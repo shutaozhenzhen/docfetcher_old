@@ -1,7 +1,8 @@
 @DATE@ - DocFetcher @VERSION@
 ---------------------------------------------
 Features:
-  * Portable version: When the indexed documents are inside the program folder, the latter can be moved around freely without breaking references.
+  * Portable version: When the indexed documents are inside the program folder, the latter can be moved around freely without breaking file references.
+  * Global hotkey: Pressing a certain key combination moves DocFetcher to the front.
 
 Changes:
   * Manual and other documentation files updated.

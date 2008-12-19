@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * @author Tran Nam Quang
  */
-public class FileTransferBox {
+public class FileTransferDialog {
 	
 	private Shell shell;
 	private ProgressPanel progressPanel;
@@ -48,10 +48,10 @@ public class FileTransferBox {
 	private File newParent;
 	private Thread thread;
 	
-	public FileTransferBox(Shell parent, String title) {
+	public FileTransferDialog(Shell parent, String title) {
 		// Create shell
 		shell = new Shell(parent, Const.DIALOG_STYLE);
-		shell.setSize(Pref.Int.IndexingBoxWidth.value(), Pref.Int.IndexingBoxHeight.value());
+		shell.setSize(Pref.Int.IndexingBoxWidth.getValue(), Pref.Int.IndexingBoxHeight.getValue());
 		UtilGUI.centerShell(parent, shell);
 		FormLayout layout = new FormLayout();
 		layout.marginWidth = layout.marginHeight = 2;

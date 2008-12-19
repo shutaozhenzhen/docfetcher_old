@@ -392,7 +392,7 @@ public class PreviewPanel extends Composite {
 					return; // Another preview request had been started while we were parsing
 				
 				// Apply character limit
-				int maxLength = Pref.Int.PreviewLimit.value();
+				int maxLength = Pref.Int.PreviewLimit.getValue();
 				final String msg = "...\n\n\n[" //$NON-NLS-1$
 					+ Msg.preview_limit_hint.format(new Object[] {
 							maxLength,

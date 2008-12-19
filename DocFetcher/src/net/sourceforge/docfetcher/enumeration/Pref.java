@@ -108,7 +108,7 @@ public class Pref {
 		public final int defaultValue;
 		private int value;
 		
-		public int value() {
+		public int getValue() {
 			return value;
 		}
 		
@@ -141,7 +141,7 @@ public class Pref {
 		public final String defaultValue;
 		private String value;
 		
-		public String value() {
+		public String getValue() {
 			return value;
 		}
 		
@@ -153,7 +153,6 @@ public class Pref {
 
 		Str(String defaultValue) {
 			this.defaultValue = defaultValue;
-			
 		}
 	}
 
@@ -172,7 +171,7 @@ public class Pref {
 		public final int[] defaultValue;
 		private int[] value;
 		
-		public int[] value() {
+		public int[] getValue() {
 			return value;
 		}
 		
@@ -196,7 +195,7 @@ public class Pref {
 		public final String[] defaultValue;
 		private String[] value;
 		
-		public String[] value() {
+		public String[] getValue() {
 			return value;
 		}
 		

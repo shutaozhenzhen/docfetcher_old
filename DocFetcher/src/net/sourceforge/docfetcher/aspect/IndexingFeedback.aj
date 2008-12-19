@@ -21,7 +21,7 @@ import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.parse.HTMLParser;
 import net.sourceforge.docfetcher.parse.ParseException;
 import net.sourceforge.docfetcher.util.UtilGUI;
-import net.sourceforge.docfetcher.view.IndexingBox;
+import net.sourceforge.docfetcher.view.IndexingDialog;
 
 /**
  * Hooks onto various method calls during indexing processes and provides the
@@ -58,7 +58,7 @@ public aspect IndexingFeedback {
 	 * Add the name of the file currently indexed to the info box.
 	 */
 	before(final File file): parsing(file) {
-		DocFetcher.getInst().getIndexingBox().appendInfo(fileCount + "\t" + file.getName()); //$NON-NLS-1$
+		DocFetcher.getInstance().getIndexingDialog().appendInfo(fileCount + "\t" + file.getName()); //$NON-NLS-1$
 	}
 	
 	/**
@@ -75,9 +75,9 @@ public aspect IndexingFeedback {
 	before(final ParseException e, RootScope rootScope):
 		handler(ParseException) && args(e) &&
 		cflow(indexing(rootScope)) && !withincode(* HTMLParser.merge(..)) {
-		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
-		indexingBox.appendInfo("### " + Msg.file_skipped.format(e.getMessage())); //$NON-NLS-1$
-		indexingBox.addError(e);
+		IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
+		indexingDialog.appendInfo("### " + Msg.file_skipped.format(e.getMessage())); //$NON-NLS-1$
+		indexingDialog.addError(e);
 	}
 	
 	/**
@@ -85,8 +85,8 @@ public aspect IndexingFeedback {
 	 */
 	after(final File file) returning(boolean excluded): execution(* RootScope.isExcluded(..)) && args(file) {
 		if (excluded) {
-			IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
-			indexingBox.appendInfo(Msg.file_skipped.format(file.getName()));
+			IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
+			indexingDialog.appendInfo(Msg.file_skipped.format(file.getName()));
 		}
 	}
 	
@@ -94,8 +94,8 @@ public aspect IndexingFeedback {
 	 * Handle the termination of indexing caused by missing index files.
 	 */
 	after(RootScope rootScope) throwing(FileNotFoundException e): indexing(rootScope) {
-		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
-		indexingBox.appendInfo(Msg.target_folder_deleted.value());
+		IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
+		indexingDialog.appendInfo(Msg.target_folder_deleted.value());
 		fileCount = 1; // Reset file counter
 	}
 	
@@ -103,16 +103,16 @@ public aspect IndexingFeedback {
 	 * Displays an appropriate status message at the end of an indexing process if it returns normally.
 	 */
 	after(final RootScope rootScope) returning(): indexing(rootScope) {
-		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
+		IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
 		
 		// Set message: Finished without or with errors
-		if (indexingBox.getErrors().length == 0)
-			indexingBox.appendInfo(Msg.finished.value());
+		if (indexingDialog.getErrors().length == 0)
+			indexingDialog.appendInfo(Msg.finished.value());
 		else
-			indexingBox.appendInfo(Msg.finished_with_errors.value());
+			indexingDialog.appendInfo(Msg.finished_with_errors.value());
 		
 		// Set mesage: total elapsed time
-		indexingBox.appendInfo(Msg.total_elapsed_time.format(UtilGUI.simpleDuration(rootScope.getParseTime())));
+		indexingDialog.appendInfo(Msg.total_elapsed_time.format(UtilGUI.simpleDuration(rootScope.getParseTime())));
 
 		// File counters
 		if (! Thread.currentThread().isInterrupted()) // Don't increase counter if indexing process was terminated by user
@@ -123,9 +123,9 @@ public aspect IndexingFeedback {
 	/**
 	 * Some things to do after the indexing box is closed.
 	 */
-	after(IndexingBox indexingBox): call(* IndexingBox.close()) && target(indexingBox) {
+	after(IndexingDialog indexingDialog): call(* IndexingDialog.close()) && target(indexingDialog) {
 		String msg = Msg.num_documents_added.format(multipleFileCount);
-		DocFetcher.getInst().setStatus(msg);
+		DocFetcher.getInstance().setStatus(msg);
 		multipleFileCount = 0;
 	}
 	

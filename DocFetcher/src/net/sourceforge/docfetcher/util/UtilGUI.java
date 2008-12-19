@@ -194,7 +194,7 @@ public class UtilGUI {
 			});
 			return;
 		}
-		MessageBox msgBox = new MessageBox(DocFetcher.getInst().getShell(), SWT.ICON_WARNING | SWT.OK | SWT.PRIMARY_MODAL);
+		MessageBox msgBox = new MessageBox(DocFetcher.getInstance().getShell(), SWT.ICON_WARNING | SWT.OK | SWT.PRIMARY_MODAL);
 		msgBox.setText(text == null ? Msg.invalid_operation.value() : text);
 		msgBox.setMessage(message);
 		msgBox.open();

@@ -34,10 +34,10 @@ import net.sourceforge.docfetcher.view.FilesizeGroup;
 import net.sourceforge.docfetcher.view.FillLayoutFactory;
 import net.sourceforge.docfetcher.view.FormDataFactory;
 import net.sourceforge.docfetcher.view.HotkeyHandler;
-import net.sourceforge.docfetcher.view.IndexingBox;
+import net.sourceforge.docfetcher.view.IndexingDialog;
 import net.sourceforge.docfetcher.view.MainPanel;
 import net.sourceforge.docfetcher.view.ParserGroup;
-import net.sourceforge.docfetcher.view.PrefPage;
+import net.sourceforge.docfetcher.view.PrefDialog;
 import net.sourceforge.docfetcher.view.PreviewPanel;
 import net.sourceforge.docfetcher.view.ResultPanel;
 import net.sourceforge.docfetcher.view.SashWeightHandler;
@@ -87,7 +87,7 @@ public class DocFetcher extends ApplicationWindow {
 	private SearchPanel searchPanel;
 	private PreviewPanel previewPanel;
 	private ResultPanel resultPanel;
-	private IndexingBox indexingBox;
+	private IndexingDialog indexingDialog;
 	private TrayItem trayItem;
 	private Clipboard clipboard; // must be disposed
 	
@@ -110,7 +110,7 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// Load preferences and scope registry
 		Pref.load();
-		appName = Pref.Str.AppName.value();
+		appName = Pref.Str.AppName.getValue();
 		if (appName.trim().equals("")) //$NON-NLS-1$
 			appName = "DocFetcher"; //$NON-NLS-1$
 		
@@ -147,15 +147,15 @@ public class DocFetcher extends ApplicationWindow {
 		fsEventHandler.setThreadWatchEnabled(Pref.Bool.WatchFS.getValue());
 	}
 	
-	public static DocFetcher getInst() {
+	public static DocFetcher getInstance() {
 		return docFetcher;
 	}
 	
 	protected void initializeBounds() {
 		// Set shell size
 		final Shell shell = getShell();
-		int shellWidth = Pref.Int.ShellWidth.value();
-		int shellHeight = Pref.Int.ShellHeight.value();
+		int shellWidth = Pref.Int.ShellWidth.getValue();
+		int shellHeight = Pref.Int.ShellHeight.getValue();
 		shell.setSize(shellWidth, shellHeight);
 		
 		/*
@@ -163,8 +163,8 @@ public class DocFetcher extends ApplicationWindow {
 		 * because the Util.centerShell(..) method depends on a correct shell
 		 * size.
 		 */
-		int shellX = Pref.Int.ShellX.value();
-		int shellY = Pref.Int.ShellY.value();
+		int shellX = Pref.Int.ShellX.getValue();
+		int shellY = Pref.Int.ShellY.getValue();
 		if (shellX < 0 || shellY < 0)
 			UtilGUI.centerShell(null, shell);
 		else
@@ -174,8 +174,8 @@ public class DocFetcher extends ApplicationWindow {
 
 		// Set sash weights
 		// Note: This must be done AFTER setting the maximization state of the main shell!
-		sashHorizontal.setWeights(Pref.IntArray.SashHorizontalWeights.value());
-		sashLeft.setWeights(Pref.IntArray.SashLeftWeights.value());
+		sashHorizontal.setWeights(Pref.IntArray.SashHorizontalWeights.getValue());
+		sashLeft.setWeights(Pref.IntArray.SashLeftWeights.getValue());
 		
 		/*
 		 * FIXME On GTK Linux (GNOME 2.22.3), when the user changes the shell
@@ -261,14 +261,14 @@ public class DocFetcher extends ApplicationWindow {
 		}.start();
 		
 		// Create indexing box
-		indexingBox = new IndexingBox(getShell());
+		indexingDialog = new IndexingDialog(getShell());
 		
 		// Try to show help page
 		boolean internalBrowserAvailable = false;
 		if (Pref.Bool.ShowWelcomePage.getValue() && Pref.Bool.ShowPreview.getValue())
 			internalBrowserAvailable = mainPanel.showHelpPage();
 		else
-			DocFetcher.getInst().setStatus(Msg.press_help_button.format(Key.Help.toString()));
+			DocFetcher.getInstance().setStatus(Msg.press_help_button.format(Key.Help.toString()));
 		Pref.Bool.ShowWelcomePage.setValue(internalBrowserAvailable);		
 		// Move text cursor to search box
 		mainPanel.focusSearchBox();
@@ -367,7 +367,7 @@ public class DocFetcher extends ApplicationWindow {
 		// Open up preferences dialog when the preferences button is clicked
 		searchPanel.evtPrefBtClicked.add(new Event.Listener<Widget> () {
 			public void update(Widget eventData) {
-				new PrefPage(getShell());
+				new PrefDialog(getShell());
 			}
 		});
 		
@@ -443,7 +443,7 @@ public class DocFetcher extends ApplicationWindow {
 				if (key == null) return;
 				
 				// Disable global keys when the main shell is inactive
-				if (Display.getCurrent().getActiveShell() != DocFetcher.getInst().getShell()) return;
+				if (Display.getCurrent().getActiveShell() != DocFetcher.getInstance().getShell()) return;
 				event.doit = false;
 				
 				switch (key) {
@@ -608,7 +608,7 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// More complicated message: "Results: 101-200 of 320	Page 2/4"
 		else {
-			int maxSize = Pref.Int.MaxResults.value();
+			int maxSize = Pref.Int.MaxResults.getValue();
 			int pageIndex = resultPanel.getPageIndex();
 			int pageCount = resultPanel.getPageCount();
 			int a = pageIndex * maxSize + 1;
@@ -730,15 +730,15 @@ public class DocFetcher extends ApplicationWindow {
 			trayItem.dispose();
 			trayItem = null;
 		}
-		shell.setLocation(Pref.Int.ShellX.value(), Pref.Int.ShellY.value());
+		shell.setLocation(Pref.Int.ShellX.getValue(), Pref.Int.ShellY.getValue());
 		mainPanel.focusSearchBox();
 	}
 	
 	/**
-	 * Returns the indexing box. Will not return null.
+	 * Returns the indexing dialog. Will not return null.
 	 */
-	public IndexingBox getIndexingBox() {
-		return indexingBox;
+	public IndexingDialog getIndexingDialog() {
+		return indexingDialog;
 	}
 	
 }

@@ -70,7 +70,7 @@ public class ProgressPanel extends Composite {
 		// Create group widgets
 		Group topGroup = new Group(sash, SWT.SHADOW_OUT);
 		Group bottomGroup = new Group(sash, SWT.SHADOW_OUT);
-		sash.setWeights(Pref.IntArray.SashProgressPanelWeights.value());
+		sash.setWeights(Pref.IntArray.SashProgressPanelWeights.getValue());
 		topGroup.setText(Msg.progress.value());
 		topGroup.setLayout(FillLayoutFactory.getInst().margin(1).create());
 		bottomGroup.setText(Msg.errors.value());
@@ -98,9 +98,9 @@ public class ProgressPanel extends Composite {
 		// Create error table columns
 		errorTypeCol = new TableColumn(errorTable, SWT.NONE);
 		pathCol = new TableColumn(errorTable, SWT.NONE);
-		errorTypeCol.setWidth(Pref.Int.ErrorTypeColWidth.value());
+		errorTypeCol.setWidth(Pref.Int.ErrorTypeColWidth.getValue());
 		errorTypeCol.setText(Msg.error_type.value());
-		pathCol.setWidth(Pref.Int.ErrorPathColWidth.value());
+		pathCol.setWidth(Pref.Int.ErrorPathColWidth.getValue());
 		pathCol.setText(Msg.property_path.value());
 		
 		// Open file associated with error item on doubleclick
@@ -141,7 +141,7 @@ public class ProgressPanel extends Composite {
 		 */
 		Pref.IntArray.SashProgressPanelWeights.evtChanged.add(new Event.Listener<int[]> () {
 			public void update(int[] eventData) {
-				for (IndexingTab tab : DocFetcher.getInst().getIndexingBox().getIndexingTabs()) {
+				for (IndexingTab tab : DocFetcher.getInstance().getIndexingDialog().getIndexingTabs()) {
 					if (! tab.getJob().isReadyForIndexing()) continue;
 					int[] w = tab.progressPanel.sash.getWeights();
 					int[] pref_w = eventData;
@@ -157,7 +157,7 @@ public class ProgressPanel extends Composite {
 		 */
 		Pref.Int.ErrorTypeColWidth.evtChanged.add(new Event.Listener<Integer> () {
 			public void update(Integer eventData) {
-				for (IndexingTab tab : DocFetcher.getInst().getIndexingBox().getIndexingTabs()) {
+				for (IndexingTab tab : DocFetcher.getInstance().getIndexingDialog().getIndexingTabs()) {
 					if (! tab.getJob().isReadyForIndexing()) continue;
 					if (tab.progressPanel.errorTypeCol.getWidth() == eventData)
 						continue;
@@ -171,7 +171,7 @@ public class ProgressPanel extends Composite {
 		 */
 		Pref.Int.ErrorPathColWidth.evtChanged.add(new Event.Listener<Integer> () {
 			public void update(Integer eventData) {
-				for (IndexingTab tab : DocFetcher.getInst().getIndexingBox().getIndexingTabs()) {
+				for (IndexingTab tab : DocFetcher.getInstance().getIndexingDialog().getIndexingTabs()) {
 					if (! tab.getJob().isReadyForIndexing()) continue;
 					if (tab.progressPanel.pathCol.getWidth() == eventData)
 						continue;
@@ -193,7 +193,7 @@ public class ProgressPanel extends Composite {
 				FileTransfer.getInstance(),
 				TextTransfer.getInstance()
 		};
-		DocFetcher.getInst().getClipboard().setContents(
+		DocFetcher.getInstance().getClipboard().setContents(
 				new Object[] {
 						filePaths,
 						UtilList.toString(Const.LS, filePaths)

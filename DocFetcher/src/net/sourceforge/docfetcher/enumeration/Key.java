@@ -96,7 +96,7 @@ public enum Key {
 	/**
 	 * Returns a string representing the key combination, e.g. "CTRL + H".
 	 */
-	private static String toString(int[] hotkey) {
+	public static String toString(int[] hotkey) {
 		int stateMask = hotkey[0];
 		int keyCode = hotkey[1];
 		boolean ctrl = (stateMask & ~SWT.CTRL) != stateMask;
@@ -150,6 +150,56 @@ public enum Key {
 		if (shift) key = "Shift + " + key; //$NON-NLS-1$
 		if (ctrl) key = "Ctrl + " + key; //$NON-NLS-1$
 		return key;
+	}
+	
+	// TODO comment
+	// returns null if key not valid, else int array with state mask and keycode
+	public static int[] acceptSWTHotkey(int stateMask, int keyCode) {
+		int[] hotkey = new int[] {stateMask, keyCode};
+		
+		// State mask must be SWT.NONE or a combination of SWT.CTRL, SWT.ALT and SWT.SHIFT
+		stateMask &= ~SWT.CTRL;
+		stateMask &= ~SWT.ALT;
+		stateMask &= ~SWT.SHIFT;
+		if (stateMask != SWT.NONE) return null;
+		
+		// Accept special keys
+		switch (keyCode) {
+		case SWT.F1:
+		case SWT.F2:
+		case SWT.F3:
+		case SWT.F4:
+		case SWT.F5:
+		case SWT.F6:
+		case SWT.F7:
+		case SWT.F8:
+		case SWT.F9:
+		case SWT.F10:
+		case SWT.F11:
+		case SWT.F12:
+		case SWT.PAUSE:
+		case SWT.PRINT_SCREEN:
+		case SWT.BS:
+		case SWT.CR:
+		case SWT.INSERT:
+		case SWT.DEL:
+		case SWT.HOME:
+		case SWT.END:
+		case SWT.PAGE_UP:
+		case SWT.PAGE_DOWN:
+		case SWT.ARROW_UP:
+		case SWT.ARROW_DOWN:
+		case SWT.ARROW_LEFT:
+		case SWT.ARROW_RIGHT: return hotkey;
+		default: break;
+		}
+		
+		// Shift and Alt as keycode is not allowed
+		if (keyCode == SWT.SHIFT) return null;
+		if (keyCode == SWT.ALT) return null;
+		
+		// Accept letters and digits
+		return Character.isLetterOrDigit(keyCode) ? hotkey : null;
 	}
 
 }

@@ -50,8 +50,8 @@ public class MainPanel extends Composite {
 	 */
 	private void loadSashWeights() {
 		sash.setWeights(sash.getOrientation() == SWT.VERTICAL ?
-				Pref.IntArray.SashRightVerticalWeights.value() :
-				Pref.IntArray.SashRightHorizontalWeights.value()
+				Pref.IntArray.SashRightVerticalWeights.getValue() :
+				Pref.IntArray.SashRightHorizontalWeights.getValue()
 		);
 	}
 	
@@ -105,10 +105,10 @@ public class MainPanel extends Composite {
 		sash.setOrientation(bottom ? SWT.VERTICAL : SWT.HORIZONTAL);
 		if (isPreviewVisible()) {
 			if (bottom) {
-				Pref.IntArray.SashRightHorizontalWeights.setValue(sash.getWeights());				sash.setWeights(Pref.IntArray.SashRightVerticalWeights.value());
+				Pref.IntArray.SashRightHorizontalWeights.setValue(sash.getWeights());				sash.setWeights(Pref.IntArray.SashRightVerticalWeights.getValue());
 			}
 			else {
-				Pref.IntArray.SashRightVerticalWeights.setValue(sash.getWeights());				sash.setWeights(Pref.IntArray.SashRightHorizontalWeights.value());
+				Pref.IntArray.SashRightVerticalWeights.setValue(sash.getWeights());				sash.setWeights(Pref.IntArray.SashRightHorizontalWeights.getValue());
 			}
 		}
 		if (bottom != Pref.Bool.PreviewBottom.getValue())

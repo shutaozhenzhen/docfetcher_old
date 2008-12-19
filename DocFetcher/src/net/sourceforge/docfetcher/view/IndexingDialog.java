@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.ToolItem;
  * 
  * @author Tran Nam Quang
  */
-public class IndexingBox {
+public class IndexingDialog {
  
 	private Shell shell;
 	private CTabFolder tabFolder;
@@ -74,7 +74,7 @@ public class IndexingBox {
 	 */
 	private boolean forceShellActiveOnClose = false;
 
-	public IndexingBox(Shell parentShell) {
+	public IndexingDialog(Shell parentShell) {
 		// Create and configure shell
 		shell = new Shell(parentShell, Const.DIALOG_STYLE);
 		shell.setText(Msg.index_management.value());
@@ -293,7 +293,7 @@ public class IndexingBox {
 		if (ScopeRegistry.load().getSubmittedJobs().length == 0
 				&& shell.getDisplay().getActiveShell() == null // Only do this if app has lost focus
 				&& forceShellActiveOnClose) {
-			DocFetcher docFetcher = DocFetcher.getInst();
+			DocFetcher docFetcher = DocFetcher.getInstance();
 			if (docFetcher.isInSystemTray())
 				docFetcher.restoreFromSystemTray();
 			else {
@@ -358,14 +358,14 @@ public class IndexingBox {
 	 * Opens the indexing box.
 	 */
 	public void open() {
-		int width = Pref.Int.IndexingBoxWidth.value();
-		int height = Pref.Int.IndexingBoxHeight.value();
+		int width = Pref.Int.IndexingBoxWidth.getValue();
+		int height = Pref.Int.IndexingBoxHeight.getValue();
 		shell.setSize(width, height);
 		UtilGUI.centerShell((Shell) shell.getParent(), shell);
 		shell.setMinimized(false); // In case the user had minimized the shell previously
 		
 		// Open the indexing box only if DocFetcher doesn't hide in the system tray
-		if (DocFetcher.getInst().getShell().isVisible()) {
+		if (DocFetcher.getInstance().getShell().isVisible()) {
 			shell.open();
 			tabFolder.setSelectionBackground(UtilGUI.getColor(SWT.COLOR_TITLE_BACKGROUND));
 			tabFolder.setSelectionForeground(UtilGUI.getColor(SWT.COLOR_TITLE_FOREGROUND));

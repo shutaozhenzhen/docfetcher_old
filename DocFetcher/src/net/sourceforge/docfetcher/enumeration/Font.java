@@ -36,15 +36,15 @@ public enum Font {
 	static {
 		fontRegistry.put(PREVIEW.name(), new FontData[] {
 				new FontData(
-						Const.IS_WINDOWS ? Pref.Str.PreviewFontWin.value() : Pref.Str.PreviewFontLinux.value(),
-						Pref.Int.PreviewFontHeight.value(),
+						Const.IS_WINDOWS ? Pref.Str.PreviewFontWin.getValue() : Pref.Str.PreviewFontLinux.getValue(),
+						Pref.Int.PreviewFontHeight.getValue(),
 						SWT.NORMAL
 				)
 		});
 		fontRegistry.put(PREVIEW_MONO.name(), new FontData[] {
 				new FontData(
-						Const.IS_WINDOWS ? Pref.Str.PreviewFontMonoWin.value() : Pref.Str.PreviewFontMonoLinux.value(),
-						Pref.Int.PreviewFontHeightMono.value(),
+						Const.IS_WINDOWS ? Pref.Str.PreviewFontMonoWin.getValue() : Pref.Str.PreviewFontMonoLinux.getValue(),
+						Pref.Int.PreviewFontHeightMono.getValue(),
 						SWT.NORMAL
 				)
 		});

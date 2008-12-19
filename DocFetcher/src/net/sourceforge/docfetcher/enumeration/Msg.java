@@ -149,6 +149,9 @@ public enum Msg {
 	pref_skip_regex,
 	pref_max_results,
 	pref_max_results_range,
+	keybox_title,
+	keybox_msg,
+	pref_hotkey,
 	restore_defaults,
 	help,
 	

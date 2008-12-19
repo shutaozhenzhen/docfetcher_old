@@ -36,7 +36,7 @@ public privileged aspect DiskWritingSuppressor {
 	
 	after(): execution(* DocFetcher.createContents(..)) {
 		if (! writable)
-			DocFetcher.getInst().setStatus(Msg.write_warning.value());
+			DocFetcher.getInstance().setStatus(Msg.write_warning.value());
 	}
 	
 	void around(): execution(* Pref.save()) {

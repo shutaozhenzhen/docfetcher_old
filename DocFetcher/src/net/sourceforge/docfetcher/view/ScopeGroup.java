@@ -219,8 +219,8 @@ public class ScopeGroup extends GroupWrapper {
 			public void drop(DropTargetEvent event) {
 				// Abort if shells other than the main shell and the indexing box are open
 				Shell[] shells = Display.getDefault().getShells();
-				Shell mainShell = DocFetcher.getInst().getShell();
-				Shell indexingBoxShell = DocFetcher.getInst().getIndexingBox().getShell();
+				Shell mainShell = DocFetcher.getInstance().getShell();
+				Shell indexingBoxShell = DocFetcher.getInstance().getIndexingDialog().getShell();
 				for (Shell shell : shells)
 					if (! shell.equals(mainShell) && ! shell.equals(indexingBoxShell))
 						return;
@@ -253,10 +253,10 @@ public class ScopeGroup extends GroupWrapper {
 				}
 				
 				// Run indexing
-				IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
+				IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
 				for (RootScope newScope : newScopes)
-					indexingBox.addJob(new Job(newScope, true, true));
-				indexingBox.open();
+					indexingDialog.addJob(new Job(newScope, true, true));
+				indexingDialog.open();
 			}
 			
 		});
@@ -403,10 +403,10 @@ public class ScopeGroup extends GroupWrapper {
 	private void updateSelectedIndexes(boolean doRebuild) {
 		RootScope[] checkedScopes = getExistingRootSelection();
 		if (checkedScopes.length == 0) return;
-		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
+		IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
 		for (RootScope scope : checkedScopes)
-			indexingBox.addJob(new Job(scope, false, doRebuild));
-		indexingBox.open();
+			indexingDialog.addJob(new Job(scope, false, doRebuild));
+		indexingDialog.open();
 	}
 	
 	public boolean setFocus() {
@@ -422,11 +422,11 @@ public class ScopeGroup extends GroupWrapper {
 			setAccelerator(Key.Insert.keyCode);
 		}
 		public void run() {
-			IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
-			if (! indexingBox.addJobFromDialog())
-				indexingBox.close();
+			IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
+			if (! indexingDialog.addJobFromDialog())
+				indexingDialog.close();
 			else
-				indexingBox.open();
+				indexingDialog.open();
 		}
 	}
 
@@ -521,7 +521,7 @@ public class ScopeGroup extends GroupWrapper {
 		public void run() {
 			Scope[] scopes = getExistingSelection();
 			if (scopes.length == 0) return;
-			int openLimit = Pref.Int.OpenLimit.value();
+			int openLimit = Pref.Int.OpenLimit.getValue();
 			if (scopes.length > openLimit) {
 				UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
 				return;
@@ -592,8 +592,8 @@ public class ScopeGroup extends GroupWrapper {
 			}
 			else {
 				// Update indexes, but silently
-				IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
-				indexingBox.addJob(new Job(rootScope, false, false));
+				IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
+				indexingDialog.addJob(new Job(rootScope, false, false));
 			}
 		}
 	}
@@ -611,7 +611,7 @@ public class ScopeGroup extends GroupWrapper {
 			if (scopes.length == 0) return;
 			RootScope rootScope = scopes[0].getRootScope();
 			File targetFolder = scopes[0].getFile();
-			IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
+			IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
 			
 			// Show confirmation message for root folders
 			if (scopes[0] instanceof RootScope) {
@@ -643,13 +643,13 @@ public class ScopeGroup extends GroupWrapper {
 				RootScope newRootScope = new RootScope(newFile);
 				Job job = new Job(newRootScope, true, true);
 				job.setReadyForIndexing(true);
-				indexingBox.addJob(job);
-				indexingBox.open();
+				indexingDialog.addJob(job);
+				indexingDialog.open();
 			}
 			else {
 				// Just update the index for non-root folders
-				indexingBox.addJob(new Job(rootScope, false, false));
-				indexingBox.open();
+				indexingDialog.addJob(new Job(rootScope, false, false));
+				indexingDialog.open();
 			}
 		}
 	}
@@ -701,9 +701,9 @@ public class ScopeGroup extends GroupWrapper {
 					jobs.add(new Job(rootScope, false, false));
 				}
 			}
-			IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
+			IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
 			for (Job job : jobs)
-				indexingBox.addJob(job);
+				indexingDialog.addJob(job);
 		}
 	}
 	
@@ -724,7 +724,7 @@ public class ScopeGroup extends GroupWrapper {
 			RootScope rootScopeToUpdate = scopes[0].getRootScope();
 			
 			// Get files from clipboard
-			Clipboard cb = DocFetcher.getInst().getClipboard();
+			Clipboard cb = DocFetcher.getInstance().getClipboard();
 			File[] files = null;
 			if (Const.IS_WINDOWS) {
 				TransferData[] types = cb.getAvailableTypes();
@@ -767,15 +767,15 @@ public class ScopeGroup extends GroupWrapper {
 			FSEventHandler.getInst().setWatchEnabled(false, rootScopeToUpdate);
 			
 			// Copy files
-			FileTransferBox transferBox = new FileTransferBox(getShell(), Msg.file_transfer.value());
-			transferBox.open();
-			transferBox.transferFiles(files, newParent);
+			FileTransferDialog transferDialog = new FileTransferDialog(getShell(), Msg.file_transfer.value());
+			transferDialog.open();
+			transferDialog.transferFiles(files, newParent);
 			
 			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScopeToUpdate);
 			
 			// Update indexes, but silently
-			IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
-			indexingBox.addJob(new Job(rootScopeToUpdate, false, false));
+			IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
+			indexingDialog.addJob(new Job(rootScopeToUpdate, false, false));
 		}
 	}
 	

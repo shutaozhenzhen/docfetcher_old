@@ -143,9 +143,9 @@ public class ResultPanel extends Composite {
 			// Store column widths in preferences
 			public void controlResized(ControlEvent e) {
 				TableColumn[] columns = viewer.getTable().getColumns();
-				if (Pref.IntArray.ResultColumnWidths.value().length != columns.length)
+				if (Pref.IntArray.ResultColumnWidths.getValue().length != columns.length)
 					Pref.IntArray.ResultColumnWidths.setValue(new int[columns.length]);				for (int i = 0; i < columns.length; i++)
-					Pref.IntArray.ResultColumnWidths.value()[i] = columns[i].getWidth();
+					Pref.IntArray.ResultColumnWidths.getValue()[i] = columns[i].getWidth();
 			}
 		}
 		ColumnListener columnListener = new ColumnListener();
@@ -169,12 +169,12 @@ public class ResultPanel extends Composite {
 		}
 		
 		// Load alternative column order from preferences if there is one
-		int[] resultColumnOrder = Pref.IntArray.ResultColumnOrder.value();
+		int[] resultColumnOrder = Pref.IntArray.ResultColumnOrder.getValue();
 		if (properties.length == resultColumnOrder.length)
 			viewer.getTable().setColumnOrder(resultColumnOrder);
 		
 		// Set column widths
-		int[] resultColumnWidths = Pref.IntArray.ResultColumnWidths.value();
+		int[] resultColumnWidths = Pref.IntArray.ResultColumnWidths.getValue();
 		TableColumn[] columns = viewer.getTable().getColumns();
 		if (properties.length == resultColumnWidths.length) {
 			for (int i = 0; i < columns.length; i++) {
@@ -349,7 +349,7 @@ public class ResultPanel extends Composite {
 		Arrays.sort(sortedInput, resultSorter);
 		
 		// Split flat array into array of arrays
-		int maxSize = Pref.Int.MaxResults.value();
+		int maxSize = Pref.Int.MaxResults.getValue();
 		if (maxSize < 1)
 			throw new IllegalStateException("Maximum number of results per page cannot be smaller than 1."); //$NON-NLS-1$
 		int nPages = (int) Math.ceil((double) sortedInput.length / (double) maxSize);
@@ -411,7 +411,7 @@ public class ResultPanel extends Composite {
 	private void launchSelection() {
 		IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
 		if (sel.isEmpty()) return;
-		int openLimit = Pref.Int.OpenLimit.value();
+		int openLimit = Pref.Int.OpenLimit.getValue();
 		if (sel.size() > openLimit) {
 			UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
 			return;
@@ -422,7 +422,7 @@ public class ResultPanel extends Composite {
 			Program.launch(doc.getFile().getAbsolutePath());
 		}
 		if (Pref.Bool.HideOnOpen.getValue())
-			DocFetcher.getInst().toSystemTray();
+			DocFetcher.getInstance().toSystemTray();
 	}
 	
 	/**
@@ -439,7 +439,7 @@ public class ResultPanel extends Composite {
 			ResultDocument doc = (ResultDocument) it.next();
 			dirsToOpen.add(doc.getFile().getParentFile().getAbsolutePath());
 		}
-		int openLimit = Pref.Int.OpenLimit.value();
+		int openLimit = Pref.Int.OpenLimit.getValue();
 		if (dirsToOpen.size() > openLimit) {
 			UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
 			return;
@@ -447,7 +447,7 @@ public class ResultPanel extends Composite {
 		for (String dir : dirsToOpen)
 			Program.launch(dir);
 		if (Pref.Bool.HideOnOpen.getValue())
-			DocFetcher.getInst().toSystemTray();
+			DocFetcher.getInstance().toSystemTray();
 	}
 	
 	/**
@@ -467,7 +467,7 @@ public class ResultPanel extends Composite {
 				FileTransfer.getInstance(),
 				TextTransfer.getInstance()
 		};
-		DocFetcher.getInst().getClipboard().setContents(
+		DocFetcher.getInstance().getClipboard().setContents(
 				new Object[] {
 						filePaths,
 						UtilList.toString(Const.LS, filePaths)
@@ -521,9 +521,9 @@ public class ResultPanel extends Composite {
 		FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), scopesToUpdate);
 		
 		// Update indexes, but silently
-		IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
+		IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
 		for (RootScope scope : scopesToUpdate)
-			indexingBox.addJob(new Job(scope, false, false));
+			indexingDialog.addJob(new Job(scope, false, false));
 		
 		// Tell user about empty folders
 		if (emptyParents.size() > 0) {
@@ -817,10 +817,10 @@ public class ResultPanel extends Composite {
 			boolean launched = Program.launch(file.getAbsolutePath());
 			if (launched) {
 				if (Pref.Bool.HideOnOpen.getValue())
-					DocFetcher.getInst().toSystemTray();
+					DocFetcher.getInstance().toSystemTray();
 			}
 			else {
-				DocFetcher.getInst().setStatus(Msg.open_file_error.format(file.getName()));
+				DocFetcher.getInstance().setStatus(Msg.open_file_error.format(file.getName()));
 			}
 		}
 		

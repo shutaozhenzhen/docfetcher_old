@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.enumeration.Icon;
+import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.enumeration.Pref.Bool;
@@ -32,6 +33,8 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
@@ -51,7 +54,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @author Tran Nam Quang
  */
-public class PrefPage {
+public class PrefDialog {
 	
 	private Shell shell;
 	private static int shellX = -1;
@@ -67,15 +70,19 @@ public class PrefPage {
 	private Map<Text, Int> textBoxIntMap = new HashMap<Text, Int> ();
 	private Text exclFilterBox;
 	private Text maxResultsBox;
+
+	private Text hotkeyField;
+	private HotkeyDialog hotkeyDialog;
+	private int[] hotkey = Pref.IntArray.HotKeyToFront.getValue();
 	
-	public PrefPage (Shell parentShell) {
+	public PrefDialog (Shell parentShell) {
 		shell = new Shell(parentShell, Const.DIALOG_STYLE);
 		shell.setImage(Icon.PREFERENCES.getImage());
 		shell.setText(Msg.preferences.value());
 		shell.setLayout(new FormLayout());
 		shell.setSize(
-				Pref.Int.PrefPageWidth.value(),
-				Pref.Int.PrefPageHeight.value()
+				Pref.Int.PrefPageWidth.getValue(),
+				Pref.Int.PrefPageHeight.getValue()
 		);
 		if (shellX == -1 || shellY == -1)
 			UtilGUI.centerShell(parentShell, shell);
@@ -125,6 +132,26 @@ public class PrefPage {
 				Msg.pref_max_results.value(),
 				Pref.Int.MaxResults
 		);
+		
+		// Controls for the hotkey
+		Label hotkeyLabel = new Label(container, SWT.NONE);
+		hotkeyLabel.setText(Msg.pref_hotkey.value());
+		hotkeyField = new Text(container, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
+		hotkeyField.setText(Key.toString(Pref.IntArray.HotKeyToFront.getValue()));
+		hotkeyField.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		hotkeyField.setBackground(UtilGUI.getColor(SWT.COLOR_WHITE));
+		hotkeyField.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				hotkeyDialog = new HotkeyDialog(shell, hotkey);
+				hotkeyDialog.addDisposeListener(new DisposeListener() {
+					public void widgetDisposed(DisposeEvent e) {
+						hotkey = hotkeyDialog.getHotkey();
+						hotkeyField.setText(Key.toString(hotkey));
+					}
+				});
+				hotkeyDialog.open();
+			}
+		});
 		
 		/*
 		 * Lower panel with buttons starts here
@@ -191,21 +218,21 @@ public class PrefPage {
 	
 	private Text createTextBox(Composite parent, String label, Str strPref) {
 		Text text = createTextBox(parent, label);
-		text.setText(strPref.value());
+		text.setText(strPref.getValue());
 		textBoxStrMap.put(text, strPref);
 		return text;
 	}
 	
 	private Text createTextBox(Composite parent, String label, StrArray strArrayPref) {
 		Text text = createTextBox(parent, label);
-		text.setText(UtilList.toString(" ", strArrayPref.value())); //$NON-NLS-1$
+		text.setText(UtilList.toString(" ", strArrayPref.getValue())); //$NON-NLS-1$
 		textBoxStrArrayMap.put(text, strArrayPref);
 		return text;
 	}
 	
 	private Text createTextBox(Composite parent, String label, Int intPref) {
 		Text text = createTextBox(parent, label);
-		text.setText(Integer.toString(intPref.value()));
+		text.setText(Integer.toString(intPref.getValue()));
 		textBoxIntMap.put(text, intPref);
 		text.addVerifyListener(new VerifyListener() {
 			public void verifyText(VerifyEvent e) {
@@ -223,7 +250,7 @@ public class PrefPage {
 				throw new NumberFormatException();
 		} catch (NumberFormatException e) {
 			UtilGUI.showWarningMsg(null, Msg.pref_max_results_range.format(Integer.MAX_VALUE));
-			maxResultsBox.setText(Integer.toString(Math.max(1, Pref.Int.MaxResults.value())));
+			maxResultsBox.setText(Integer.toString(Math.max(1, Pref.Int.MaxResults.getValue())));
 			return;
 		}
 		
@@ -242,7 +269,7 @@ public class PrefPage {
 		}
 		for (Entry<Text, Int> entry : textBoxIntMap.entrySet()) {
 			int newValue = Integer.parseInt(entry.getKey().getText());
-			if (entry.getValue().value() != newValue) {
+			if (entry.getValue().getValue() != newValue) {
 				entry.getValue().setValue(newValue);
 				changed = true;
 			}
@@ -256,18 +283,24 @@ public class PrefPage {
 				);
 			else
 				newValue = entry.getKey().getText();
-			if (! entry.getValue().value().equals(newValue)) {
+			if (! entry.getValue().getValue().equals(newValue)) {
 				entry.getValue().setValue(newValue);
 				changed = true;
 			}
 		}
 		for (Entry<Text, StrArray> entry : textBoxStrArrayMap.entrySet()) {
 			String[] newValue = entry.getKey().getText().split("[^\\p{Alnum}]+"); //$NON-NLS-1$
-			if (! Arrays.equals(entry.getValue().value(), newValue)) {
+			if (! Arrays.equals(entry.getValue().getValue(), newValue)) {
 				entry.getValue().setValue(newValue);
 				changed = true;
 			}
 		}
+		
+		if (Pref.IntArray.HotKeyToFront.getValue() != hotkey) {
+			Pref.IntArray.HotKeyToFront.setValue(hotkey);
+			changed = true;
+		}
+		hotkeyDialog = null;
 		
 		if (changed) {
 			try {
@@ -288,6 +321,9 @@ public class PrefPage {
 			entry.getKey().setText(entry.getValue().defaultValue);
 		for (Entry<Text, StrArray> entry : textBoxStrArrayMap.entrySet())
 			entry.getKey().setText(UtilList.toString(" ", entry.getValue().defaultValue)); //$NON-NLS-1$
+		int[] defaultHotkey = Pref.IntArray.HotKeyToFront.defaultValue;
+		hotkeyField.setText(Key.toString(defaultHotkey));
+		hotkey = defaultHotkey;
 	}
 
 }

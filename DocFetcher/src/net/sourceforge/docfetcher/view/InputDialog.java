@@ -108,7 +108,7 @@ public class InputDialog {
 	 * canceled.
 	 */
 	public String open() {
-		UtilGUI.centerShell(DocFetcher.getInst().getShell(), shell);
+		UtilGUI.centerShell(DocFetcher.getInstance().getShell(), shell);
 		shell.open();
 		while (! shell.isDisposed()) {
 			if (! shell.getDisplay().readAndDispatch())

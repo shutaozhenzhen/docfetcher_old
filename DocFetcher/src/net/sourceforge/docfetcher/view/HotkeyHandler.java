@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2008 Tonio Rush.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Tonio Rush - initial API and implementation
+ *******************************************************************************/
+
 package net.sourceforge.docfetcher.view;
 
 import jxgrabkey.JXGrabKey;
@@ -21,24 +32,24 @@ import com.melloware.jintellitype.JIntellitype;
  * 
  */
 public class HotkeyHandler {
-	protected static final int HOTKEY_TO_FRONT_IDX = 1;
+	
+	private static final int HOTKEY_TO_FRONT_IDX = 1;
 
 	/**
 	 * Platform specific stuffs
 	 */
-	HotkeyListenerImpl implementation;
+	private HotkeyListenerImpl implementation;
 
 	/**
 	 * All implementations have this methods
 	 *
 	 */
-	interface HotkeyListenerImpl {
+	private interface HotkeyListenerImpl {
 		public void initialize(HotkeyHandler listener);
 		public void registerSwingHotkey(int id, int mask, int key);
 		public void unregisterHotkey(int id);
 		public void shutdown();
-	};
-
+	}
 
 	/**
 	 * Installs a listener on hotkey to bring the app to top
@@ -46,16 +57,10 @@ public class HotkeyHandler {
 	 * 
 	 */
 	public HotkeyHandler() {
-		if(Const.IS_WINDOWS){
+		if (Const.IS_WINDOWS)
 			implementation = new HotkeyListenerWindowsImpl();
-		}else if(Const.IS_LINUX){
-			// TODO: test on linux
+		else if (Const.IS_LINUX)
 			implementation = new HotkeyListenerLinuxImpl();
-		}else{
-			// Mac ?
-			return;
-		}
-			
 		
 		implementation.initialize(this);
 		
@@ -66,23 +71,21 @@ public class HotkeyHandler {
 				implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
 						KeyCodeTranslator.translateSWTModifiers(eventData[0]), 
 						KeyCodeTranslator.translateSWTKey(eventData[1]));
-				
 			}
 		});
 
 		implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
-				KeyCodeTranslator.translateSWTModifiers(Pref.IntArray.HotKeyToFront.value()[0]), 
-				KeyCodeTranslator.translateSWTKey(Pref.IntArray.HotKeyToFront.value()[1]));
+				KeyCodeTranslator.translateSWTModifiers(Pref.IntArray.HotKeyToFront.getValue()[0]), 
+				KeyCodeTranslator.translateSWTKey(Pref.IntArray.HotKeyToFront.getValue()[1]));
 
 		/**
 		 * uninstall hotkeys when DocFetcher shuts down 
 		 */
-		DocFetcher.getInst().getShell().addDisposeListener(new DisposeListener(){
+		DocFetcher.getInstance().getShell().addDisposeListener(new DisposeListener(){
 			public void widgetDisposed(DisposeEvent arg0) {
 				implementation.shutdown();
 			}
 		});
-		
 	}
 	
 	/**
@@ -90,22 +93,17 @@ public class HotkeyHandler {
 	 * To make actions on the UI, we must call the display to enter in
 	 * the UI thread
 	 */
-	protected void onHotKey(final int hotkey_idx) {
+	private void onHotKey(final int hotkey_idx) {
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
-				switch (hotkey_idx) {
-				case HOTKEY_TO_FRONT_IDX:
-					if (DocFetcher.getInst().isInSystemTray()) {
-						DocFetcher.getInst().restoreFromSystemTray();
-					} else {
-						Shell shell = DocFetcher.getInst().getShell();
-						shell.setVisible(true);
-						shell.forceActive();
-					}
-
-					break;
-				default:
-					// future hotkeys
+				if (hotkey_idx != HOTKEY_TO_FRONT_IDX)
+					return;
+				if (DocFetcher.getInstance().isInSystemTray()) {
+					DocFetcher.getInstance().restoreFromSystemTray();
+				} else {
+					Shell shell = DocFetcher.getInstance().getShell();
+					shell.setVisible(true);
+					shell.forceActive();
 				}
 			}
 		});
@@ -117,7 +115,7 @@ public class HotkeyHandler {
 	 * @author Tonio Rush
 	 *
 	 */
-	class HotkeyListenerWindowsImpl implements HotkeyListenerImpl {
+	private class HotkeyListenerWindowsImpl implements HotkeyListenerImpl {
 
 		public void initialize(final HotkeyHandler listener) {
 			JIntellitype.getInstance();
@@ -137,25 +135,22 @@ public class HotkeyHandler {
 			JIntellitype.getInstance().unregisterHotKey(id);
 		}
 
-		
 		public void shutdown() {
 			JIntellitype.getInstance().cleanUp();
-			
 		}
 		
 	}
+	
 	/**
 	 * Linux implementation with JXGrabKey
 	 * 
 	 * @author Tonio Rush
 	 *
 	 */
-	class HotkeyListenerLinuxImpl implements HotkeyListenerImpl {
+	private class HotkeyListenerLinuxImpl implements HotkeyListenerImpl {
 
 		public void initialize(final HotkeyHandler listener) {
-			System.loadLibrary("JXGrabKey");
-			
-			JXGrabKey.setDebugOutput(true);
+			System.loadLibrary("JXGrabKey"); //$NON-NLS-1$
 
 			JXGrabKey.getInstance().addHotkeyListener(new jxgrabkey.HotkeyListener(){
 				public void onHotkey(int hotkey_idx) {
@@ -355,43 +350,43 @@ public class HotkeyHandler {
 	    private static final int VK_RIGHT_PARENTHESIS = 0x020A;
 	    private static final int VK_UNDERSCORE = 0x020B;
 	    
-	    private final static int SWTVK_A = 'A';
-	    private final static int SWTVK_B = 'B';
-	    private final static int SWTVK_C = 'C';
-	    private final static int SWTVK_D = 'D';
-	    private final static int SWTVK_E = 'E';
-	    private final static int SWTVK_F = 'F';
-	    private final static int SWTVK_G = 'G';
-	    private final static int SWTVK_H = 'H';
-	    private final static int SWTVK_I = 'I';
-	    private final static int SWTVK_J = 'J';
-	    private final static int SWTVK_K = 'K';
-	    private final static int SWTVK_L = 'L';
-	    private final static int SWTVK_M = 'M';
-	    private final static int SWTVK_N = 'N';
-	    private final static int SWTVK_O = 'O';
-	    private final static int SWTVK_P = 'P';
-	    private final static int SWTVK_Q = 'Q';
-	    private final static int SWTVK_R = 'R';
-	    private final static int SWTVK_S = 'S';
-	    private final static int SWTVK_T = 'T';
-	    private final static int SWTVK_U = 'U';
-	    private final static int SWTVK_V = 'V';
-	    private final static int SWTVK_W = 'W';
-	    private final static int SWTVK_X = 'X';
-	    private final static int SWTVK_Y = 'Y';
-	    private final static int SWTVK_Z = 'Z';
-	    private final static int SWTVK_SPACE = ' ';
-	    private final static int SWTVK_0 = '0';
-	    private final static int SWTVK_1 = '1';
-	    private final static int SWTVK_2 = '2';
-	    private final static int SWTVK_3 = '3';
-	    private final static int SWTVK_4 = '4';
-	    private final static int SWTVK_5 = '5';
-	    private final static int SWTVK_6 = '6';
-	    private final static int SWTVK_7 = '7';
-	    private final static int SWTVK_8 = '8';
-	    private final static int SWTVK_9 = '9';
+	    private static final int SWTVK_A = 'A';
+	    private static final int SWTVK_B = 'B';
+	    private static final int SWTVK_C = 'C';
+	    private static final int SWTVK_D = 'D';
+	    private static final int SWTVK_E = 'E';
+	    private static final int SWTVK_F = 'F';
+	    private static final int SWTVK_G = 'G';
+	    private static final int SWTVK_H = 'H';
+	    private static final int SWTVK_I = 'I';
+	    private static final int SWTVK_J = 'J';
+	    private static final int SWTVK_K = 'K';
+	    private static final int SWTVK_L = 'L';
+	    private static final int SWTVK_M = 'M';
+	    private static final int SWTVK_N = 'N';
+	    private static final int SWTVK_O = 'O';
+	    private static final int SWTVK_P = 'P';
+	    private static final int SWTVK_Q = 'Q';
+	    private static final int SWTVK_R = 'R';
+	    private static final int SWTVK_S = 'S';
+	    private static final int SWTVK_T = 'T';
+	    private static final int SWTVK_U = 'U';
+	    private static final int SWTVK_V = 'V';
+	    private static final int SWTVK_W = 'W';
+	    private static final int SWTVK_X = 'X';
+	    private static final int SWTVK_Y = 'Y';
+	    private static final int SWTVK_Z = 'Z';
+	    private static final int SWTVK_SPACE = ' ';
+	    private static final int SWTVK_0 = '0';
+	    private static final int SWTVK_1 = '1';
+	    private static final int SWTVK_2 = '2';
+	    private static final int SWTVK_3 = '3';
+	    private static final int SWTVK_4 = '4';
+	    private static final int SWTVK_5 = '5';
+	    private static final int SWTVK_6 = '6';
+	    private static final int SWTVK_7 = '7';
+	    private static final int SWTVK_8 = '8';
+	    private static final int SWTVK_9 = '9';
 	    private static final int SWTVK_SEMICOLON = ';';
 	    private static final int SWTVK_EQUALS = '=';
 	    private static final int SWTVK_COMMA = ',';

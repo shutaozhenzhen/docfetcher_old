@@ -18,7 +18,7 @@ import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
-import net.sourceforge.docfetcher.view.IndexingBox;
+import net.sourceforge.docfetcher.view.IndexingDialog;
 
 /**
  * Some constraints on the code.
@@ -33,8 +33,8 @@ public aspect CodeConventions {
 	declare warning: set(* ExceptionHandler.forceDisabled):
 		"Don't forget to re-enable the exception handler after usage."; //$NON-NLS-1$
 	
-	declare warning: call(* ScopeRegistry.addJob(..)) && !within(IndexingBox):
-		"Don't add jobs via the ScopeRegistry; use the IndexingBox interface instead."; //$NON-NLS-1$
+	declare warning: call(* ScopeRegistry.addJob(..)) && !within(IndexingDialog):
+		"Don't add jobs via the ScopeRegistry; use the IndexingDialog interface instead."; //$NON-NLS-1$
 	
 	declare warning: call(Parser+.new(..)) && !within(ParserRegistry):
 		"Don't instantiate parsers outside the parser registry."; //$NON-NLS-1$

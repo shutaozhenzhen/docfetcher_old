@@ -71,11 +71,11 @@ public class RootScope extends Scope {
 	
 	private boolean detectHTMLPairs = true;
 	
-	private String[] textExtensions = Pref.StrArray.TextExtensions.value();
+	private String[] textExtensions = Pref.StrArray.TextExtensions.getValue();
 	
-	private String[] htmlExtensions = Pref.StrArray.HTMLExtensions.value();
+	private String[] htmlExtensions = Pref.StrArray.HTMLExtensions.getValue();
 	
-	private String[] exclusionFilters = Pref.Str.ExclusionFilter.value().split("\\s*\\$+\\s*"); //$NON-NLS-1$
+	private String[] exclusionFilters = Pref.Str.ExclusionFilter.getValue().split("\\s*\\$+\\s*"); //$NON-NLS-1$
 	
 	private List<ParseException> parseExceptions = new ArrayList<ParseException> ();
 	

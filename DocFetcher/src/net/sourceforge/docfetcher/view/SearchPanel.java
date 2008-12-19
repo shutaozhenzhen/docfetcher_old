@@ -82,7 +82,7 @@ public class SearchPanel extends Composite {
 		searchBar.setLayout(formLayout);
 		
 		searchBox = new Combo(searchBar, SWT.BORDER);
-		searchBox.setVisibleItemCount(Pref.Int.SearchHistorySize.value());
+		searchBox.setVisibleItemCount(Pref.Int.SearchHistorySize.getValue());
 		UtilGUI.selectAllOnFocus(searchBox);
 		
 		searchBox.addKeyListener(new KeyAdapter() {
@@ -157,7 +157,7 @@ public class SearchPanel extends Composite {
 		searchBar.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
 				int spaceLeft = searchBar.getSize().x - toolBarContainer.getSize().x - searchBar.getBorderWidth() * 2;
-				if (spaceLeft < Pref.Int.SearchBoxMaxWidth.value())
+				if (spaceLeft < Pref.Int.SearchBoxMaxWidth.getValue())
 					FormDataFactory.getInstance().setMargin(0)
 					.top().bottom()
 					.left().right(toolBarContainer)
@@ -168,7 +168,7 @@ public class SearchPanel extends Composite {
 		// Limit the width of the search box
 		searchBox.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
-				int maxWidth = Pref.Int.SearchBoxMaxWidth.value();
+				int maxWidth = Pref.Int.SearchBoxMaxWidth.getValue();
 				if (searchBox.getSize().x > maxWidth) {
 					searchBox.setSize(maxWidth, SWT.DEFAULT); // necessary for avoiding a layout bug
 					FormDataFactory.getInstance().setMargin(0)
@@ -213,7 +213,7 @@ public class SearchPanel extends Composite {
 		int newHistoryLength = oldHistory.length;
 		if (! UtilList.containsEquality(oldHistory, term))
 			newHistoryLength += 1;
-		newHistoryLength = Math.min(newHistoryLength, Pref.Int.SearchHistorySize.value());
+		newHistoryLength = Math.min(newHistoryLength, Pref.Int.SearchHistorySize.getValue());
 		if (newHistoryLength <= 0) // search history size was set to a value <= 0
 			return;
 		String[] newHistory = new String[newHistoryLength];

@@ -27,7 +27,7 @@ import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.ExceptionHandler;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilList;
-import net.sourceforge.docfetcher.view.IndexingBox;
+import net.sourceforge.docfetcher.view.IndexingDialog;
 
 import org.eclipse.swt.widgets.Display;
 
@@ -162,9 +162,9 @@ public class FSEventHandler {
 				if (display == null || display.isDisposed()) return;
 				display.syncExec(new Runnable() {
 					public void run() {
-						IndexingBox indexingBox = DocFetcher.getInst().getIndexingBox();
+						IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
 						if (eventCache.isEmpty()) return;
-						indexingBox.addJob(new Job(eventCache.get(0), false, false));
+						indexingDialog.addJob(new Job(eventCache.get(0), false, false));
 						
 						/*
 						 * FIXME Opening of the indexing box on file system
