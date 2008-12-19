@@ -80,7 +80,7 @@ public class HotkeyDialog {
 		
 		hotkeyBox.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				hotkey = Key.acceptSWTHotkey(e.stateMask, e.keyCode);
+				hotkey = HotkeyDialog.this.acceptSWTHotkey(e.stateMask, e.keyCode);
 				if (hotkey != null)
 					hotkeyBox.setText(Key.toString(hotkey));
 			}
@@ -142,6 +142,59 @@ public class HotkeyDialog {
 
 	public void removeDisposeListener(DisposeListener listener) {
 		shell.removeDisposeListener(listener);
+	}
+	
+	/**
+	 * Returns the hotkey if the given SWT state mask and keycode represent
+	 * valid user input, otherwise returns null. Some user inputs are invalid
+	 * because they wouldn't work in the way they're supposed to work.
+	 */
+	private int[] acceptSWTHotkey(int stateMask, int keyCode) {
+		int[] hotkey = new int[] {stateMask, keyCode};
+		
+		// State mask must be SWT.NONE or a combination of SWT.CTRL, SWT.ALT and SWT.SHIFT
+		stateMask &= ~SWT.CTRL;
+		stateMask &= ~SWT.ALT;
+		stateMask &= ~SWT.SHIFT;
+		if (stateMask != SWT.NONE) return null;
+		
+		// Accept special keys
+		switch (keyCode) {
+		case SWT.F1:
+		case SWT.F2:
+		case SWT.F3:
+		case SWT.F4:
+		case SWT.F5:
+		case SWT.F6:
+		case SWT.F7:
+		case SWT.F8:
+		case SWT.F9:
+		case SWT.F10:
+		case SWT.F11:
+		case SWT.F12:
+		case SWT.PAUSE:
+		case SWT.PRINT_SCREEN:
+		case SWT.BS:
+		case SWT.CR:
+		case SWT.INSERT:
+		case SWT.DEL:
+		case SWT.HOME:
+		case SWT.END:
+		case SWT.PAGE_UP:
+		case SWT.PAGE_DOWN:
+		case SWT.ARROW_UP:
+		case SWT.ARROW_DOWN:
+		case SWT.ARROW_LEFT:
+		case SWT.ARROW_RIGHT: return hotkey;
+		default: break;
+		}
+		
+		// Shift and Alt as keycode is not allowed
+		if (keyCode == SWT.SHIFT) return null;
+		if (keyCode == SWT.ALT) return null;
+		
+		// Accept letters and digits
+		return Character.isLetterOrDigit(keyCode) ? hotkey : null;
 	}
 
 }
