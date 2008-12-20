@@ -27,12 +27,12 @@ import com.melloware.jintellitype.JIntellitype;
 
 /**
  * Handler for hot keys
- * 
+ *
  * @author Tonio Rush
- * 
+ *
  */
 public class HotkeyHandler {
-	
+
 	private static final int HOTKEY_TO_FRONT_IDX = 1;
 
 	/**
@@ -54,32 +54,32 @@ public class HotkeyHandler {
 	/**
 	 * Installs a listener on hotkey to bring the app to top
 	 * The hotkey is registred in Pref.IntArray.HotKeyToFront
-	 * 
+	 *
 	 */
 	public HotkeyHandler() {
 		if (Const.IS_WINDOWS)
 			implementation = new HotkeyListenerWindowsImpl();
 		else if (Const.IS_LINUX)
 			implementation = new HotkeyListenerLinuxImpl();
-		
+
 		implementation.initialize(this);
-		
+
 		Pref.IntArray.HotKeyToFront.evtChanged.add(new Listener<int[]>() {
 			public void update(int[] eventData) {
 				implementation.unregisterHotkey(HOTKEY_TO_FRONT_IDX);
-				
+
 				implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
-						KeyCodeTranslator.translateSWTModifiers(eventData[0]), 
+						KeyCodeTranslator.translateSWTModifiers(eventData[0]),
 						KeyCodeTranslator.translateSWTKey(eventData[1]));
 			}
 		});
 
 		implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
-				KeyCodeTranslator.translateSWTModifiers(Pref.IntArray.HotKeyToFront.getValue()[0]), 
+				KeyCodeTranslator.translateSWTModifiers(Pref.IntArray.HotKeyToFront.getValue()[0]),
 				KeyCodeTranslator.translateSWTKey(Pref.IntArray.HotKeyToFront.getValue()[1]));
 
 		/**
-		 * uninstall hotkeys when DocFetcher shuts down 
+		 * uninstall hotkeys when DocFetcher shuts down
 		 */
 		DocFetcher.getInstance().getShell().addDisposeListener(new DisposeListener(){
 			public void widgetDisposed(DisposeEvent arg0) {
@@ -87,7 +87,7 @@ public class HotkeyHandler {
 			}
 		});
 	}
-	
+
 	/**
 	 * When a hotkey is pressed, we are called from a dll
 	 * To make actions on the UI, we must call the display to enter in
@@ -111,7 +111,7 @@ public class HotkeyHandler {
 
 	/**
 	 * Windows implementation with JIntellitype
-	 * 
+	 *
 	 * @author Tonio Rush
 	 *
 	 */
@@ -138,12 +138,12 @@ public class HotkeyHandler {
 		public void shutdown() {
 			JIntellitype.getInstance().cleanUp();
 		}
-		
+
 	}
-	
+
 	/**
 	 * Linux implementation with JXGrabKey
-	 * 
+	 *
 	 * @author Tonio Rush
 	 *
 	 */
@@ -157,7 +157,7 @@ public class HotkeyHandler {
 					listener.onHotKey(hotkey_idx);
 				}
 	        });
-			
+
 		}
 
 		public void registerSwingHotkey(int id, int mask, int key) {
@@ -170,7 +170,7 @@ public class HotkeyHandler {
 		public void shutdown() {
 	        JXGrabKey.getInstance().cleanUp();
 		}
-		
+
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class HotkeyHandler {
 	        }
 	        return awt;
 	    }
-	    
+
 	    /** Returns the SWT key code for an AWT key */
 	    public static int translateAWTKey(int awtKey) {
 	        int swt = 0;
@@ -223,7 +223,7 @@ public class HotkeyHandler {
 	        }
 	        return swt;
 	    }
-	    
+
 	    private static final int VK_ENTER = '\n';
 	    private static final int VK_BACK_SPACE = '\b';
 	    private static final int VK_TAB  = '\t';
@@ -349,7 +349,7 @@ public class HotkeyHandler {
 	    private static final int VK_PLUS = 0x0209;
 	    private static final int VK_RIGHT_PARENTHESIS = 0x020A;
 	    private static final int VK_UNDERSCORE = 0x020B;
-	    
+
 	    private static final int SWTVK_A = 'A';
 	    private static final int SWTVK_B = 'B';
 	    private static final int SWTVK_C = 'C';
@@ -459,7 +459,7 @@ public class HotkeyHandler {
 	    private static final int SWTVK_HOME = SWT.HOME;
 	    private static final int SWTVK_END = SWT.END;
 	    */
-	    
+
 	    private static final int SWTVK_PAGE_UP = SWT.PAGE_UP;
 	    private static final int SWTVK_PAGE_DOWN = SWT.PAGE_DOWN;
 	    private static final int SWTVK_INSERT = SWT.INSERT;
@@ -481,7 +481,7 @@ public class HotkeyHandler {
 	      * ensure binary compatibility for existing Swing/AWT apps.
 	      */
 	    private static int[] translationMap = new int[] {
-	        VK_ENTER,               SWTVK_ENTER, 
+	        VK_ENTER,               SWTVK_ENTER,
 	        VK_BACK_SPACE,          SWTVK_BACK_SPACE,
 	        VK_TAB,                 SWTVK_TAB,
 	        VK_CANCEL,              SWTVK_CANCEL,
@@ -605,7 +605,33 @@ public class HotkeyHandler {
 	        VK_NUMBER_SIGN,         SWTVK_NUMBER_SIGN,
 	        VK_PLUS,                SWTVK_PLUS,
 	        VK_RIGHT_PARENTHESIS,   SWTVK_RIGHT_PARENTHESIS,
-	        VK_UNDERSCORE,          SWTVK_UNDERSCORE
+	        VK_UNDERSCORE,          SWTVK_UNDERSCORE,
+	        VK_A,                   SWTVK_A + 32,
+	        VK_B,                   SWTVK_B + 32,
+	        VK_C,                   SWTVK_C + 32,
+	        VK_D,                   SWTVK_D + 32,
+	        VK_E,                   SWTVK_E + 32,
+	        VK_F,                   SWTVK_F + 32,
+	        VK_G,                   SWTVK_G + 32,
+	        VK_H,                   SWTVK_H + 32,
+	        VK_I,                   SWTVK_I + 32,
+	        VK_J,                   SWTVK_J + 32,
+	        VK_K,                   SWTVK_K + 32,
+	        VK_L,                   SWTVK_L + 32,
+	        VK_M,                   SWTVK_M + 32,
+	        VK_N,                   SWTVK_N + 32,
+	        VK_O,                   SWTVK_O + 32,
+	        VK_P,                   SWTVK_P + 32,
+	        VK_Q,                   SWTVK_Q + 32,
+	        VK_R,                   SWTVK_R + 32,
+	        VK_S,                   SWTVK_S + 32,
+	        VK_T,                   SWTVK_T + 32,
+	        VK_U,                   SWTVK_U + 32,
+	        VK_V,                   SWTVK_V + 32,
+	        VK_W,                   SWTVK_W + 32,
+	        VK_X,                   SWTVK_X + 32,
+	        VK_Y,                   SWTVK_Y + 32,
+	        VK_Z,                   SWTVK_Z + 32,
 	    };
 	}
 }
