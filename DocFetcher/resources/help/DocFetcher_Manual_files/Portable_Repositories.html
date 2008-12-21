@@ -30,15 +30,15 @@ terminated earlier. Therefore, if you want to make some changes
 from an instance A, either make sure A is the last one that terminates,
 or make sure A is the only instance with write permission.</li><li>As
 mentioned above, the document repository will NOT be fully portable if
-some of its documents are somewhere outside of the DocFetcher
+some of its documents are somewhere outside the DocFetcher
 folder.&nbsp;The reason is that DocFetcher can&nbsp;use relative file
 paths instead of absolute ones only if the documents are all located in its
 own folder.</li><li>Documents
 inside the 'indexes' folder will not be indexed. (In fact, you
-shouldn't put anything into that folder, because it might become
+shouldn't put anything into that folder, because it might be
 deleted!)</li><li>Beware
 of filename incompatibilities between Linux and Windows. For example,
-in Linux filenames can contain characters such as ":" or "|", but in
+on Linux filenames can contain characters such as ":" or "|", but on
 Windows they can't. As a result, you can only move a document
 repository from Linux to Windows or in the opposite direction if it
 doesn't contain documents with incompatible filenames. Oh, and special

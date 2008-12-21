@@ -528,7 +528,9 @@ public class DocFetcher extends ApplicationWindow {
 			errorMsg = Msg.search_scope_empty.value();
 		
 		// Check for correct filesizes
-		errorMsg = filesizeGroup.checkSearchDisabled();
+		String filesizeGroupMsg = filesizeGroup.checkSearchDisabled();
+		if (filesizeGroupMsg != null)
+			errorMsg = filesizeGroupMsg;
 		
 		// At least one item in the filetype table must be checked
 		if (! ParserRegistry.hasCheckedParsers())

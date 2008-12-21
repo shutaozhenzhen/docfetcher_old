@@ -218,7 +218,8 @@ public class PreviewPanel extends Composite {
 
 		htmlPreviewBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Pref.Bool.PreviewHTML.setValue(htmlPreviewBt.getSelection());				if (parser instanceof HTMLParser) // Only refresh preview panel for HTML documents
+				Pref.Bool.PreviewHTML.setValue(htmlPreviewBt.getSelection());
+				if (parser instanceof HTMLParser) // Only refresh preview panel for HTML documents
 					setFile(file, parser, true);
 			}
 		});

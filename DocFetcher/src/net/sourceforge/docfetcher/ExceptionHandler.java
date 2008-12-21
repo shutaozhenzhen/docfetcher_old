@@ -15,15 +15,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import net.sourceforge.docfetcher.enumeration.Icon;
-import net.sourceforge.docfetcher.enumeration.Msg;
-import net.sourceforge.docfetcher.util.UtilGUI;
+import net.sourceforge.docfetcher.view.ErrorDialog;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * This class makes the system error output show up in an error window.
@@ -40,7 +34,7 @@ public class ExceptionHandler {
 	/**
 	 * The SWT textbox the error output is send to.
 	 */
-	private static Text text;
+	private static ErrorDialog errorDialog;
 
 	/**
 	 * The default error printstream provided by the system. This needs to be
@@ -66,21 +60,10 @@ public class ExceptionHandler {
 	 * Returns the textbox to write the error output to, or creates a new one if
 	 * none has been created yet.
 	 */
-	private static Text getTextWidget() {
-		if (text == null) {
-			int shellStyle = SWT.SYSTEM_MODAL | SWT.DIALOG_TRIM | SWT.MIN | SWT.MAX | SWT.RESIZE;
-			Shell shell = new Shell(Display.getDefault(), shellStyle);
-			shell.setImage(Icon.WARNING_BIG.getImage());
-			shell.setText(Msg.system_error.value());
-			shell.setSize(400, 300);
-			shell.setLayout(new FillLayout());
-			UtilGUI.centerShell(null, shell);
-			text = new Text(shell, SWT.MULTI | SWT.READ_ONLY | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-			text.setBackground(UtilGUI.getColor(SWT.COLOR_WHITE));
-			text.setForeground(UtilGUI.getColor(SWT.COLOR_RED));
-			shell.open();
-		}
-		return text;
+	private static ErrorDialog getErrorDialog() {
+		if (errorDialog == null)
+			errorDialog = new ErrorDialog();
+		return errorDialog;
 	}
 
 	/**
@@ -98,7 +81,7 @@ public class ExceptionHandler {
 			 * much slower.
 			 */
 			if (Display.getCurrent() != null) {
-				getTextWidget().append(String.valueOf((char) b));
+				getErrorDialog().append(String.valueOf((char) b));
 			}
 			else {
 				Display display = Display.getDefault();
@@ -106,7 +89,7 @@ public class ExceptionHandler {
 				final int fb = b;
 				display.syncExec(new Runnable() {
 					public void run() {
-						getTextWidget().append(String.valueOf((char) fb));
+						getErrorDialog().append(String.valueOf((char) fb));
 					}
 				});
 			}
@@ -137,13 +120,13 @@ public class ExceptionHandler {
 			 * much slower.
 			 */
 			if (Display.getCurrent() != null)
-				getTextWidget().append(buf.toString());
+				getErrorDialog().append(buf.toString());
 			else {
 				Display display = Display.getDefault();
 				if (display == null || display.isDisposed()) return;
 				display.syncExec(new Runnable() {
 					public void run() {
-						getTextWidget().append(buf.toString());
+						getErrorDialog().append(buf.toString());
 					}
 				});
 			}

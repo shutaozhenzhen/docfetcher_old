@@ -28,6 +28,7 @@ public enum Msg {
 	confirm_operation,
 	invalid_operation,
 	system_error,
+	report_bug,
 	read_error,
 	write_error,
 	write_warning,

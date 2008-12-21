@@ -194,7 +194,13 @@ public class HotkeyDialog {
 		if (keyCode == SWT.ALT) return null;
 		
 		// Accept letters and digits
-		return Character.isLetterOrDigit(keyCode) ? hotkey : null;
+		if (Character.isLetterOrDigit(keyCode)) {
+			if (Character.isLetter(keyCode)) // return uppercase letters
+				hotkey[1] = Character.toUpperCase(hotkey[1]);
+			return hotkey;
+		}
+		
+		return null; // user input rejected
 	}
 
 }
