@@ -11,6 +11,8 @@
 
 package net.sourceforge.docfetcher;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -20,7 +22,8 @@ import net.sourceforge.docfetcher.view.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * This class makes the system error output show up in an error window.
+ * This class makes the system error output show up not only on the console, but
+ * also in an error window and in a text file.
  * 
  * @author Tran Nam Quang
  */
@@ -29,47 +32,93 @@ public class ExceptionHandler {
 	/**
 	 * A convenience variable to turn this class off.
 	 */
-	private static boolean forceDisabled;
+	private boolean forceDisabled;
 
 	/**
-	 * The SWT textbox the error output is send to.
+	 * The error dialog the error output is send to.
 	 */
-	private static ErrorDialog errorDialog;
-
+	private ErrorDialog errorDialog;
+	
+	/**
+	 * The FileWriter used to write the error output to a file.
+	 */
+	private FileWriter fileWriter;
+	
 	/**
 	 * The default error printstream provided by the system. This needs to be
 	 * saved so we can both output to the default printstream and the textbox.
 	 */
-	private static PrintStream defaultErr = System.err;
+	private PrintStream defaultErr = System.err;
 
+	/**
+	 * Customized error output stream.
+	 */
 	private static PrintStream customErr;
 
-	public static void setEnabled(boolean enabled) {
+	/**
+	 * Enables or disables the customized error outputs provided by this class.
+	 * When enabled, errors are written to the console, a GUI component and a
+	 * text file. When disabled, errors are only written to the console.
+	 */
+	public void setEnabled(boolean enabled) {
 		if (forceDisabled) return;
 		if (enabled) {
 			if (customErr == null)
-				customErr = new PrintStream(new ErrToScreen());
+				customErr = new PrintStream(new CustomError());
 			System.setErr(customErr);
 		}
 		else {
 			System.setErr(defaultErr);
 		}
 	}
-
+	
 	/**
-	 * Returns the textbox to write the error output to, or creates a new one if
-	 * none has been created yet.
+	 * Close the file output stream if one was opened.
 	 */
-	private static ErrorDialog getErrorDialog() {
+	public void closeErrorFile() {
+		if (fileWriter == null) return;
+		try {
+			fileWriter.close();
+		} catch (IOException e) {
+		}
+	}
+	
+	/**
+	 * Appends the given String to the error textfile and the textbox of the
+	 * error dialog.
+	 */
+	private void appendError(String str) {
 		if (errorDialog == null)
 			errorDialog = new ErrorDialog();
-		return errorDialog;
+		errorDialog.append(str);
+		try {
+			if (fileWriter == null) {
+				File file = new File(Const.ERROR_FILENAME);
+				boolean fileExists = file.exists();
+				fileWriter = new FileWriter(file, true);
+				
+				/*
+				 * If the file already exists, but the FileWriter was null, then
+				 * DocFetcher must have been launched at least twice within a
+				 * single minute (due to the minute resolution of the file's
+				 * date signature), and each time an error was printed. In other
+				 * words, we're writing multiple stacktraces to a single file.
+				 * In order to make the file output more readable, we're
+				 * separating the stacktraces with this line terminator:
+				 */
+				if (fileExists) fileWriter.write(Const.LS);
+			}
+			fileWriter.write(str);
+			fileWriter.flush();
+		} catch (IOException e) {
+		}
 	}
 
 	/**
-	 * A custom implementation of a printstream that writes into a textbox.
+	 * A custom implementation of a printstream that writes to a textbox and a
+	 * text file.
 	 */
-	static class ErrToScreen extends OutputStream {
+	class CustomError extends OutputStream {
 
 		public void write(int b) throws IOException {
 			defaultErr.write(b);
@@ -81,7 +130,7 @@ public class ExceptionHandler {
 			 * much slower.
 			 */
 			if (Display.getCurrent() != null) {
-				getErrorDialog().append(String.valueOf((char) b));
+				appendError(String.valueOf((char) b));
 			}
 			else {
 				Display display = Display.getDefault();
@@ -89,7 +138,7 @@ public class ExceptionHandler {
 				final int fb = b;
 				display.syncExec(new Runnable() {
 					public void run() {
-						getErrorDialog().append(String.valueOf((char) fb));
+						appendError(String.valueOf((char) fb));
 					}
 				});
 			}
@@ -120,13 +169,13 @@ public class ExceptionHandler {
 			 * much slower.
 			 */
 			if (Display.getCurrent() != null)
-				getErrorDialog().append(buf.toString());
+				appendError(buf.toString());
 			else {
 				Display display = Display.getDefault();
 				if (display == null || display.isDisposed()) return;
 				display.syncExec(new Runnable() {
 					public void run() {
-						getErrorDialog().append(buf.toString());
+						appendError(buf.toString());
 					}
 				});
 			}

@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.view;
 
+import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.util.UtilGUI;
@@ -38,12 +39,12 @@ public class ErrorDialog {
 		Shell shell = new Shell(Display.getDefault(), shellStyle);
 		shell.setImage(Icon.WARNING_BIG.getImage());
 		shell.setText(Msg.system_error.value());
-		shell.setSize(400, 300);
+		shell.setSize(400, 400);
 		UtilGUI.centerShell(null, shell);
 		
 		// Widgets
 		Link label = new Link(shell, SWT.NONE);
-		label.setText(Msg.report_bug.value());
+		label.setText(Msg.report_bug.format(Const.USER_DIR + Const.FS + Const.ERROR_FILENAME));
 		label.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Program.launch(e.text);

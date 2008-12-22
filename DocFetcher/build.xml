@@ -70,7 +70,7 @@
 		<fixcrlf srcdir="${versiondir}/licenses" eol="crlf"/>
 	</target>
 	
-	<target name="deploy.linux.deb" depends="compile, fixcrlf.linux"
+	<target name="deploy.linux" depends="compile, fixcrlf.linux"
 		description="Build debian package for Linux">
 		<copy todir="build/tmp/usr/share/docfetcher/lib">
 			<fileset dir="lib" includes="**/*.jar, **/*.so" excludes="**/*win32*.jar"/>
@@ -164,7 +164,7 @@
 	</target>
 	
 	<target name="deploy.all"
-		depends="deploy.linux.deb, deploy.portable, deploy.source"
+		depends="deploy.linux, deploy.portable, deploy.source"
 		description="Build all, except for the Windows installer"/>
 	
 </project>

@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.sourceforge.docfetcher.ExceptionHandler;
+import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Msg;
 
 import org.apache.poi.hslf.extractor.PowerPointExtractor;
@@ -41,9 +41,9 @@ public class MSPowerPointParser extends MSOfficeParser {
 				 * deactivate the custom exception handler in order to avoid
 				 * stacktrace pop-ups.
 				 */
-				ExceptionHandler.setEnabled(false);
+				DocFetcher.getInstance().setExceptionHandlerEnabled(false);
 				extractor = new PowerPointExtractor(in);
-				ExceptionHandler.setEnabled(true);
+				DocFetcher.getInstance().setExceptionHandlerEnabled(true);
 			}
 			catch (Exception e) {
 				// This can happen if the file has the "ppt" extension, but is not a PowerPoint document

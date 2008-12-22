@@ -79,6 +79,7 @@ import org.eclipse.swt.widgets.Widget;
 public class DocFetcher extends ApplicationWindow {
 	
 	private static DocFetcher docFetcher;
+	private ExceptionHandler exceptionHandler;
 	public static String appName;
 	private Composite filterPanel;
 	private SashForm sashHorizontal;
@@ -469,7 +470,8 @@ public class DocFetcher extends ApplicationWindow {
 		 * main) so developers can see a stacktrace in the Eclipse console if
 		 * they haven't set up the run configuration appropriately.
 		 */
-		ExceptionHandler.setEnabled(true);
+		exceptionHandler = new ExceptionHandler();
+		exceptionHandler.setEnabled(true);
 		
 		return topContainer;
 	}
@@ -496,6 +498,8 @@ public class DocFetcher extends ApplicationWindow {
 		} catch (IOException e) {
 			UtilGUI.showErrorMsg(null, Msg.write_error.value());
 		}
+		
+		exceptionHandler.closeErrorFile();
  
 		// On Windows, this may cause a crash, so we do this last
 		FSEventHandler.getInst().setThreadWatchEnabled(false);
@@ -741,6 +745,13 @@ public class DocFetcher extends ApplicationWindow {
 	 */
 	public IndexingDialog getIndexingDialog() {
 		return indexingDialog;
+	}
+	
+	/**
+	 * Enables or disables the application's custom exception handler.
+	 */
+	public void setExceptionHandlerEnabled(boolean enabled) {
+		exceptionHandler.setEnabled(enabled);
 	}
 	
 }

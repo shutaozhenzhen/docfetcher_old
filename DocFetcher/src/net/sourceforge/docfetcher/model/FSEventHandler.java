@@ -24,7 +24,6 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.Event;
-import net.sourceforge.docfetcher.ExceptionHandler;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilList;
 import net.sourceforge.docfetcher.view.IndexingDialog;
@@ -269,13 +268,13 @@ public class FSEventHandler {
 			 * FIXME JNotify 0.91 can somehow throw JNotifyExceptions that
 			 * bypass this try-catch-clause. WTF?
 			 */
-			ExceptionHandler.setEnabled(false);
+			DocFetcher.getInstance().setExceptionHandlerEnabled(false);
 			int id = JNotify.addWatch(
 					file.getAbsolutePath(),
 					JNotify.FILE_ANY, true,
 					fsListener
 			);
-			ExceptionHandler.setEnabled(true);
+			DocFetcher.getInstance().setExceptionHandlerEnabled(true);
 			
 			watchIdMap.put(rootScope, id);
 		} catch (JNotifyException e) {
@@ -297,9 +296,9 @@ public class FSEventHandler {
 			 * FIXME JNotify 0.91 can somehow throw JNotifyExceptions that
 			 * bypass this try-catch-clause. WTF?
 			 */
-			ExceptionHandler.setEnabled(false);
+			DocFetcher.getInstance().setExceptionHandlerEnabled(false);
 			JNotify.removeWatch(watchIdMap.get(rootScope));
-			ExceptionHandler.setEnabled(true);
+			DocFetcher.getInstance().setExceptionHandlerEnabled(true);
 			
 			watchIdMap.remove(rootScope);
 		} catch (JNotifyException e) {

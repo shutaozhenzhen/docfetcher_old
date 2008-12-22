@@ -3,7 +3,7 @@ Version: @VERSION@
 Section: utils
 Priority: optional
 Architecture: all
-Maintainer: Tran Nam Quang <qforce@web.de>
+Maintainer: Tran Nam Quang <qforce@users.sourceforge.net>
 Depends: sun-java5-jre | sun-java6-jre | java2-runtime
 Homepage: http://docfetcher.sourceforge.net
 Description: Find documents that contain specific keywords

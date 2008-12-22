@@ -12,6 +12,8 @@
 package net.sourceforge.docfetcher;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.eclipse.swt.SWT;
 
@@ -64,6 +66,14 @@ public class Const {
 	public static final String USER_DIR = System.getProperty("user.dir"); //$NON-NLS-1$
 	
 	/**
+	 * Each time DocFetcher starts, a new file is used to write the stacktrace
+	 * to. The files are differentiated by this date string in their filenames.
+	 * The date string has minute resolution, so multiple stacktraces occurring
+	 * within the same minute will be written to the same file.
+	 */
+	public static final String ERROR_FILENAME = "stacktrace_" + new SimpleDateFormat("yyyyMMdd-HHmm").format(new Date()) + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	
+	/**
 	 * File separator character.
 	 */
 	public static final String FS = System.getProperty("file.separator"); //$NON-NLS-1$
@@ -81,7 +91,7 @@ public class Const {
 	/**
 	 * Whether this instance of DocFetcher was installed on the system or not.
 	 */
-	public static final Boolean isPortable;
+	public static final Boolean IS_PORTABLE;
 	
 	/**
 	 * The file where the preferences are stored.
@@ -125,7 +135,7 @@ public class Const {
 			USER_PROPERTIES_FILE = propFile;
 			INDEX_PARENT_FILE = new File("indexes"); //$NON-NLS-1$
 			MANUAL_PATH = "help"; //$NON-NLS-1$
-			isPortable = true;
+			IS_PORTABLE = true;
 		}
 		// Installed version
 		else {
@@ -138,7 +148,7 @@ public class Const {
 			INDEX_PARENT_FILE = new File(appDataPath);
 			MANUAL_PATH = IS_WINDOWS ? "help" : "/usr/share/doc/docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
 			new File(appDataPath).mkdirs();
-			isPortable = false;
+			IS_PORTABLE = false;
 		}
 	}
 	
