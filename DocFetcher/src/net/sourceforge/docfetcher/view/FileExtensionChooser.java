@@ -66,10 +66,10 @@ public class FileExtensionChooser {
 		comp.setLayout(layout = new StackLayout());
 		table = new Table(comp, SWT.CHECK | SWT.HIDE_SELECTION | SWT.BORDER);
 		Composite textContainer = new Composite(comp, SWT.BORDER);
-		textContainer.setBackground(UtilGUI.getColor(SWT.COLOR_WHITE));
+		textContainer.setBackground(UtilGUI.getColor(SWT.COLOR_LIST_BACKGROUND)); // don't use WHITE, it won't work with dark themes
 		textContainer.setLayout(FillLayoutFactory.getInst().margin(5).create());
 		StyledText loadingMsg = new StyledText(textContainer, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
-		loadingMsg.setBackground(UtilGUI.getColor(SWT.COLOR_WHITE));
+		loadingMsg.setBackground(UtilGUI.getColor(SWT.COLOR_LIST_BACKGROUND)); // don't use WHITE, it won't work with dark themes
 		loadingMsg.setText(Msg.loading.value());
 		loadingMsg.setFont(Font.PREVIEW.getFont());
 		loadingMsg.getCaret().setVisible(false);

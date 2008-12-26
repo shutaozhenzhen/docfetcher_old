@@ -163,7 +163,12 @@ public class BrowserPanel extends Composite {
 					}
 	            }
 	            locationBar.setText(path);
-	            locationBar.setBackground(UtilGUI.getColor(SWT.COLOR_WHITE));
+	            
+	            /*
+				 * The appropriate color is 'LIST_BACKGROUND', not 'WHITE',
+				 * because the user might have chosen a dark theme.
+				 */
+	            locationBar.setBackground(UtilGUI.getColor(SWT.COLOR_LIST_BACKGROUND));
 			}
 		});
 	}

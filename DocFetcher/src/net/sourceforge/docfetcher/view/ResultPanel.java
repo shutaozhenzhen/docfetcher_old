@@ -28,7 +28,6 @@ import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
-import net.sourceforge.docfetcher.model.FSEventHandler;
 import net.sourceforge.docfetcher.model.FileWrapper;
 import net.sourceforge.docfetcher.model.HTMLPair;
 import net.sourceforge.docfetcher.model.Job;
@@ -128,6 +127,12 @@ public class ResultPanel extends Composite {
 		viewer.addDoubleClickListener(new SelectionLauncher());
 		Table table = viewer.getTable();
 		table.setHeaderVisible(true);
+		
+		Pref.Int.MaxResults.evtChanged.add(new Event.Listener<Integer> () {
+			public void update(Integer eventData) {
+				refresh();
+			}
+		});
 		
 		// Create column event listener
 		class ColumnListener extends SelectionAdapter implements ControlListener {
@@ -481,7 +486,7 @@ public class ResultPanel extends Composite {
 		IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
 		if (sel.isEmpty()) return;
 		Iterator<?> it = sel.iterator();
-		RootScope[] rootScopes = ScopeRegistry.load().getEntries();
+		RootScope[] rootScopes = ScopeRegistry.getInstance().getEntries();
 		int deleteCount = 0; // Counts documents, not files
 		Set<File> filesToDelete = new HashSet<File> ();
 		Set<RootScope> scopesToUpdate = new HashSet<RootScope> ();
@@ -507,7 +512,7 @@ public class ResultPanel extends Composite {
 		if (ans != SWT.OK) return;
 		
 		Set<File> emptyParents = new HashSet<File> ();
-		FSEventHandler.getInst().setWatchEnabled(false, scopesToUpdate);
+		DocFetcher.getInstance().setWatchEnabled(false, scopesToUpdate);
 		
 		// Delete files
 		for (File file : filesToDelete) {
@@ -518,7 +523,7 @@ public class ResultPanel extends Composite {
 				emptyParents.add(parent);
 		} 
 		
-		FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), scopesToUpdate);
+		DocFetcher.getInstance().setWatchEnabled(Pref.Bool.WatchFS.getValue(), scopesToUpdate);
 		
 		// Update indexes, but silently
 		IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
@@ -687,7 +692,7 @@ public class ResultPanel extends Composite {
 		public boolean select(ResultDocument doc) {
 			File target = doc.getFile();
 			Scope location = null;
-			for (RootScope rootScope : ScopeRegistry.load().getEntries()) {
+			for (RootScope rootScope : ScopeRegistry.getInstance().getEntries()) {
 				if (rootScope.contains(target)) {
 					location = locate(rootScope, target);
 					break;

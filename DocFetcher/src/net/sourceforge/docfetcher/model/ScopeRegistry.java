@@ -408,7 +408,7 @@ public class ScopeRegistry implements Serializable {
 	 * Loads and returns the singleton instance of this class. Returns the
 	 * instance without loading if it has already been loaded.
 	 */
-	public static ScopeRegistry load() {
+	public static ScopeRegistry getInstance() {
 		if (instance != null) return instance;
 		try {
 			instance = (ScopeRegistry) Serializer.load(ScopeRegistry.class, Const.INDEX_PARENT_FILE);

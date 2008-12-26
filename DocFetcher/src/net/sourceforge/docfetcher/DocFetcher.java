@@ -14,13 +14,13 @@ package net.sourceforge.docfetcher;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
-import net.sourceforge.docfetcher.model.FSEventHandler;
 import net.sourceforge.docfetcher.model.ResultDocument;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.model.Scope;
@@ -79,6 +79,7 @@ import org.eclipse.swt.widgets.Widget;
 public class DocFetcher extends ApplicationWindow {
 	
 	private static DocFetcher docFetcher;
+	private HotkeyHandler hotkeyHandler;
 	private ExceptionHandler exceptionHandler;
 	public static String appName;
 	private Composite filterPanel;
@@ -93,7 +94,7 @@ public class DocFetcher extends ApplicationWindow {
 	private Clipboard clipboard; // must be disposed
 	
 	private ScopeRegistry scopeReg;
-	private FSEventHandler fsEventHandler;
+	private FolderWatcher folderWatcher;
 	private FilesizeGroup filesizeGroup;
 	private ParserGroup parserGroup;
 	private ScopeGroup scopeGroup;
@@ -116,7 +117,7 @@ public class DocFetcher extends ApplicationWindow {
 			appName = "DocFetcher"; //$NON-NLS-1$
 		
 		Display.setAppName(DocFetcher.appName);
-		scopeReg = ScopeRegistry.load();
+		scopeReg = ScopeRegistry.getInstance();
 		
 		// Remove scope registry entries whose index folders don't exist anymore
 		RootScope[] rootScopes = scopeReg.getEntries();
@@ -144,14 +145,13 @@ public class DocFetcher extends ApplicationWindow {
 			}
 		});
 		
-		fsEventHandler = FSEventHandler.getInst();
-		fsEventHandler.setThreadWatchEnabled(Pref.Bool.WatchFS.getValue());
+		folderWatcher = new FolderWatcher(); // must be done after loading the Prefs
 	}
 	
 	public static DocFetcher getInstance() {
 		return docFetcher;
 	}
-	
+
 	protected void initializeBounds() {
 		// Set shell size
 		final Shell shell = getShell();
@@ -274,49 +274,12 @@ public class DocFetcher extends ApplicationWindow {
 		// Move text cursor to search box
 		mainPanel.focusSearchBox();
 		
-		/*
-		 * Set up preferences event hooks
-		 */
-		Pref.Bool.ShowPreview.evtChanged.add(new Event.Listener<Boolean> () {
-			public void update(Boolean eventData) {
-				mainPanel.setPreviewVisible(eventData);
-			}
-		});
+		// Toggle filter panel when its preferences value changes
 		Pref.Bool.ShowFilterPanel.evtChanged.add(new Event.Listener<Boolean> () {
 			public void update(Boolean eventData) {
 				filterPanel.setVisible(eventData);
 				sashHorizontal.layout();
 				mainPanel.setFilterButtonChecked(eventData);
-			}
-		});
-		Pref.Bool.PreviewBottom.evtChanged.add(new Event.Listener<Boolean> () {
-			public void update(Boolean eventData) {
-				mainPanel.setPreviewBottom(eventData);
-			}
-		});
-		Pref.Bool.WatchFS.evtChanged.add(new Event.Listener<Boolean> () {
-			public void update(Boolean eventData) {
-				/*
-				 * FIXME Save preferences and scope registry before we remove the watches;
-				 * on Windows that may cause a crash.
-				 */
-				if (! eventData)
-					try {
-						Pref.save();
-						ScopeRegistry.load().save();
-					} catch (IOException e) {
-					}
-				fsEventHandler.setThreadWatchEnabled(eventData);
-			}
-		});
-		Pref.Bool.HighlightSearchTerms.evtChanged.add(new Event.Listener<Boolean> () {
-			public void update(Boolean eventData) {
-				previewPanel.setHighlighting(eventData);
-			}
-		});
-		Pref.Int.MaxResults.evtChanged.add(new Event.Listener<Integer> () {
-			public void update(Integer eventData) {
-				resultPanel.refresh();
 			}
 		});
 		
@@ -359,7 +322,7 @@ public class DocFetcher extends ApplicationWindow {
 		});
 		
 		// Update result panel after removal of a RootScope
-		ScopeRegistry.load().getEvtRegistryRootChanged().add(new Event.Listener<ScopeRegistry> () {
+		ScopeRegistry.getInstance().getEvtRegistryRootChanged().add(new Event.Listener<ScopeRegistry> () {
 			public void update(ScopeRegistry eventData) {
 				resultPanel.refresh();
 			}
@@ -463,7 +426,18 @@ public class DocFetcher extends ApplicationWindow {
 		});
 
 		// add hotkey support
-		new HotkeyHandler();
+		hotkeyHandler = new HotkeyHandler();
+		hotkeyHandler.evtHotkeyPressed.add(new Event.Listener<HotkeyHandler> () {
+			public void update(HotkeyHandler eventData) {
+				if (DocFetcher.getInstance().isInSystemTray()) {
+					DocFetcher.getInstance().restoreFromSystemTray();
+				} else {
+					Shell shell = DocFetcher.getInstance().getShell();
+					shell.setVisible(true);
+					shell.forceActive();
+				}
+			}
+		});
 
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
@@ -499,10 +473,10 @@ public class DocFetcher extends ApplicationWindow {
 			UtilGUI.showErrorMsg(null, Msg.write_error.value());
 		}
 		
+		hotkeyHandler.shutdown();
 		exceptionHandler.closeErrorFile();
- 
-		// On Windows, this may cause a crash, so we do this last
-		FSEventHandler.getInst().setThreadWatchEnabled(false);
+		folderWatcher.shutdown(); // On Windows, this may cause a crash, so we do this last
+		
 		return super.close();
 	}
 	
@@ -528,7 +502,7 @@ public class DocFetcher extends ApplicationWindow {
 		String errorMsg = searchPanel.checkSearchDisabled();
 		
 		// Disallow search when there are no indexes to search in
-		if (ScopeRegistry.load().getEntries().length == 0)
+		if (ScopeRegistry.getInstance().getEntries().length == 0)
 			errorMsg = Msg.search_scope_empty.value();
 		
 		// Check for correct filesizes
@@ -587,8 +561,7 @@ public class DocFetcher extends ApplicationWindow {
 	}
 	
 	/**
-	 * Displays a status message about the results in the currently active
-	 * result page.
+	 * Displays a message about the results on the status bar.
 	 */
 	private void showResultStatus() {
 		// Get active result tab, clear status line if no result panel hasn't been created yet
@@ -748,10 +721,26 @@ public class DocFetcher extends ApplicationWindow {
 	}
 	
 	/**
-	 * Enables or disables the application's custom exception handler.
+	 * Enables or disables the application's custom exception handler. Does
+	 * nothing if the exception handler hasn't been created yet.
 	 */
 	public void setExceptionHandlerEnabled(boolean enabled) {
-		exceptionHandler.setEnabled(enabled);
+		if (exceptionHandler != null)
+			exceptionHandler.setEnabled(enabled);
+	}
+
+	/**
+	 * @see net.sourceforge.docfetcher.FolderWatcher#setWatchEnabled(boolean, java.util.Collection)
+	 */
+	public void setWatchEnabled(boolean enabled, Collection<RootScope> targets) {
+		folderWatcher.setWatchEnabled(enabled, targets);
+	}
+
+	/**
+	 * @see net.sourceforge.docfetcher.FolderWatcher#setWatchEnabled(boolean, net.sourceforge.docfetcher.model.RootScope[])
+	 */
+	public void setWatchEnabled(boolean enabled, RootScope... targets) {
+		folderWatcher.setWatchEnabled(enabled, targets);
 	}
 	
 }

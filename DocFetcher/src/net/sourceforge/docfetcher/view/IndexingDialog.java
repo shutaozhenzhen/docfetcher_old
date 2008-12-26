@@ -124,7 +124,7 @@ public class IndexingDialog {
 		});
 
 		// Synchronize tabs to items in the indexing queue
-		ScopeRegistry.load().getEvtQueueChanged().add(
+		ScopeRegistry.getInstance().getEvtQueueChanged().add(
 				regObserver = new Event.Listener<ScopeRegistry> () {
 					public void update(ScopeRegistry scopeReg) {
 						onQueueChanged();
@@ -161,7 +161,7 @@ public class IndexingDialog {
 		RootScope newScope = new RootScope(dir);
 
 		// Check for intersections, if so, show warning message and open the dialog again
-		String msg = ScopeRegistry.load().checkIntersection(newScope);
+		String msg = ScopeRegistry.getInstance().checkIntersection(newScope);
 		if (msg != null) {
 			UtilGUI.showWarningMsg(null, msg);
 			return addJobFromDialog();
@@ -177,7 +177,7 @@ public class IndexingDialog {
 	 * intersects with registered entries or entries in the indexing queue.
 	 */
 	public void addJob(Job newJob) {
-		ScopeRegistry scopeReg = ScopeRegistry.load();
+		ScopeRegistry scopeReg = ScopeRegistry.getInstance();
 		if (newJob.isAddToRegistry()) {
 			String msg = scopeReg.checkIntersection(newJob.getScope());
 			if (msg != null)
@@ -216,7 +216,7 @@ public class IndexingDialog {
 		tabItem.setControl(tabControl);
 		tabControl.setFocus(); // Move focus away from tab item, or else the tab title will be underlined
 		
-		ScopeRegistry.load().addJob(newJob); // Must be done after the previous line
+		ScopeRegistry.getInstance().addJob(newJob); // Must be done after the previous line
 		tabFolder.setSelection(tabItem);
 		newJob.evtReadyStateChanged.add(new Event.Listener<Job> () {
 			public void update(Job job) {
@@ -246,7 +246,7 @@ public class IndexingDialog {
 	 */
 	private void onQueueChanged() {
 		// Remove tabs which display no parse errors and the queue items of which have been discarded
-		Job[] queueJobs = ScopeRegistry.load().getJobs();
+		Job[] queueJobs = ScopeRegistry.getInstance().getJobs();
 		List<Job> remainingTabJobs = new ArrayList<Job>();
 		for (CTabItem tabItem : tabFolder.getItems()) {
 			IndexingTab indexingTab = (IndexingTab) tabItem.getControl();
@@ -272,7 +272,7 @@ public class IndexingDialog {
 
 		// Find tab that corresponds to current job
 		activeTab = null;
-		Job currentJob = ScopeRegistry.load().getCurrentJob();
+		Job currentJob = ScopeRegistry.getInstance().getCurrentJob();
 		for (CTabItem tabItem : tabFolder.getItems()) {
 			IndexingTab indexingTab = (IndexingTab) tabItem.getControl();
 			if (indexingTab.getJob() == currentJob) {
@@ -290,7 +290,7 @@ public class IndexingDialog {
 		 * Force focus on app if all submitted jobs (i.e. 'submit' button has
 		 * been clicked on their tabs) have been finished.
 		 */
-		if (ScopeRegistry.load().getSubmittedJobs().length == 0
+		if (ScopeRegistry.getInstance().getSubmittedJobs().length == 0
 				&& shell.getDisplay().getActiveShell() == null // Only do this if app has lost focus
 				&& forceShellActiveOnClose) {
 			DocFetcher docFetcher = DocFetcher.getInstance();
@@ -314,14 +314,14 @@ public class IndexingDialog {
 		
 		// Ask for confirmation if the indexing job to be stopped is a full index (re)creation.
 		if (job.isDoRebuild()
-				&& job.equals(ScopeRegistry.load().getCurrentJob())) {
+				&& job.equals(ScopeRegistry.getInstance().getCurrentJob())) {
 			int ans = UtilGUI.showConfirmMsg(null, Msg.discard_incomplete_index.value());
 			if (ans != SWT.OK) {
 				event.doit = false;
 				return;
 			}
 		}
-		ScopeRegistry scopeReg = ScopeRegistry.load();
+		ScopeRegistry scopeReg = ScopeRegistry.getInstance();
 		scopeReg.getEvtQueueChanged().remove(regObserver);
 		scopeReg.removeFromQueue(job);
 		scopeReg.getEvtQueueChanged().add(regObserver);
@@ -332,7 +332,7 @@ public class IndexingDialog {
 	 */
 	private void onIndexingBoxClosed(ShellEvent e) {
 		e.doit = false;
-		ScopeRegistry scopeReg = ScopeRegistry.load();
+		ScopeRegistry scopeReg = ScopeRegistry.getInstance();
 		Job job = scopeReg.getCurrentJob();
 		if (job != null && job.isDoRebuild()) {
 			int ans = UtilGUI.showConfirmMsg(null, Msg.discard_incomplete_index.value());

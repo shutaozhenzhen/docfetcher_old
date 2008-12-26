@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.view;
 
+import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Pref;
 
 import org.eclipse.swt.SWT;
@@ -43,6 +44,18 @@ public class MainPanel extends Composite {
 		}
 		else 
 			sash.setMaximizedControl(searchPanel);
+		
+		Pref.Bool.ShowPreview.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				setPreviewVisible(eventData);
+			}
+		});
+		
+		Pref.Bool.PreviewBottom.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				setPreviewBottom(eventData);
+			}
+		});
 	}
 	
 	/**
@@ -65,7 +78,7 @@ public class MainPanel extends Composite {
 	/**
 	 * Sets whether the preview panel is visible.
 	 */
-	public void setPreviewVisible(boolean show) {
+	private void setPreviewVisible(boolean show) {
 		if (show) {
 			sash.setMaximizedControl(null);
 			previewPanel.setActive(true);
@@ -100,7 +113,7 @@ public class MainPanel extends Composite {
 	 * Sets whether the preview is shown below the result panel (instead of
 	 * on the right).
 	 */
-	public void setPreviewBottom(boolean bottom) {
+	private void setPreviewBottom(boolean bottom) {
 		if (bottom == (sash.getOrientation() == SWT.VERTICAL)) return;
 		sash.setOrientation(bottom ? SWT.VERTICAL : SWT.HORIZONTAL);
 		if (isPreviewVisible()) {

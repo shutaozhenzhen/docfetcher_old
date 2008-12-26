@@ -39,12 +39,17 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -74,6 +79,10 @@ public class PrefDialog {
 	private Text hotkeyField;
 	private HotkeyDialog hotkeyDialog;
 	private int[] hotkey = Pref.IntArray.HotKeyToFront.getValue();
+	
+	private int[] hlColorArray = Pref.IntArray.HighlightColor.getValue();
+	private Color hlColor;
+	private Text hlColorBt;
 	
 	public PrefDialog (Shell parentShell) {
 		shell = new Shell(parentShell, Const.DIALOG_STYLE);
@@ -116,6 +125,35 @@ public class PrefDialog {
 				Msg.pref_highlight.value(),
 				Pref.Bool.HighlightSearchTerms
 		);
+		
+		/*
+		 * Controls for the highlighting color
+		 */
+		Label hlColorLabel = new Label(container, SWT.NONE);
+		hlColorLabel.setText(Msg.pref_highlight_color.value());
+		hlColorBt = new Text(container, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		GridData gdData = new GridData(SWT.LEFT, SWT.FILL, false, false);
+		gdData.widthHint = 50;
+		hlColorBt.setLayoutData(gdData);
+		updateWidgetColor();
+		hlColorBt.setCursor(Display.getDefault().getSystemCursor(SWT.CURSOR_ARROW));
+		hlColorBt.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent event) {
+				// Get color from color dialog
+				ColorDialog dialog = new ColorDialog(((Control) event.widget).getShell());
+				dialog.setRGB(new RGB(hlColorArray[0], hlColorArray[1], hlColorArray[2]));
+				RGB rgb = dialog.open();
+				if (rgb == null) return;
+				
+				/*
+				 * A new array must be created, otherwise no change will be
+				 * detected in the onOKButton() method.
+				 */
+				hlColorArray = new int[] {rgb.red, rgb.green, rgb.blue};
+				updateWidgetColor();
+			}
+		});
+		
 		createTextBox(container,
 				Msg.pref_text_ext.value(),
 				Pref.StrArray.TextExtensions
@@ -134,12 +172,10 @@ public class PrefDialog {
 		);
 		
 		// Controls for the hotkey
-		Label hotkeyLabel = new Label(container, SWT.NONE);
-		hotkeyLabel.setText(Msg.pref_hotkey.value());
-		hotkeyField = new Text(container, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
-		hotkeyField.setText(Key.toString(Pref.IntArray.HotKeyToFront.getValue()));
-		hotkeyField.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		hotkeyField.setBackground(UtilGUI.getColor(SWT.COLOR_WHITE));
+		hotkeyField = createReadOnlyTextBox(container,
+				Msg.pref_hotkey.value(),
+				Key.toString(Pref.IntArray.HotKeyToFront.getValue())
+		);
 		hotkeyField.addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				hotkeyDialog = new HotkeyDialog(shell, hotkey);
@@ -174,6 +210,13 @@ public class PrefDialog {
 		fdf.left(helpButton).applyTo(resetButton);
 		fdf.reset().bottom(okButton).left().right().minWidth(0).applyTo(separator);
 		fdf.top().bottom(separator).applyTo(container);
+		
+		// Dispose of color resource
+		shell.addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				if (hlColor != null) hlColor.dispose();
+			}
+		});
 		
 		okButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -211,8 +254,23 @@ public class PrefDialog {
 	private Text createTextBox(Composite parent, String label) {
 		Label labelWidget = new Label(parent, SWT.NONE);
 		labelWidget.setText(label);
-		Text text = new Text(parent, SWT.BORDER);
+		Text text = new Text(parent, SWT.SINGLE | SWT.BORDER);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		return text;
+	}
+
+	private Text createReadOnlyTextBox(Composite parent, String label, String defaultValue) {
+		Label labelWidget = new Label(parent, SWT.NONE);
+		labelWidget.setText(label);
+		Text text = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
+		text.setText(defaultValue);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		
+		/*
+		 * We set the background color because the read-only style may result in
+		 * an undesirable background color on some platforms
+		 */
+		text.setBackground(UtilGUI.getColor(SWT.COLOR_LIST_BACKGROUND)); // don't use WHITE, it won't work with dark themes
 		return text;
 	}
 	
@@ -296,11 +354,15 @@ public class PrefDialog {
 			}
 		}
 		
-		if (Pref.IntArray.HotKeyToFront.getValue() != hotkey) {
+		if (! Arrays.equals(Pref.IntArray.HotKeyToFront.getValue(), hotkey)) {
 			Pref.IntArray.HotKeyToFront.setValue(hotkey);
 			changed = true;
 		}
-		hotkeyDialog = null;
+		
+		if (! Arrays.equals(Pref.IntArray.HighlightColor.getValue(), hlColorArray)) {
+			Pref.IntArray.HighlightColor.setValue(hlColorArray);
+			changed = true;
+		}
 		
 		if (changed) {
 			try {
@@ -324,6 +386,15 @@ public class PrefDialog {
 		int[] defaultHotkey = Pref.IntArray.HotKeyToFront.defaultValue;
 		hotkeyField.setText(Key.toString(defaultHotkey));
 		hotkey = defaultHotkey;
+		hlColorArray = Pref.IntArray.HighlightColor.defaultValue;
+		updateWidgetColor();
+	}
+	
+	private void updateWidgetColor() {
+		Color oldColor = hlColor;
+		hlColor = new Color(Display.getDefault(), hlColorArray[0], hlColorArray[1], hlColorArray[2]);
+		hlColorBt.setBackground(hlColor);
+		if (oldColor != null) oldColor.dispose();
 	}
 
 }

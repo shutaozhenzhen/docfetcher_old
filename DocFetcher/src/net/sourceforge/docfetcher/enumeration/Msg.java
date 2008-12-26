@@ -145,6 +145,7 @@ public enum Msg {
 	pref_watch_fs,
 	pref_hide_in_systray,
 	pref_highlight,
+	pref_highlight_color,
 	pref_text_ext,
 	pref_html_ext,
 	pref_skip_regex,

@@ -9,9 +9,10 @@
  *    Tran Nam Quang - initial API and implementation
  *******************************************************************************/
 
-package net.sourceforge.docfetcher.model;
+package net.sourceforge.docfetcher;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,8 +23,11 @@ import java.util.Set;
 import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
-import net.sourceforge.docfetcher.DocFetcher;
-import net.sourceforge.docfetcher.Event;
+import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.model.FileWrapper;
+import net.sourceforge.docfetcher.model.Job;
+import net.sourceforge.docfetcher.model.RootScope;
+import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilList;
 import net.sourceforge.docfetcher.view.IndexingDialog;
@@ -35,9 +39,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  * @author Tran Nam Quang
  */
-public class FSEventHandler {
-	
-	private static FSEventHandler instance;
+public class FolderWatcher {
 	
 	/**
 	 * A map associating all registered <tt>RootScope</tt>s with their
@@ -63,16 +65,24 @@ public class FSEventHandler {
 	 */
 	private long lastEventTime = -1;
 	
-	private FSEventHandler() {
-	}
-	
-	/**
-	 * Returns the <tt>FSEventHandler</tt> instance.
-	 */
-	public static FSEventHandler getInst() {
-		if (instance == null)
-			instance = new FSEventHandler();
-		return instance;
+	public FolderWatcher() {
+		Pref.Bool.WatchFS.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				/*
+				 * FIXME Save preferences and scope registry before we remove the watches;
+				 * on Windows that may cause a crash.
+				 */
+				if (! eventData)
+					try {
+						Pref.save();
+						ScopeRegistry.getInstance().save();
+					} catch (IOException e) {
+					}
+				setThreadWatchEnabled(eventData);
+			}
+		});
+		
+		setThreadWatchEnabled(Pref.Bool.WatchFS.getValue());
 	}
 	
 	// Updates the internal RootScope-WatchID-map whenever the scope registry changes
@@ -111,7 +121,7 @@ public class FSEventHandler {
 			if (filePath == null) filePath = ""; //$NON-NLS-1$
 			File targetFile = new File(rootPath, filePath);
 			RootScope modifiedScope = null;
-			for (RootScope candidate : ScopeRegistry.load().getEntries()) {
+			for (RootScope candidate : ScopeRegistry.getInstance().getEntries()) {
 				if (candidate.getFile().equals(targetFile) || candidate.contains(targetFile)) {
 					modifiedScope = candidate;
 					break;
@@ -191,7 +201,7 @@ public class FSEventHandler {
 	 * Enables or disables the file system event listening feature. Runs in a
 	 * thread to avoid slowing down the application.
 	 */
-	public void setThreadWatchEnabled(final boolean enabled) {
+	private void setThreadWatchEnabled(final boolean enabled) {
 		// Doing this inside a thread is better if lots of watches have to be added or removed
 		new Thread() {
 			public void run() {
@@ -201,18 +211,25 @@ public class FSEventHandler {
 	}
 	
 	/**
+	 * Disables the folder watching.
+	 */
+	public void shutdown() {
+		setThreadWatchEnabled(false);
+	}
+	
+	/**
 	 * Enables or disables the file system event listening feature.
 	 */
 	private void setWatchEnabled(boolean enabled) {
 		if (enabled) {
-			ScopeRegistry.load().getEvtRegistryRootChanged().add(regChangeHandler);
-			for (RootScope rootScope : ScopeRegistry.load().getEntries())
+			ScopeRegistry.getInstance().getEvtRegistryRootChanged().add(regChangeHandler);
+			for (RootScope rootScope : ScopeRegistry.getInstance().getEntries())
 				addWatch(rootScope);
 		}
 		else {
-			ScopeRegistry.load().getEvtRegistryRootChanged().remove(regChangeHandler);
+			ScopeRegistry.getInstance().getEvtRegistryRootChanged().remove(regChangeHandler);
 			if (watchIdMap.isEmpty()) return;
-			for (RootScope rootScope : ScopeRegistry.load().getEntries())
+			for (RootScope rootScope : ScopeRegistry.getInstance().getEntries())
 				removeWatch(rootScope);
 		}
 	}
@@ -264,17 +281,20 @@ public class FSEventHandler {
 		File file = rootScope.getFile();
 		if (! file.exists()) return;
 		try {
+			DocFetcher docFetcher = DocFetcher.getInstance();
+			if (docFetcher == null) return; // this is null on startup
+			
 			/*
 			 * FIXME JNotify 0.91 can somehow throw JNotifyExceptions that
 			 * bypass this try-catch-clause. WTF?
 			 */
-			DocFetcher.getInstance().setExceptionHandlerEnabled(false);
+			docFetcher.setExceptionHandlerEnabled(false);
 			int id = JNotify.addWatch(
 					file.getAbsolutePath(),
 					JNotify.FILE_ANY, true,
 					fsListener
 			);
-			DocFetcher.getInstance().setExceptionHandlerEnabled(true);
+			docFetcher.setExceptionHandlerEnabled(true);
 			
 			watchIdMap.put(rootScope, id);
 		} catch (JNotifyException e) {

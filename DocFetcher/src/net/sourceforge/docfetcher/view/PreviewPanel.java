@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Font;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -41,6 +42,8 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -74,6 +77,7 @@ public class PreviewPanel extends Composite {
 	private Text occurrenceCounter;
 	private ToolItem upBt;
 	private ToolItem downBt;
+	private Color highlightColor;
 	
 	/** Whether this preview panel is enabled or not. */
 	private boolean isActive;
@@ -158,6 +162,30 @@ public class PreviewPanel extends Composite {
 		// Toolbar layout
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.setMargin(0).top().bottom().right().applyTo(generalToolBar);
+		
+		// Change search term highlighting color when the corresponding preferences value has changed
+		Pref.IntArray.HighlightColor.evtChanged.add(new Event.Listener<int[]> () {
+			public void update(int[] eventData) {
+				Color oldColor = highlightColor;
+				highlightColor = null; // the following call creates a new color object if this is null
+				setHighlighting(Pref.Bool.HighlightSearchTerms.getValue());
+				if (oldColor != null) oldColor.dispose();
+			}
+		});
+		
+		// Toggle search term highlighting when the corresponding preferences value has changed
+		Pref.Bool.HighlightSearchTerms.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				setHighlighting(eventData);
+			}
+		});
+		
+		// Dispose of search term highlighting color on shutdown (it is created lazily)
+		addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent arg0) {
+				if (highlightColor != null) highlightColor.dispose();
+			}
+		});
 		
 		upBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -446,9 +474,19 @@ public class PreviewPanel extends Composite {
 	 * Update the search term highlighting based on the current highlighting
 	 * preferences.
 	 */
-	public void setHighlighting(boolean highlight) {
+	private void setHighlighting(boolean highlight) {
 		if (terms.length != 0) {
-			Color col = highlight ? UtilGUI.getColor(SWT.COLOR_YELLOW) : textViewer.getBackground();
+			Color col = null;
+			if (highlight) {
+				if (highlightColor == null) { // lazy instantiation
+					int[] rgb = Pref.IntArray.HighlightColor.getValue();
+					highlightColor = new Color(getDisplay(), rgb[0], rgb[1], rgb[2]);
+				}
+				col = highlightColor;
+			}
+			else {
+				col = textViewer.getBackground();
+			}
 			StyleRange style = new StyleRange(0, 0, null, col);
 			StyleRange[] styles = new StyleRange[ranges.length / 2];
 			for (int i = 0; i < styles.length; i++)

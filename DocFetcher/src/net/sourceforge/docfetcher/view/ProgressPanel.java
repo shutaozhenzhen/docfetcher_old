@@ -87,7 +87,7 @@ public class ProgressPanel extends Composite {
 		
 		// Create progress textbox
 		progressBox = new Text(topGroup, SWT.READ_ONLY | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
-		progressBox.setBackground(UtilGUI.getColor(SWT.COLOR_WHITE));
+		progressBox.setBackground(UtilGUI.getColor(SWT.COLOR_LIST_BACKGROUND)); // don't use WHITE, it won't work with dark themes
 		
 		// Create error table
 		errorTable = new Table(bottomGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);

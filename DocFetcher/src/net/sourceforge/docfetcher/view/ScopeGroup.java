@@ -24,7 +24,6 @@ import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
-import net.sourceforge.docfetcher.model.FSEventHandler;
 import net.sourceforge.docfetcher.model.Indexable;
 import net.sourceforge.docfetcher.model.Job;
 import net.sourceforge.docfetcher.model.ResultDocument;
@@ -106,7 +105,7 @@ public class ScopeGroup extends GroupWrapper {
 		viewerMenu.setManagedActionsEnabled(false);
 
 		// Update self on add/remove in scope registry
-		ScopeRegistry.load().getEvtRegistryChanged().add(new Event.Listener<ScopeRegistry> () {
+		ScopeRegistry.getInstance().getEvtRegistryChanged().add(new Event.Listener<ScopeRegistry> () {
 			public void update(ScopeRegistry scopeReg) {
 				Object[] expandedElements = viewer.getExpandedElements();
 				setScopes(scopeReg.getEntries());
@@ -246,7 +245,7 @@ public class ScopeGroup extends GroupWrapper {
 					}
 					newScopes.add(new RootScope(file));
 				}
-				String msg = ScopeRegistry.load().checkIntersection(newScopes.toArray(new RootScope[newScopes.size()]));
+				String msg = ScopeRegistry.getInstance().checkIntersection(newScopes.toArray(new RootScope[newScopes.size()]));
 				if (msg != null) {
 					UtilGUI.showWarningMsg(Msg.invalid_operation.value(), msg);
 					return;
@@ -302,7 +301,7 @@ public class ScopeGroup extends GroupWrapper {
 				checkedItems.add(scope);
 			addVisibleCheckedChildren(scope, checkedItems);
 		}
-		for (RootScope rootScope : ScopeRegistry.load().getEntries()) {
+		for (RootScope rootScope : ScopeRegistry.getInstance().getEntries()) {
 			if (rootScope.isChecked())
 				checkedItems.add(rootScope);
 		}
@@ -447,7 +446,7 @@ public class ScopeGroup extends GroupWrapper {
 			if (scopes.length == 0) return;
 			int ans = UtilGUI.showConfirmMsg(null, Msg.remove_sel_indexes.value());
 			if (ans == SWT.OK)
-				ScopeRegistry.load().remove(scopes);
+				ScopeRegistry.getInstance().remove(scopes);
 		}
 	}
 	
@@ -583,9 +582,9 @@ public class ScopeGroup extends GroupWrapper {
 			}
 			
 			// Create folder
-			FSEventHandler.getInst().setWatchEnabled(false, rootScope);
+			DocFetcher.getInstance().setWatchEnabled(false, rootScope);
 			boolean success = newFolder.mkdir();
-			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
+			DocFetcher.getInstance().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
 			
 			if (! success) {
 				UtilGUI.showErrorMsg(null, Msg.create_subfolder_failed.value());
@@ -628,9 +627,9 @@ public class ScopeGroup extends GroupWrapper {
 			
 			// Try to rename file
 			File newFile = new File(targetFolder.getParentFile().getAbsolutePath(), input);
-			FSEventHandler.getInst().setWatchEnabled(false, rootScope);
+			DocFetcher.getInstance().setWatchEnabled(false, rootScope);
 			boolean success = targetFolder.renameTo(newFile);
-			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
+			DocFetcher.getInstance().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
 			if (! success) {
 				UtilGUI.showErrorMsg(null, Msg.cant_rename_folder.value());
 				return;
@@ -639,7 +638,7 @@ public class ScopeGroup extends GroupWrapper {
 			// Update or rebuild index
 			if (scopes[0] instanceof RootScope) {
 				// Rebuild index if a root folder was renamed
-				ScopeRegistry.load().remove(rootScope);
+				ScopeRegistry.getInstance().remove(rootScope);
 				RootScope newRootScope = new RootScope(newFile);
 				Job job = new Job(newRootScope, true, true);
 				job.setReadyForIndexing(true);
@@ -690,14 +689,14 @@ public class ScopeGroup extends GroupWrapper {
 			for (Scope scope : scopeList) {
 				RootScope rootScope = scope.getRootScope();
 				File targetFolder = scope.getFile();
-				FSEventHandler.getInst().setWatchEnabled(false, rootScope);
+				DocFetcher.getInstance().setWatchEnabled(false, rootScope);
 				if (scope instanceof RootScope) {
-					ScopeRegistry.load().remove(rootScope);
+					ScopeRegistry.getInstance().remove(rootScope);
 					UtilFile.delete(targetFolder, true);
 				}
 				else {
 					UtilFile.delete(targetFolder, true);
-					FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
+					DocFetcher.getInstance().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
 					jobs.add(new Job(rootScope, false, false));
 				}
 			}
@@ -764,14 +763,14 @@ public class ScopeGroup extends GroupWrapper {
 					}	
 			}
 			
-			FSEventHandler.getInst().setWatchEnabled(false, rootScopeToUpdate);
+			DocFetcher.getInstance().setWatchEnabled(false, rootScopeToUpdate);
 			
 			// Copy files
 			FileTransferDialog transferDialog = new FileTransferDialog(getShell(), Msg.file_transfer.value());
 			transferDialog.open();
 			transferDialog.transferFiles(files, newParent);
 			
-			FSEventHandler.getInst().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScopeToUpdate);
+			DocFetcher.getInstance().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScopeToUpdate);
 			
 			// Update indexes, but silently
 			IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();

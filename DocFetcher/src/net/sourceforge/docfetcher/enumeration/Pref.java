@@ -165,6 +165,7 @@ public class Pref {
 		ResultColumnOrder (new int[0]),
 		ResultColumnWidths (new int[0]),
 		HotKeyToFront (SWT.CTRL, SWT.F8),
+		HighlightColor (255, 255, 0),
 		;
 
 		public final Event<int[]> evtChanged = new Event<int[]> ();

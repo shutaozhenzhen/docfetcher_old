@@ -7,21 +7,19 @@
  *
  * Contributors:
  *    Tonio Rush - initial API and implementation
+ *    Tran Nam Quang - removed some external dependencies
  *******************************************************************************/
 
 package net.sourceforge.docfetcher.view;
 
 import jxgrabkey.JXGrabKey;
 import net.sourceforge.docfetcher.Const;
-import net.sourceforge.docfetcher.DocFetcher;
+import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.Event.Listener;
 import net.sourceforge.docfetcher.enumeration.Pref;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 import com.melloware.jintellitype.JIntellitype;
 
@@ -32,6 +30,11 @@ import com.melloware.jintellitype.JIntellitype;
  *
  */
 public class HotkeyHandler {
+	
+	/**
+	 * This event is fired when the hotkey is pressed.
+	 */
+	public final Event<HotkeyHandler> evtHotkeyPressed = new Event<HotkeyHandler> ();
 
 	private static final int HOTKEY_TO_FRONT_IDX = 1;
 
@@ -77,15 +80,14 @@ public class HotkeyHandler {
 		implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
 				KeyCodeTranslator.translateSWTModifiers(Pref.IntArray.HotKeyToFront.getValue()[0]),
 				KeyCodeTranslator.translateSWTKey(Pref.IntArray.HotKeyToFront.getValue()[1]));
-
-		/**
-		 * uninstall hotkeys when DocFetcher shuts down
-		 */
-		DocFetcher.getInstance().getShell().addDisposeListener(new DisposeListener(){
-			public void widgetDisposed(DisposeEvent arg0) {
-				implementation.shutdown();
-			}
-		});
+	}
+	
+	/**
+	 * Unregisters the hotkeys.
+	 */
+	public void shutdown() {
+		implementation.unregisterHotkey(HOTKEY_TO_FRONT_IDX);
+		implementation.shutdown();
 	}
 
 	/**
@@ -94,17 +96,11 @@ public class HotkeyHandler {
 	 * the UI thread
 	 */
 	private void onHotKey(final int hotkey_idx) {
+		if (hotkey_idx != HOTKEY_TO_FRONT_IDX)
+			return;
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
-				if (hotkey_idx != HOTKEY_TO_FRONT_IDX)
-					return;
-				if (DocFetcher.getInstance().isInSystemTray()) {
-					DocFetcher.getInstance().restoreFromSystemTray();
-				} else {
-					Shell shell = DocFetcher.getInstance().getShell();
-					shell.setVisible(true);
-					shell.forceActive();
-				}
+				evtHotkeyPressed.fireUpdate(HotkeyHandler.this);
 			}
 		});
 	}
