@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Tonio Rush - initial API and implementation
- *    Tran Nam Quang - removed some external dependencies
+ *    Tran Nam Quang - removed some external dependencies; minor tweaks
  *******************************************************************************/
 
 package net.sourceforge.docfetcher.view;
@@ -49,7 +49,7 @@ public class HotkeyHandler {
 	 */
 	private interface HotkeyListenerImpl {
 		public void initialize(HotkeyHandler listener);
-		public void registerSwingHotkey(int id, int mask, int key);
+		public void registerHotkey(int id, int mask, int key);
 		public void unregisterHotkey(int id);
 		public void shutdown();
 	}
@@ -71,13 +71,13 @@ public class HotkeyHandler {
 			public void update(int[] eventData) {
 				implementation.unregisterHotkey(HOTKEY_TO_FRONT_IDX);
 
-				implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
+				implementation.registerHotkey(HOTKEY_TO_FRONT_IDX,
 						KeyCodeTranslator.translateSWTModifiers(eventData[0]),
 						KeyCodeTranslator.translateSWTKey(eventData[1]));
 			}
 		});
 
-		implementation.registerSwingHotkey(HOTKEY_TO_FRONT_IDX,
+		implementation.registerHotkey(HOTKEY_TO_FRONT_IDX,
 				KeyCodeTranslator.translateSWTModifiers(Pref.IntArray.HotKeyToFront.getValue()[0]),
 				KeyCodeTranslator.translateSWTKey(Pref.IntArray.HotKeyToFront.getValue()[1]));
 	}
@@ -123,7 +123,7 @@ public class HotkeyHandler {
 			});
 		}
 
-		public void registerSwingHotkey(int id, int mask, int key) {
+		public void registerHotkey(int id, int mask, int key) {
 			JIntellitype.getInstance().registerSwingHotKey(id, mask, key);
 		}
 
@@ -156,8 +156,8 @@ public class HotkeyHandler {
 
 		}
 
-		public void registerSwingHotkey(int id, int mask, int key) {
-	        JXGrabKey.getInstance().registerSwingHotkey(id, mask, key);
+		public void registerHotkey(int id, int mask, int key) {
+	        JXGrabKey.getInstance().registerAWTHotkey(id, mask, key);
 		}
 		public void unregisterHotkey(int id) {
 			JXGrabKey.getInstance().unregisterHotKey(id);
