@@ -32,6 +32,7 @@ public enum Msg {
 	read_error,
 	write_error,
 	write_warning,
+	hotkey_disabled,
 	yes,
 	no,
 	ok,
@@ -57,6 +58,7 @@ public enum Msg {
 	filetype_pdf,
 	filetype_rtf,
 	filetype_txt,
+	filetype_wpd,
 	
 	// Search scope panel
 	search_scope,
@@ -101,15 +103,15 @@ public enum Msg {
 	// Main panel
 	prev_page,
 	next_page,
-	show_filterpanel,
+	ui_layout,
 	show_preview,
 	preferences,
+	to_systray,
 	occurrence_count,
 	prev_occurrence,
 	next_occurrence,
 	open_manual,
 	use_embedded_html_viewer,
-	change_preview_pos,
 	browser_stop,
 	browser_refresh,
 	browser_launch_external,
@@ -195,6 +197,8 @@ public enum Msg {
 	unsupported_encoding,
 	doc_pw_protected,
 	parser_error,
+	wordperfect_expected,
+	wordperfect_parser_not_installed,
 	
 	// Result panel
 	open,

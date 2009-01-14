@@ -31,8 +31,6 @@ public enum Key {
 	FocusParserGroup (SWT.ALT, 't'),
 	FocusScopeGroup (SWT.ALT, 's'),
 	FocusResults (SWT.ALT, 'r'),
-	HideFilterPanel (SWT.ALT, 'h'),
-	HidePreviewPanel (SWT.ALT, 'p'),
 	Update (SWT.NONE, SWT.F5),
 	Rename (SWT.NONE, SWT.F2),
 	Enter (SWT.NONE, SWT.CR),

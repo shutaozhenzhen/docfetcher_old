@@ -98,7 +98,7 @@ public class MainPanel extends Composite {
 			sash.setMaximizedControl(searchPanel);
 		}
 		if (show != Pref.Bool.ShowPreview.getValue())
-			Pref.Bool.ShowPreview.setValue(show);		searchPanel.setPreviewButtonChecked(show);
+			Pref.Bool.ShowPreview.setValue(show);
 	}
 	
 	/**
@@ -174,13 +174,6 @@ public class MainPanel extends Composite {
 			return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * Sets the check state of the hide/show filter button.
-	 */
-	public void setFilterButtonChecked(boolean checked) {
-		searchPanel.setFilterButtonChecked(checked);
 	}
 	
 	/**

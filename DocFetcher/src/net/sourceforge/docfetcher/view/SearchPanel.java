@@ -12,9 +12,9 @@
 package net.sourceforge.docfetcher.view;
 
 import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Icon;
-import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.util.UtilGUI;
@@ -53,9 +53,9 @@ public class SearchPanel extends Composite {
 	private Combo searchBox;
 	private ToolItem leftBt;
 	private ToolItem rightBt;
-	private ToolItem filterBt;
-	private ToolItem previewBt;
+	private ToolItem layoutBt;
 	private ToolItem prefBt;
+	private ToolItem toSystrayBt;
 	private ResultPanel resultPanel;
 	
 	public SearchPanel(Composite parent) {
@@ -118,33 +118,34 @@ public class SearchPanel extends Composite {
 		
 		new ToolItem(toolBar, SWT.SEPARATOR);
 		
-		filterBt = new ToolItem(toolBar, SWT.FLAT | SWT.CHECK);
-		filterBt.setImage(Icon.LAYOUT.getImage());
-		filterBt.setToolTipText(Msg.show_filterpanel.value() + " (" + Key.HideFilterPanel.toString() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-		filterBt.setSelection(Pref.Bool.ShowFilterPanel.getValue());
-		filterBt.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				Pref.Bool.ShowFilterPanel.setValue(filterBt.getSelection());
-			}
-		});
+		layoutBt = new ToolItem(toolBar, SWT.DROP_DOWN);
+		layoutBt.setImage(Icon.LAYOUT.getImage());
+		layoutBt.setToolTipText(Msg.ui_layout.value());
 		
-		previewBt = new ToolItem(toolBar, SWT.FLAT | SWT.CHECK);
-		previewBt.setImage(Icon.PREVIEW.getImage());
-		previewBt.setToolTipText(Msg.show_preview.value() + " (" + Key.HidePreviewPanel.toString() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
-		previewBt.setSelection(Pref.Bool.ShowPreview.getValue());
-		previewBt.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				Pref.Bool.ShowPreview.setValue(previewBt.getSelection());
-			}
-		});
+		// Populate drop-down menu of layout button
+		DropDownManager dropDownManager = new DropDownManager(layoutBt);
+		addLayoutOption(dropDownManager, Icon.LAYOUT1, false, false, true);
+		addLayoutOption(dropDownManager, Icon.LAYOUT2, false, true, true);
+		addLayoutOption(dropDownManager, Icon.LAYOUT3, false, true, false);
+		addLayoutOption(dropDownManager, Icon.LAYOUT4, true, false, true);
+		addLayoutOption(dropDownManager, Icon.LAYOUT5, true, true, true);
+		addLayoutOption(dropDownManager, Icon.LAYOUT6, true, true, false);
 		
 		prefBt = new ToolItem(toolBar, SWT.FLAT);
 		prefBt.setImage(Icon.PREFERENCES.getImage());
 		prefBt.setToolTipText(Msg.preferences.value());
 		prefBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Pref.Bool.ShowFilterPanel.setValue(filterBt.getSelection());
 				evtPrefBtClicked.fireUpdate(prefBt);
+			}
+		});
+		
+		toSystrayBt = new ToolItem(toolBar, SWT.FLAT);
+		toSystrayBt.setImage(Icon.TO_SYSTRAY.getImage());
+		toSystrayBt.setToolTipText(Msg.to_systray.value());
+		toSystrayBt.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				DocFetcher.getInstance().toSystemTray();
 			}
 		});
 		
@@ -190,6 +191,20 @@ public class SearchPanel extends Composite {
 		 * off by a few pixels to the top.
 		 */
 		layout();
+	}
+	
+	/**
+	 * Convenience method for populating the drop-down menu of the layout
+	 * button.
+	 */
+	private void addLayoutOption(DropDownManager dropDownManager, Icon icon, final boolean showFilterPanel, final boolean showPreviewPanel, final boolean previewBottom) {
+		dropDownManager.add(null, icon.getImage(), new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Pref.Bool.ShowFilterPanel.setValue(showFilterPanel);
+				Pref.Bool.ShowPreview.setValue(showPreviewPanel);
+				Pref.Bool.PreviewBottom.setValue(previewBottom);
+			}
+		});
 	}
 	
 	/**
@@ -246,14 +261,6 @@ public class SearchPanel extends Composite {
 	
 	public boolean isFocusControl() {
 		return searchBox.isFocusControl();
-	}
-	
-	public void setFilterButtonChecked(boolean checked) {
-		filterBt.setSelection(checked);
-	}
-	
-	public void setPreviewButtonChecked(boolean checked) {
-		previewBt.setSelection(checked);
 	}
 	
 	public void setLeftBtEnabled(boolean enabled) {

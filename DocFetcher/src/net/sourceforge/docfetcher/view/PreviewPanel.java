@@ -154,10 +154,6 @@ public class PreviewPanel extends Composite {
 		htmlPreviewBt.setImage(Icon.BROWSER.getImage());
 		htmlPreviewBt.setSelection(Pref.Bool.PreviewHTML.getValue());
 		htmlPreviewBt.setToolTipText(Msg.use_embedded_html_viewer.value());
-		final ToolItem previewPosBt = new ToolItem(generalToolBar, SWT.FLAT);
-		Icon previewPosBtIcon = Pref.Bool.PreviewBottom.getValue() ? Icon.ATTACH_RIGHT : Icon.ATTACH_BOTTOM;
-		previewPosBt.setImage(previewPosBtIcon.getImage());
-		previewPosBt.setToolTipText(Msg.change_preview_pos.value());
 
 		// Toolbar layout
 		FormDataFactory fdf = FormDataFactory.getInstance();
@@ -249,14 +245,6 @@ public class PreviewPanel extends Composite {
 				Pref.Bool.PreviewHTML.setValue(htmlPreviewBt.getSelection());
 				if (parser instanceof HTMLParser) // Only refresh preview panel for HTML documents
 					setFile(file, parser, true);
-			}
-		});
-
-		previewPosBt.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				Pref.Bool.PreviewBottom.setValue(! Pref.Bool.PreviewBottom.getValue());
-				Icon previewPosBtIcon = Pref.Bool.PreviewBottom.getValue() ? Icon.ATTACH_RIGHT : Icon.ATTACH_BOTTOM;
-				previewPosBt.setImage(previewPosBtIcon.getImage());
 			}
 		});
 		

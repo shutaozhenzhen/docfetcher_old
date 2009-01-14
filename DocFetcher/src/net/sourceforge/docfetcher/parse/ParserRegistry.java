@@ -47,6 +47,7 @@ public class ParserRegistry {
 		new RTFParser(),
 		new MSVisioParser(),
 		new MSWordParser(),
+		new WordPerfectParser()
 	};
 
 	// Additional reference to the text parser for faster access.

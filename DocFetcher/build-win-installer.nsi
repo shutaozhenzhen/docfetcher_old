@@ -59,7 +59,7 @@ Section "DocFetcher"
     File /r /x .svn resources\icons\*.*
     
     SetOutPath $INSTDIR\lib
-    File /x *.so /x swt-*-linux-gtk.jar /x .svn lib\*.*
+    File /x *.so /x *.so.* /x swt-*-linux-gtk.jar /x .svn lib\*.*
     File build\net.sourceforge.docfetcher_*.jar
     
     ; Uninstaller

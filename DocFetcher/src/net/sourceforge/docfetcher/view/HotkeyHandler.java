@@ -76,7 +76,7 @@ public class HotkeyHandler {
 						KeyCodeTranslator.translateSWTKey(eventData[1]));
 			}
 		});
-
+		
 		implementation.registerHotkey(HOTKEY_TO_FRONT_IDX,
 				KeyCodeTranslator.translateSWTModifiers(Pref.IntArray.HotKeyToFront.getValue()[0]),
 				KeyCodeTranslator.translateSWTKey(Pref.IntArray.HotKeyToFront.getValue()[1]));
@@ -147,18 +147,18 @@ public class HotkeyHandler {
 
 		public void initialize(final HotkeyHandler listener) {
 			System.loadLibrary("JXGrabKey"); //$NON-NLS-1$
-
+			
 			JXGrabKey.getInstance().addHotkeyListener(new jxgrabkey.HotkeyListener(){
 				public void onHotkey(int hotkey_idx) {
 					listener.onHotKey(hotkey_idx);
 				}
 	        });
-
 		}
 
 		public void registerHotkey(int id, int mask, int key) {
 	        JXGrabKey.getInstance().registerAWTHotkey(id, mask, key);
 		}
+		
 		public void unregisterHotkey(int id) {
 			JXGrabKey.getInstance().unregisterHotKey(id);
 		}

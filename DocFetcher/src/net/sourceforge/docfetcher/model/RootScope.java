@@ -121,6 +121,7 @@ public class RootScope extends Scope {
 		// Initialization
 		parseTime = System.currentTimeMillis();
 		parseExceptions.clear();
+		finishedWithErrors = false;
 		ParserRegistry.setTextExtensions(textExtensions);
 		ParserRegistry.setHTMLExtensions(htmlExtensions);
 		

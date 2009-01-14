@@ -58,6 +58,7 @@ public class Pref {
 		PreviewHTML (true),
 		HideOnOpen (true),
 		HighlightSearchTerms (true),
+		HotkeyEnabled (true),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();

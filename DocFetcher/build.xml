@@ -73,7 +73,7 @@
 	<target name="deploy.linux" depends="compile, fixcrlf.linux"
 		description="Build debian package for Linux">
 		<copy todir="build/tmp/usr/share/docfetcher/lib">
-			<fileset dir="lib" includes="**/*.jar, **/*.so" excludes="**/*win32*.jar"/>
+			<fileset dir="lib" includes="**/*.jar, **/*.so, **/*.so.*" excludes="**/*win32*.jar"/>
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher">
@@ -121,7 +121,7 @@
 	<target name="deploy.portable" depends="compile, fixcrlf.windows"
 		description="Build portable Windows/Linux hybrid release">
 		<copy todir="${programdir}/lib">
-			<fileset dir="lib" includes="**/*.jar, **/*.dll, **/*.so" excludes="**/*linux*.jar, **/*win32*.jar"/>
+			<fileset dir="lib" includes="**/*.jar, **/*.dll, **/*.so, **/*.so.*" excludes="**/*linux*.jar, **/*win32*.jar"/>
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
 		<copy todir="${programdir}/lib/windows">

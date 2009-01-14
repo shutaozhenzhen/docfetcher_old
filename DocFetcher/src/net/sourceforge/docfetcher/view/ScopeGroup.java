@@ -438,15 +438,24 @@ public class ScopeGroup extends GroupWrapper {
 			setAccelerator(Key.Delete.keyCode);
 		}
 		public void run() {
-			RootScope[] scopes = getExistingRootSelection();
+			// Get RootScope selection
+			StructuredSelection sel = (StructuredSelection) viewer.getSelection();
+			List<RootScope> selRootScopes = new ArrayList<RootScope> (sel.size());
+			Iterator<?> it = sel.iterator();
+			while (it.hasNext()) {
+				Object item = it.next();
+				if (item instanceof RootScope)
+					selRootScopes.add((RootScope) item);
+			}
+			
 			/*
 			 * This check is needed because we don't want the message box to pop up
 			 * when the user hits DELETE without selecting anything.
 			 */
-			if (scopes.length == 0) return;
+			if (selRootScopes.size() == 0) return;
 			int ans = UtilGUI.showConfirmMsg(null, Msg.remove_sel_indexes.value());
 			if (ans == SWT.OK)
-				ScopeRegistry.getInstance().remove(scopes);
+				ScopeRegistry.getInstance().remove(selRootScopes.toArray(new RootScope[selRootScopes.size()]));
 		}
 	}
 	

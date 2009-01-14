@@ -55,8 +55,6 @@ import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormLayout;
@@ -208,13 +206,6 @@ public class DocFetcher extends ApplicationWindow {
 		});
 		
 		super.configureShell(shell);
-		
-		// Replace shell minimization with sending it to the system tray
-		shell.addShellListener(new ShellAdapter() {
-			public void shellIconified(ShellEvent e) {
-				toSystemTray();
-			}
-		});
 	}
 	
 	protected Control createContents(Composite parent) {
@@ -279,7 +270,6 @@ public class DocFetcher extends ApplicationWindow {
 			public void update(Boolean eventData) {
 				filterPanel.setVisible(eventData);
 				sashHorizontal.layout();
-				mainPanel.setFilterButtonChecked(eventData);
 			}
 		});
 		
@@ -418,26 +408,60 @@ public class DocFetcher extends ApplicationWindow {
 				case FocusParserGroup: parserGroup.setFocus(); break;
 				case FocusScopeGroup: scopeGroup.setFocus(); break;
 				case FocusResults: resultPanel.setFocus(); break;
-				case HideFilterPanel: Pref.Bool.ShowFilterPanel.setValue(! Pref.Bool.ShowFilterPanel.getValue()); break;
-				case HidePreviewPanel: Pref.Bool.ShowPreview.setValue(! Pref.Bool.ShowPreview.getValue()); break;
 				default: event.doit = true;
 				}
 			}
 		});
 
 		// add hotkey support
-		hotkeyHandler = new HotkeyHandler();
-		hotkeyHandler.evtHotkeyPressed.add(new Event.Listener<HotkeyHandler> () {
-			public void update(HotkeyHandler eventData) {
-				if (DocFetcher.getInstance().isInSystemTray()) {
-					DocFetcher.getInstance().restoreFromSystemTray();
-				} else {
-					Shell shell = DocFetcher.getInstance().getShell();
-					shell.setVisible(true);
-					shell.forceActive();
+		if (Const.IS_WINDOWS) {
+			hotkeyHandler = new HotkeyHandler();
+		}
+		/*
+		 * FIXME On Linux, JXGrabkey can cause DocFetcher to crash with a
+		 * BadAccessError on startup. If that happens, we remember the crash and
+		 * disable the hotkey so that subsequent startups may succeed.
+		 */
+		else {
+			if (Pref.Bool.HotkeyEnabled.getValue()) {
+				Pref.Bool.HotkeyEnabled.setValue(false);
+				try {
+					Pref.save();
+				} catch (IOException e1) {
 				}
+				
+				hotkeyHandler = new HotkeyHandler(); // Can cause a crash
+				
+				new Thread() {
+					public void run() {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+						}
+						Pref.Bool.HotkeyEnabled.setValue(true);
+						try {
+							Pref.save();
+						} catch (IOException e) {
+						}
+					}
+				}.start();
 			}
-		});
+			else setStatus(Msg.hotkey_disabled.value());
+		}
+		
+		if (hotkeyHandler != null)
+			hotkeyHandler.evtHotkeyPressed.add(new Event.Listener<HotkeyHandler> () {
+				public void update(HotkeyHandler eventData) {
+					if (isInSystemTray()) {
+						restoreFromSystemTray();
+					} else {
+						Shell shell = getShell();
+						shell.setMinimized(false);
+						shell.setVisible(true);
+						shell.forceActive();
+					}
+				}
+			});
 
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
@@ -473,7 +497,8 @@ public class DocFetcher extends ApplicationWindow {
 			UtilGUI.showErrorMsg(null, Msg.write_error.value());
 		}
 		
-		hotkeyHandler.shutdown();
+		if (hotkeyHandler != null)
+			hotkeyHandler.shutdown();
 		exceptionHandler.closeErrorFile();
 		folderWatcher.shutdown(); // On Windows, this may cause a crash, so we do this last
 		
