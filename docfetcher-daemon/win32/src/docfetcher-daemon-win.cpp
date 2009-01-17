@@ -107,24 +107,24 @@ bool InitInstance() {
 
 	WNDCLASS wc;
 
-	const char *className = "DocFectcherDaemonWnd";
+	const char *CLASS_DOCFETCHER_WND = "DocFectcherDaemonWnd";
 
 	wc.style = 0;
 	wc.lpfnWndProc = (WNDPROC) WndProc;
 	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
+ 	wc.cbWndExtra = 0;
 	wc.hInstance = _hInstance;
 	wc.hIcon = hDocFetcherIcon;
 	wc.hCursor = LoadCursor((HINSTANCE) NULL, IDC_ARROW);
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = "MainMenu";
-	wc.lpszClassName = className;
+	wc.lpszClassName = CLASS_DOCFETCHER_WND;
 
 	if (!RegisterClass(&wc))
 		return false;
 
 	// Create the main window.
-	_hwndMain = CreateWindow(className, "Sample",
+	_hwndMain = CreateWindow(CLASS_DOCFETCHER_WND, "Sample",
 			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
 			CW_USEDEFAULT, CW_USEDEFAULT, (HWND) NULL,
 			(HMENU) NULL, _hInstance, (LPVOID) NULL);
