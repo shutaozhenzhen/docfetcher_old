@@ -19,6 +19,7 @@ import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -43,6 +44,7 @@ public class HotkeyDialog {
 	private Shell shell;
 	private Text hotkeyBox;
 	private int[] hotkey = Pref.IntArray.HotKeyToFront.getValue();
+	private boolean hotkeyEnabled = Pref.Bool.HotkeyEnabled.getValue();
 	
 	public HotkeyDialog(Shell parentShell, int[] initialHotkey) {
 		this.parentShell = parentShell;
@@ -77,6 +79,16 @@ public class HotkeyDialog {
 		fdf.minWidth(0).right(restoreBt).left().applyTo(hSpacer);
 		fdf.reset().left().right().bottom(cancelBt).applyTo(sep);
 		fdf.bottom(sep).top(hotkeyBox).applyTo(vSpacer);
+		
+		/*
+		 * We don't want the current hotkey to interfere with the hotkey dialog.
+		 */
+		Pref.Bool.HotkeyEnabled.setValue(false);
+		shell.addDisposeListener(new DisposeListener () {
+			public void widgetDisposed(DisposeEvent e) {
+				Pref.Bool.HotkeyEnabled.setValue(hotkeyEnabled);
+			}
+		});
 		
 		hotkeyBox.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {

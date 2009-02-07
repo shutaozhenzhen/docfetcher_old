@@ -32,7 +32,7 @@ public enum Msg {
 	read_error,
 	write_error,
 	write_warning,
-	hotkey_disabled,
+	hotkey_in_use,
 	yes,
 	no,
 	ok,

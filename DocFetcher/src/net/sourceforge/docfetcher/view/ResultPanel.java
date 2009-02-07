@@ -128,7 +128,7 @@ public class ResultPanel extends Composite {
 		Table table = viewer.getTable();
 		table.setHeaderVisible(true);
 		
-		Pref.Int.MaxResults.evtChanged.add(new Event.Listener<Integer> () {
+		Pref.Int.MaxResultsPerPage.evtChanged.add(new Event.Listener<Integer> () {
 			public void update(Integer eventData) {
 				refresh();
 			}
@@ -354,7 +354,7 @@ public class ResultPanel extends Composite {
 		Arrays.sort(sortedInput, resultSorter);
 		
 		// Split flat array into array of arrays
-		int maxSize = Pref.Int.MaxResults.getValue();
+		int maxSize = Pref.Int.MaxResultsPerPage.getValue();
 		if (maxSize < 1)
 			throw new IllegalStateException("Maximum number of results per page cannot be smaller than 1."); //$NON-NLS-1$
 		int nPages = (int) Math.ceil((double) sortedInput.length / (double) maxSize);

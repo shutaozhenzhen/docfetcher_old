@@ -54,6 +54,9 @@ public class FileWrapper extends Indexable {
 	/**
 	 * Parses the file represented by this object and returns the parse result as
 	 * a <tt>Document</tt>.
+	 * <br>
+	 * Note: This method may throw an OutOfMemoryError if the parsed file is too
+	 * big.
 	 */
 	public Document parse() throws ParseException {
 		Parser parser = ParserRegistry.getSingleFileParser(file);
@@ -65,8 +68,6 @@ public class FileWrapper extends Indexable {
 			return doc;
 		} catch (RuntimeException e) {
 			throw new ParseException(file, Msg.parser_error.value());
-		} catch (OutOfMemoryError e2) {
-			throw new ParseException(file, Msg.out_of_jvm_memory.value());
 		}
 	}
 

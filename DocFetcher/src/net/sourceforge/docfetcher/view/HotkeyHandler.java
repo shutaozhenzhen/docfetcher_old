@@ -12,6 +12,7 @@
 
 package net.sourceforge.docfetcher.view;
 
+import jxgrabkey.HotkeyConflictException;
 import jxgrabkey.JXGrabKey;
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.Event;
@@ -27,6 +28,7 @@ import com.melloware.jintellitype.JIntellitype;
  * Handler for hot keys
  *
  * @author Tonio Rush
+ * @author Tran Nam Quang
  *
  */
 public class HotkeyHandler {
@@ -35,6 +37,15 @@ public class HotkeyHandler {
 	 * This event is fired when the hotkey is pressed.
 	 */
 	public final Event<HotkeyHandler> evtHotkeyPressed = new Event<HotkeyHandler> ();
+	
+	/**
+	 * This event is fired when the HotkeyHandler fails to register a hotkey
+	 * because it is already registered by another program. Currently, this can
+	 * only happen on Linux.<br>
+	 * The integer array contains the state mask and the key this class tried to
+	 * register.
+	 */
+	public final Event<int[]> evtHotkeyConflict = new Event<int[]> ();
 
 	private static final int HOTKEY_TO_FRONT_IDX = 1;
 
@@ -70,16 +81,29 @@ public class HotkeyHandler {
 		Pref.IntArray.HotKeyToFront.evtChanged.add(new Listener<int[]>() {
 			public void update(int[] eventData) {
 				implementation.unregisterHotkey(HOTKEY_TO_FRONT_IDX);
-
-				implementation.registerHotkey(HOTKEY_TO_FRONT_IDX,
-						KeyCodeTranslator.translateSWTModifiers(eventData[0]),
-						KeyCodeTranslator.translateSWTKey(eventData[1]));
+				
+				if (Pref.Bool.HotkeyEnabled.getValue())
+					implementation.registerHotkey(HOTKEY_TO_FRONT_IDX, eventData[0], eventData[1]);
 			}
 		});
 		
-		implementation.registerHotkey(HOTKEY_TO_FRONT_IDX,
-				KeyCodeTranslator.translateSWTModifiers(Pref.IntArray.HotKeyToFront.getValue()[0]),
-				KeyCodeTranslator.translateSWTKey(Pref.IntArray.HotKeyToFront.getValue()[1]));
+		Pref.Bool.HotkeyEnabled.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				if (eventData)
+					implementation.registerHotkey(HOTKEY_TO_FRONT_IDX,
+							Pref.IntArray.HotKeyToFront.getValue()[0],
+							Pref.IntArray.HotKeyToFront.getValue()[1]);
+				else
+					implementation.unregisterHotkey(HOTKEY_TO_FRONT_IDX);
+			}
+		});
+	}
+	
+	public void registerHotkey() {
+		if (Pref.Bool.HotkeyEnabled.getValue())
+			implementation.registerHotkey(HOTKEY_TO_FRONT_IDX,
+					Pref.IntArray.HotKeyToFront.getValue()[0],
+					Pref.IntArray.HotKeyToFront.getValue()[1]);
 	}
 	
 	/**
@@ -124,7 +148,9 @@ public class HotkeyHandler {
 		}
 
 		public void registerHotkey(int id, int mask, int key) {
-			JIntellitype.getInstance().registerSwingHotKey(id, mask, key);
+			JIntellitype.getInstance().registerSwingHotKey(id, 
+					KeyCodeTranslator.translateSWTModifiers(mask),
+					KeyCodeTranslator.translateSWTKey(key));
 		}
 
 		public void unregisterHotkey(int id) {
@@ -156,7 +182,13 @@ public class HotkeyHandler {
 		}
 
 		public void registerHotkey(int id, int mask, int key) {
-	        JXGrabKey.getInstance().registerAWTHotkey(id, mask, key);
+			try {
+				JXGrabKey.getInstance().registerAWTHotkey(id, 
+						KeyCodeTranslator.translateSWTModifiers(mask),
+						KeyCodeTranslator.translateSWTKey(key));
+			} catch (HotkeyConflictException e) {
+				evtHotkeyConflict.fireUpdate(new int[] {mask, key});
+			}
 		}
 		
 		public void unregisterHotkey(int id) {

@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.Const;
-import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.parse.HTMLParser;
 import net.sourceforge.docfetcher.parse.ParseException;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
@@ -88,15 +87,15 @@ public class HTMLPair extends FileWrapper {
 		return false;
 	}
 	
+	/**
+	 * Note: This method may throw an OutOfMemoryError if the parsed file is too
+	 * big.
+	 */
 	public Document parse() throws ParseException {
-		try {
-			HTMLParser htmlParser = ParserRegistry.getHTMLParser();
-			Document doc = htmlParser.parse(file, getHtmlFolder());
-			doc.setParsedBy(htmlParser);
-			return doc;
-		} catch (OutOfMemoryError e) {
-			throw new ParseException(file, Msg.out_of_jvm_memory.value());
-		}
+		HTMLParser htmlParser = ParserRegistry.getHTMLParser();
+		Document doc = htmlParser.parse(file, getHtmlFolder());
+		doc.setParsedBy(htmlParser);
+		return doc;
 	}
 
 }

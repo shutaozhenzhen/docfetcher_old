@@ -413,55 +413,29 @@ public class DocFetcher extends ApplicationWindow {
 			}
 		});
 
-		// add hotkey support
-		if (Const.IS_WINDOWS) {
-			hotkeyHandler = new HotkeyHandler();
-		}
 		/*
-		 * FIXME On Linux, JXGrabkey can cause DocFetcher to crash with a
-		 * BadAccessError on startup. If that happens, we remember the crash and
-		 * disable the hotkey so that subsequent startups may succeed.
+		 * Add Hotkey support.
 		 */
-		else {
-			if (Pref.Bool.HotkeyEnabled.getValue()) {
-				Pref.Bool.HotkeyEnabled.setValue(false);
-				try {
-					Pref.save();
-				} catch (IOException e1) {
+		hotkeyHandler = new HotkeyHandler();
+		hotkeyHandler.evtHotkeyPressed.add(new Event.Listener<HotkeyHandler> () {
+			public void update(HotkeyHandler eventData) {
+				if (isInSystemTray()) {
+					restoreFromSystemTray();
+				} else {
+					Shell shell = getShell();
+					shell.setMinimized(false);
+					shell.setVisible(true);
+					shell.forceActive();
 				}
-				
-				hotkeyHandler = new HotkeyHandler(); // Can cause a crash
-				
-				new Thread() {
-					public void run() {
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-						}
-						Pref.Bool.HotkeyEnabled.setValue(true);
-						try {
-							Pref.save();
-						} catch (IOException e) {
-						}
-					}
-				}.start();
 			}
-			else setStatus(Msg.hotkey_disabled.value());
-		}
-		
-		if (hotkeyHandler != null)
-			hotkeyHandler.evtHotkeyPressed.add(new Event.Listener<HotkeyHandler> () {
-				public void update(HotkeyHandler eventData) {
-					if (isInSystemTray()) {
-						restoreFromSystemTray();
-					} else {
-						Shell shell = getShell();
-						shell.setMinimized(false);
-						shell.setVisible(true);
-						shell.forceActive();
-					}
-				}
-			});
+		});
+		hotkeyHandler.evtHotkeyConflict.add(new Event.Listener<int[]> () {
+			public void update(int[] eventData) {
+				String key = Key.toString(eventData);
+				UtilGUI.showWarningMsg(null, Msg.hotkey_in_use.format(key));
+			}
+		});
+		hotkeyHandler.registerHotkey();
 
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
@@ -612,7 +586,7 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// More complicated message: "Results: 101-200 of 320	Page 2/4"
 		else {
-			int maxSize = Pref.Int.MaxResults.getValue();
+			int maxSize = Pref.Int.MaxResultsPerPage.getValue();
 			int pageIndex = resultPanel.getPageIndex();
 			int pageCount = resultPanel.getPageCount();
 			int a = pageIndex * maxSize + 1;

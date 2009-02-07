@@ -168,7 +168,7 @@ public class PrefDialog {
 		);
 		maxResultsBox = createTextBox(container,
 				Msg.pref_max_results.value(),
-				Pref.Int.MaxResults
+				Pref.Int.MaxResultsPerPage
 		);
 		
 		// Controls for the hotkey
@@ -308,7 +308,7 @@ public class PrefDialog {
 				throw new NumberFormatException();
 		} catch (NumberFormatException e) {
 			UtilGUI.showWarningMsg(null, Msg.pref_max_results_range.format(Integer.MAX_VALUE));
-			maxResultsBox.setText(Integer.toString(Math.max(1, Pref.Int.MaxResults.getValue())));
+			maxResultsBox.setText(Integer.toString(Math.max(1, Pref.Int.MaxResultsPerPage.getValue())));
 			return;
 		}
 		

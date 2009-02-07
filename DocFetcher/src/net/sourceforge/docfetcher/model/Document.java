@@ -151,7 +151,7 @@ public class Document {
 	 */
 	public Document addAuthor(String author) {
 		if (author == null) return this;
-		luceneDoc.add(new Field(Document.author, author, Store.YES, Index.TOKENIZED));
+		luceneDoc.add(new Field(Document.author, author, Store.YES, Index.ANALYZED));
 		return this;
 	}
 	
@@ -184,7 +184,7 @@ public class Document {
 	public Document setTitle(String title) {
 		if (title == null) title = ""; //$NON-NLS-1$
 		luceneDoc.removeFields(Document.title);
-		luceneDoc.add(new Field(Document.title, title, Store.YES, Index.TOKENIZED));
+		luceneDoc.add(new Field(Document.title, title, Store.YES, Index.ANALYZED));
 		return this;
 	}
 	
@@ -202,9 +202,9 @@ public class Document {
 	public Document setContents(StringBuffer contents) {
 		luceneDoc.removeFields(Document.contents);
 		if (contents == null)
-			luceneDoc.add(new Field(Document.contents, "", Store.NO, Index.TOKENIZED)); //$NON-NLS-1$
+			luceneDoc.add(new Field(Document.contents, "", Store.NO, Index.ANALYZED)); //$NON-NLS-1$
 		else
-			luceneDoc.add(new Field(Document.contents, contents.toString(), Store.NO, Index.TOKENIZED));
+			luceneDoc.add(new Field(Document.contents, contents.toString(), Store.NO, Index.ANALYZED));
 		return this;
 	}
 
@@ -216,7 +216,7 @@ public class Document {
 		if (contents == null)
 			contents = ""; //$NON-NLS-1$
 		luceneDoc.removeFields(Document.contents);
-		luceneDoc.add(new Field(Document.contents, contents, Store.NO, Index.TOKENIZED));
+		luceneDoc.add(new Field(Document.contents, contents, Store.NO, Index.ANALYZED));
 		return this;
 	}
 	

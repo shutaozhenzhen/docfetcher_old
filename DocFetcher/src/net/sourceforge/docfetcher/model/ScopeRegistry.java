@@ -24,17 +24,19 @@ import java.util.TreeSet;
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Msg;
+import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Searchable;
+import org.apache.lucene.search.TopDocCollector;
 
 /**
  * A registry for managing registered scopes.
@@ -468,12 +470,18 @@ public class ScopeRegistry implements Serializable {
 			for (RootScope rootScope : rootScopes)
 				searchables[i++] = new IndexSearcher(rootScope.getIndexDir().getAbsolutePath());
 			multiSearcher = new MultiSearcher(searchables);
-			Hits hits = multiSearcher.search(query);
+			
+			TopDocCollector collector = new TopDocCollector(Pref.Int.MaxResultsTotal.getValue());
+			multiSearcher.search(query, collector);
+			ScoreDoc[] hits = collector.topDocs().scoreDocs;
 			
 			// Process results 
-			final ResultDocument[] results = new ResultDocument[hits.length()];
+			final ResultDocument[] results = new ResultDocument[hits.length];
 			for (i = 0; i < results.length; i++)
-				results[i] = new ResultDocument(hits.doc(i), hits.score(i));
+				results[i] = new ResultDocument(
+						multiSearcher.doc(hits[i].doc),
+						hits[i].score
+				);
 			
 			// Get search terms (for term highlighting in the preview panel)
 			Set<Object> termsSet = new HashSet<Object>();

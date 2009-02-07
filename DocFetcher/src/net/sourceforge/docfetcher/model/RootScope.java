@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.parse.ParseException;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
@@ -32,6 +33,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.MultiReader;
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 
 /**
  * An object representation for top-level-directories in the search scope.
@@ -127,7 +129,7 @@ public class RootScope extends Scope {
 		
 		try {
 			// Create index if it doesn't exist yet
-			writer = new IndexWriter(indexDir, analyzer); 
+			writer = new IndexWriter(indexDir, analyzer, MaxFieldLength.UNLIMITED); 
 			writer.close();
 			
 			/*
@@ -174,7 +176,7 @@ public class RootScope extends Scope {
 
 			// Recursively index new files
 			if (! Thread.currentThread().isInterrupted()) {
-				writer = new IndexWriter(indexDir, analyzer);
+				writer = new IndexWriter(indexDir, analyzer, MaxFieldLength.UNLIMITED);
 				indexNewFiles(this);
 				writer.optimize();
 			}
@@ -332,7 +334,13 @@ public class RootScope extends Scope {
 			if (isExcluded(subFile)) continue;
 			try {
 				FileWrapper wrapper = new FileWrapper(scope, subFile);
-				writer.addDocument(wrapper.parse().getLuceneDoc());
+				try {
+					// Both the addDocument(..) and the parse() method can run out of memory!
+					writer.addDocument(wrapper.parse().getLuceneDoc());
+				}
+				catch (OutOfMemoryError e) {
+					throw new ParseException(subFile, Msg.out_of_jvm_memory.value());
+				}
 				scope.subFiles.add(wrapper);
 			}
 			catch (ParseException e) {
@@ -347,8 +355,13 @@ public class RootScope extends Scope {
 			if (isExcluded(subHTMLPair.getFile())) continue;
 			try {
 				subHTMLPair.setParent(scope);
-				Document doc = subHTMLPair.parse();
-				writer.addDocument(doc.getLuceneDoc());
+				try {
+					// Both the addDocument(..) and the parse() method can run out of memory!
+					writer.addDocument(subHTMLPair.parse().getLuceneDoc());
+				}
+				catch (OutOfMemoryError e) {
+					throw new ParseException(subHTMLPair.file, Msg.out_of_jvm_memory.value());
+				}
 				scope.subHTMLPairs.add(subHTMLPair);
 			} catch (ParseException e) {
 				parseExceptions.add(e);
