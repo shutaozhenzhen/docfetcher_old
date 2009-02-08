@@ -57,6 +57,7 @@ public enum Msg {
 	filetype_odp,
 	filetype_pdf,
 	filetype_rtf,
+	filetype_svg,
 	filetype_txt,
 	filetype_wpd,
 	

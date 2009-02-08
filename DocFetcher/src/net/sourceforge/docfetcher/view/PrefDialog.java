@@ -354,13 +354,25 @@ public class PrefDialog {
 			}
 		}
 		
-		if (! Arrays.equals(Pref.IntArray.HotKeyToFront.getValue(), hotkey)) {
-			Pref.IntArray.HotKeyToFront.setValue(hotkey);
+		if (! Arrays.equals(Pref.IntArray.HighlightColor.getValue(), hlColorArray)) {
+			Pref.IntArray.HighlightColor.setValue(hlColorArray);
 			changed = true;
 		}
 		
-		if (! Arrays.equals(Pref.IntArray.HighlightColor.getValue(), hlColorArray)) {
-			Pref.IntArray.HighlightColor.setValue(hlColorArray);
+		/*
+		 * The shell must be closed before changing the hotkey. If we closed the
+		 * shell after changing it and a hotkey conflict occurs (hotkey already
+		 * in use), the resulting fast closing and reopening of the preferences
+		 * dialog would look like a glitch.
+		 * 
+		 * The shell can't be closed before changing the other preferences,
+		 * since they'll need to read the values from the widgets on the
+		 * preferences dialog.
+		 */
+		shell.close();
+		
+		if (! Arrays.equals(Pref.IntArray.HotKeyToFront.getValue(), hotkey)) {
+			Pref.IntArray.HotKeyToFront.setValue(hotkey);
 			changed = true;
 		}
 		
@@ -371,7 +383,6 @@ public class PrefDialog {
 				UtilGUI.showErrorMsg(null, Msg.write_error.value());
 			}
 		}
-		shell.close();
 	}
 	
 	private void onResetButton() {

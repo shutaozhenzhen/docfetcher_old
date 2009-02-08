@@ -38,15 +38,16 @@ public class ParserRegistry {
 		new AbiWordParser(),
 		new CHMParser(),
 		new MSExcelParser(),
+		new MSPowerPointParser(),
+		new MSVisioParser(),
+		new MSWordParser(),
 		new OOoWriterParser(),
 		new OOoCalcParser(),
 		new OOoDrawParser(),
 		new OOoImpressParser(),
 		new PDFParser(),
-		new MSPowerPointParser(),
 		new RTFParser(),
-		new MSVisioParser(),
-		new MSWordParser(),
+		new SVGParser(),
 		new WordPerfectParser()
 	};
 

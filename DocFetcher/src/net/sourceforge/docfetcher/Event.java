@@ -39,6 +39,7 @@ public class Event<T> {
 		public void update(T eventData);
 	}
 	
+	private boolean enabled = true;
 	private Set<Listener<T>> observers = new HashSet<Listener<T>> ();
 	private List<T> eventCache = new ArrayList<T> ();
 	
@@ -64,6 +65,7 @@ public class Event<T> {
 	}
 	
 	public void fireUpdate(final T eventData) {
+		if (! (enabled && globalEnabled)) return;
 		if (hold == 0) {
 			if (Display.getCurrent() != null || Display.getDefault() == null) {
 				for (Listener<T> observer : new HashSet<Listener<T>> (observers))
@@ -85,13 +87,26 @@ public class Event<T> {
 	}
 	
 	private void flushCache() {
-		for (T eventData : new ArrayList<T> (eventCache))
-			for (Listener<T> observer : new HashSet<Listener<T>> (observers))
-				observer.update(eventData);
+		if (enabled && globalEnabled)
+			for (T eventData : new ArrayList<T> (eventCache))
+				for (Listener<T> observer : new HashSet<Listener<T>> (observers))
+					observer.update(eventData);
 		eventCache.clear();
 	}
 	
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	/**
+	 * Enables or disables this event.
+	 */
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
 	private static int hold = 0;
+	private static boolean globalEnabled = true;
 	private static Set<Event<?>> needsFlushing = new HashSet<Event<?>> ();
 	
 	/**
@@ -127,6 +142,17 @@ public class Event<T> {
 			});
 		}
 		needsFlushing.clear();
+	}
+	
+	public static boolean isGlobalEnabled() {
+		return globalEnabled;
+	}
+	
+	/**
+	 * Enables or disables the entire event system.
+	 */
+	public static void setGlobalEnabled(boolean enabled) {
+		globalEnabled = enabled;
 	}
 
 }

@@ -433,6 +433,13 @@ public class DocFetcher extends ApplicationWindow {
 			public void update(int[] eventData) {
 				String key = Key.toString(eventData);
 				UtilGUI.showWarningMsg(null, Msg.hotkey_in_use.format(key));
+				
+				/*
+				 * Don't open preferences dialog when the hotkey conflict occurs
+				 * at startup.
+				 */
+				if (getShell().isVisible())
+					new PrefDialog(getShell());
 			}
 		});
 		hotkeyHandler.registerHotkey();

@@ -89,10 +89,18 @@ public class HotkeyHandler {
 		
 		Pref.Bool.HotkeyEnabled.evtChanged.add(new Event.Listener<Boolean> () {
 			public void update(Boolean eventData) {
-				if (eventData)
+				if (eventData) {
+					/*
+					 * The hotkey conflict event is temporarily disabled here
+					 * because we don't want to display an error message when an
+					 * invalid hotkey is re-registered.
+					 */
+					evtHotkeyConflict.setEnabled(false);
 					implementation.registerHotkey(HOTKEY_TO_FRONT_IDX,
 							Pref.IntArray.HotKeyToFront.getValue()[0],
 							Pref.IntArray.HotKeyToFront.getValue()[1]);
+					evtHotkeyConflict.setEnabled(true);
+				}
 				else
 					implementation.unregisterHotkey(HOTKEY_TO_FRONT_IDX);
 			}
