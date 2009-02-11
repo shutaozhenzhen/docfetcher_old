@@ -93,11 +93,14 @@ public class ScopeGroup extends GroupWrapper {
 		viewerMenu.addSeparator();
 		viewerMenu.addRootAction(new RemoveIndexAction(), Key.Delete);
 		viewerMenu.addSeparator();
+		viewerMenu.addUnmanagedAction(new CheckAllAction(true), null);
+		viewerMenu.addUnmanagedAction(new CheckAllAction(false), null);
+		viewerMenu.addSeparator();
 		viewerMenu.addNonEmptyAction(new CheckFlatAction(true), null);
 		viewerMenu.addNonEmptyAction(new CheckFlatAction(false), null);
 		viewerMenu.addSeparator();
 		viewerMenu.addNonEmptyAction(new OpenDirectoryAction(), Key.Enter);
-		viewerMenu.addRootAction(new ListDocumentsAction(), null);
+		viewerMenu.addNonEmptyAction(new ListDocumentsAction(), null);
 		viewerMenu.addSingleElementAction(new CreateSubfolderAction(), Key.ShiftInsert);
 		viewerMenu.addSingleElementAction(new RenameFolderAction(), Key.Rename);
 		viewerMenu.addNonEmptyAction(new DeleteFolderAction(), Key.ShiftDelete);
@@ -186,16 +189,18 @@ public class ScopeGroup extends GroupWrapper {
 				Event.flush();
 				updateVisibleCheckStates(new Object[] {event.getElement()});
 			}
-			/**
-			 * Recursively checks or unchecks all Scopes under the given Scope,
-			 * including the latter.
-			 */
-			private void checkDeep(Scope scope, boolean checked) {
-				scope.setChecked(checked);
-				for (Scope child : scope.getChildren())
-					checkDeep(child, checked);
-			}
+			
 		});
+	}
+	
+	/**
+	 * Recursively checks or unchecks all Scopes under the given Scope,
+	 * including the latter.
+	 */
+	private void checkDeep(Scope scope, boolean checked) {
+		scope.setChecked(checked);
+		for (Scope child : scope.getChildren())
+			checkDeep(child, checked);
 	}
 	
 	/**
@@ -482,6 +487,30 @@ public class ScopeGroup extends GroupWrapper {
 		public void run() {
 			updateSelectedIndexes(true);
 		}
+	}
+	
+	/**
+	 * Action to check or uncheck all scopes.
+	 */
+	class CheckAllAction extends Action {
+		
+		/**
+		 * Whether this Action checks or unchecks all Scopes.
+		 */
+		private boolean checked = true;
+		
+		public CheckAllAction(boolean checked) {
+			setText(checked ? Msg.check_all.value() : Msg.uncheck_all.value());
+			this.checked = checked;
+		}
+		
+		public void run() {
+			Event.hold();
+			for (RootScope rootScope : ScopeRegistry.getInstance().getEntries())
+				checkDeep(rootScope, checked);
+			Event.flush();
+			updateVisibleCheckStates(new Scope[0]);
+		}
 		
 	}
 	
@@ -548,7 +577,7 @@ public class ScopeGroup extends GroupWrapper {
 			setText(Msg.list_docs.value());
 		}
 		public void run() {
-			final RootScope[] scopes = getExistingRootSelection();
+			final Scope[] scopes = getExistingSelection();
 			if (scopes.length == 0) return;
 			new Thread() {
 				public void run() {

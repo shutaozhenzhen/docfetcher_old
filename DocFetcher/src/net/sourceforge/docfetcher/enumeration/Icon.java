@@ -54,14 +54,6 @@ public enum Icon {
 	TO_SYSTRAY ("to_systray.gif"), //$NON-NLS-1$
 	LETTERS ("letters.gif"), //$NON-NLS-1$
 	
-	LAYOUT ("layout.gif"), //$NON-NLS-1$
-	LAYOUT1 ("layout1.png"), //$NON-NLS-1$
-	LAYOUT2 ("layout2.png"), //$NON-NLS-1$
-	LAYOUT3 ("layout3.png"), //$NON-NLS-1$
-	LAYOUT4 ("layout4.png"), //$NON-NLS-1$
-	LAYOUT5 ("layout5.png"), //$NON-NLS-1$
-	LAYOUT6 ("layout6.png"), //$NON-NLS-1$
-	
 	INDEX_MANAGEMENT ("index_management.gif"), //$NON-NLS-1$
 	ADD ("add.gif"), //$NON-NLS-1$
 	WALK_TREE ("walk_tree.gif"), //$NON-NLS-1$

@@ -96,6 +96,12 @@ public class RootScope extends Scope {
 	public RootScope(File file) {
 		super(null, file);
 		id = UtilFile.getUniqueID();
+		
+		/*
+		 * Note: If the given directory is a hard drive (e.g. "C:"), then the
+		 * resulting name of the index directory will start with an underscore
+		 * character.
+		 */
 		indexDir = new File(Const.INDEX_PARENT_FILE, file.getName() + "_" + id); //$NON-NLS-1$
 	}
 
@@ -591,26 +597,43 @@ public class RootScope extends Scope {
 	}
 	
 	/**
-	 * Returns all documents under the given <tt>RootScope</tt>s.
+	 * Returns all documents under the given <tt>Scope</tt>s.
 	 */
-	public static ResultDocument[] listDocuments(RootScope[] rootScopes) {
+	public static ResultDocument[] listDocuments(Scope... scopes) {
+		// Get the root elements of the given scopes
+		Set<RootScope> rootScopeSet = new HashSet<RootScope> ();
+		for (Scope scope : scopes)
+			rootScopeSet.add(scope.getRootScope());
+		RootScope[] rootScopes = rootScopeSet.toArray(new RootScope[rootScopeSet.size()]);
+		
 		try {
+			// Get all documents under the root elements
 			IndexReader[] readers = new IndexReader[rootScopes.length];
 			for (int i = 0; i < rootScopes.length; i++)
 				readers[i] = IndexReader.open(rootScopes[i].getIndexDir());
 			MultiReader multiReader = new MultiReader(readers);
-			ResultDocument[] docs = new ResultDocument[multiReader.numDocs()];
+			ResultDocument[] rootScopeDocs = new ResultDocument[multiReader.numDocs()];
 			for (int i = 0; i < multiReader.numDocs(); i++)
-				docs[i] = new ResultDocument(multiReader.document(i), 0);
+				rootScopeDocs[i] = new ResultDocument(multiReader.document(i), 0);
 			multiReader.close();
-			return docs;
+			
+			// From the documents of the previous step,
+			// filter out those that aren't inside the given scopes,
+			// and return the remaining documents.
+			Set<ResultDocument> scopeDocs = new HashSet<ResultDocument> ();
+			for (ResultDocument rootScopeDoc : rootScopeDocs)
+				for (Scope scope : scopes)
+					if (scope.contains(rootScopeDoc.file)) {
+						scopeDocs.add(rootScopeDoc);
+						break;
+					}
+			return scopeDocs.toArray(new ResultDocument[scopeDocs.size()]);
 		} catch (CorruptIndexException e) {
 			e.printStackTrace();
-			return new ResultDocument[0];
 		} catch (IOException e) {
 			e.printStackTrace();
-			return new ResultDocument[0];
 		}
+		return new ResultDocument[0];
 	}
 
 }

@@ -288,6 +288,7 @@ public class ResultPanel extends Composite {
 			this.results = new ResultDocument[0];
 			resultPages = new ResultDocument[0][];
 			viewer.setInput(new ResultDocument[0]);
+			evtVisibleItemsChanged.fireUpdate(this);
 			return;
 		}
 		this.results = results;
@@ -388,6 +389,14 @@ public class ResultPanel extends Composite {
 		if (pageIndex == -1) return;
 		int maxIndex = resultPages.length - 1;
 		pageIndex = Math.min(pageIndex + 1, maxIndex);
+		viewer.setInput(resultPages[pageIndex]);
+		viewer.getTable().setTopIndex(0);
+		evtVisibleItemsChanged.fireUpdate(this);
+	}
+	
+	public void setPage(int newPageIndex) {
+		if (pageIndex == -1) return;
+		pageIndex = Math.min(Math.max(0, newPageIndex), resultPages.length - 1);
 		viewer.setInput(resultPages[pageIndex]);
 		viewer.getTable().setTopIndex(0);
 		evtVisibleItemsChanged.fireUpdate(this);
@@ -572,7 +581,9 @@ public class ResultPanel extends Composite {
 		for (ResultDocument resultDoc : results)
 			if (! UtilList.containsEquality(filesToDelete, resultDoc.getFile()))
 				newResults.add(resultDoc);
+		int previousPageIndex = pageIndex;
 		setResults(newResults.toArray(new ResultDocument[newResults.size()]));
+		setPage(previousPageIndex);
 	}
 	
 	/**

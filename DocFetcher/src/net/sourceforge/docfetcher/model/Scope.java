@@ -140,7 +140,7 @@ public class Scope extends Indexable {
 	/**
 	 * Returns true if the receiver contains the given file. Example: If the
 	 * receiver represents "C:\", then it contains "C:\Windows\System\foo.dll".
-	 * This method does not check whether the given file actually exists.
+	 * This method does not check if the given file actually exists.
 	 */
 	public boolean contains(File file) {
 		return UtilFile.contains(this.file.getAbsolutePath(), file.getAbsolutePath());

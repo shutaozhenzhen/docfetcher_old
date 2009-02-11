@@ -273,8 +273,9 @@ public class ScopeRegistry implements Serializable {
 	}
 	
 	/**
-	 * Returns the currently processed entry in the indexing queue. This is not
-	 * necessarily the first item in the queue.
+	 * Returns the currently processed entry in the indexing queue, or null if
+	 * none is processed right now. This is not necessarily the first item in
+	 * the queue.
 	 */
 	public Job getCurrentJob() {
 		return currentJob;

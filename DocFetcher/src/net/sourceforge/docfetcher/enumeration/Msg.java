@@ -38,6 +38,7 @@ public enum Msg {
 	ok,
 	cancel,
 	already_running,
+	force_quit,
 	close,
 	
 	// Filter panel
@@ -104,7 +105,6 @@ public enum Msg {
 	// Main panel
 	prev_page,
 	next_page,
-	ui_layout,
 	show_preview,
 	preferences,
 	to_systray,

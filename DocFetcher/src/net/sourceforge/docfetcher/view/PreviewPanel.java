@@ -146,10 +146,6 @@ public class PreviewPanel extends Composite {
 		// Create general toolbar
 		generalToolBar = new ToolBar(previewBar, SWT.FLAT);
 		new ToolItem(generalToolBar, SWT.SEPARATOR);
-		ToolItem helpBt = new ToolItem(generalToolBar, SWT.FLAT);
-		helpBt.setImage(Icon.HELP.getImage());
-		helpBt.setToolTipText(Msg.open_manual.value());
-		helpBt.setSelection(Pref.Bool.ShowWelcomePage.getValue());
 		final ToolItem htmlPreviewBt = new ToolItem(generalToolBar, SWT.FLAT | SWT.CHECK);
 		htmlPreviewBt.setImage(Icon.BROWSER.getImage());
 		htmlPreviewBt.setSelection(Pref.Bool.PreviewHTML.getValue());
@@ -231,12 +227,6 @@ public class PreviewPanel extends Composite {
 						Integer.toString(ranges.length / 2)
 				);
 				scrollToMiddle((tokenStart + tokenEnd) / 2);
-			}
-		});
-
-		helpBt.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				showHelpPage();
 			}
 		});
 
@@ -362,7 +352,7 @@ public class PreviewPanel extends Composite {
 		downBt.setEnabled(terms.length != 0);
 
 		// Use the HTML browser
-		if (Pref.Bool.PreviewHTML.getValue()) {
+		if (file.getAbsolutePath().equals(Const.HELP_FILE) || Pref.Bool.PreviewHTML.getValue()) {
 			final BrowserPanel browser = browserProvider.getBrowser(previewPanel, browserToolBar, parser);
 			if (browser != null) {
 				browser.addProgressListener(new ProgressAdapter() {
@@ -403,6 +393,13 @@ public class PreviewPanel extends Composite {
 					text = parser.renderText(file);
 				} catch (ParseException e) {
 					text = Msg.cant_read_file.format(e.getMessage());
+				} catch (OutOfMemoryError e) {
+					/*
+					 * We can get here if the user sets a high java heap space
+					 * value during indexing and then sets a lower value for
+					 * search only usage.
+					 */
+					text = Msg.out_of_jvm_memory.value();
 				}
 				
 				if (PreviewPanel.this.file != file)
@@ -518,8 +515,8 @@ public class PreviewPanel extends Composite {
 
 	/**
 	 * If the internal HTML viewer is available, this method displays the help
-	 * page in it, opens the preview panel if necessary and return true. If not,
-	 * it opens the help page in the external HTML browser and returns false.
+	 * page in it and returns true. If not, it opens the help page in the
+	 * external HTML browser and returns false.
 	 */
 	public boolean showHelpPage() {
 		parser = ParserRegistry.getHTMLParser();

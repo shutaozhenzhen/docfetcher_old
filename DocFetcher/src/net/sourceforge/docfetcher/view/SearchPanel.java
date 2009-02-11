@@ -47,16 +47,17 @@ public class SearchPanel extends Composite {
 	public final Event<String> evtSearchRequest = new Event<String> ();
 	public final Event<Widget> evtLeftBtClicked = new Event<Widget> ();
 	public final Event<Widget> evtRightBtClicked = new Event<Widget> ();
+	public final Event<Widget> evtHelpBtClicked = new Event<Widget> ();
 	public final Event<Widget> evtPrefBtClicked = new Event<Widget> ();
 	
 	private Composite searchBar;
 	private Combo searchBox;
 	private ToolItem leftBt;
 	private ToolItem rightBt;
-	private ToolItem layoutBt;
 	private ToolItem prefBt;
 	private ToolItem toSystrayBt;
 	private ResultPanel resultPanel;
+	private ToolItem helpBt;
 	
 	public SearchPanel(Composite parent) {
 		super(parent, SWT.NONE);
@@ -118,18 +119,15 @@ public class SearchPanel extends Composite {
 		
 		new ToolItem(toolBar, SWT.SEPARATOR);
 		
-		layoutBt = new ToolItem(toolBar, SWT.DROP_DOWN);
-		layoutBt.setImage(Icon.LAYOUT.getImage());
-		layoutBt.setToolTipText(Msg.ui_layout.value());
-		
-		// Populate drop-down menu of layout button
-		DropDownManager dropDownManager = new DropDownManager(layoutBt);
-		addLayoutOption(dropDownManager, Icon.LAYOUT1, false, false, true);
-		addLayoutOption(dropDownManager, Icon.LAYOUT2, false, true, true);
-		addLayoutOption(dropDownManager, Icon.LAYOUT3, false, true, false);
-		addLayoutOption(dropDownManager, Icon.LAYOUT4, true, false, true);
-		addLayoutOption(dropDownManager, Icon.LAYOUT5, true, true, true);
-		addLayoutOption(dropDownManager, Icon.LAYOUT6, true, true, false);
+		helpBt = new ToolItem(toolBar, SWT.FLAT);
+		helpBt.setImage(Icon.HELP.getImage());
+		helpBt.setToolTipText(Msg.open_manual.value());
+		helpBt.setSelection(Pref.Bool.ShowWelcomePage.getValue());
+		helpBt.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				evtHelpBtClicked.fireUpdate(helpBt);
+			}
+		});
 		
 		prefBt = new ToolItem(toolBar, SWT.FLAT);
 		prefBt.setImage(Icon.PREFERENCES.getImage());
@@ -191,20 +189,6 @@ public class SearchPanel extends Composite {
 		 * off by a few pixels to the top.
 		 */
 		layout();
-	}
-	
-	/**
-	 * Convenience method for populating the drop-down menu of the layout
-	 * button.
-	 */
-	private void addLayoutOption(DropDownManager dropDownManager, Icon icon, final boolean showFilterPanel, final boolean showPreviewPanel, final boolean previewBottom) {
-		dropDownManager.add(null, icon.getImage(), new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				Pref.Bool.ShowFilterPanel.setValue(showFilterPanel);
-				Pref.Bool.ShowPreview.setValue(showPreviewPanel);
-				Pref.Bool.PreviewBottom.setValue(previewBottom);
-			}
-		});
 	}
 	
 	/**

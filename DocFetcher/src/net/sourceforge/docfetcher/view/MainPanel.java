@@ -14,9 +14,13 @@ package net.sourceforge.docfetcher.view;
 import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Pref;
 
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -31,31 +35,128 @@ public class MainPanel extends Composite {
 	private SashForm sash;
 	private SearchPanel searchPanel;
 	private PreviewPanel previewPanel;
+	private Composite searchPanelWithButtons;
+	private ThinArrowButton togglePreviewBottomBt;
+	private ThinArrowButton togglePreviewRightBt;
+	private ThinArrowButton togglePreviewRightBt2;
 
 	public MainPanel(Composite parent) {
 		super(parent, SWT.NONE);
-		setLayout(new FillLayout());
+		setLayout(GridLayoutFactory.fillDefaults().numColumns(3).spacing(0, 0).create());
+		
+		int btLeftStyle = Pref.Bool.ShowFilterPanel.getValue() ? SWT.LEFT : SWT.RIGHT;
+		final ThinArrowButton toggleFilterPanelBt = new ThinArrowButton(this, btLeftStyle | SWT.BORDER);
+		toggleFilterPanelBt.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		
 		sash = new SashForm(this, Pref.Bool.PreviewBottom.getValue() ? SWT.VERTICAL : SWT.HORIZONTAL);
-		searchPanel = new SearchPanel(sash);
+		sash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		boolean previewBottom = Pref.Bool.PreviewBottom.getValue();
+		boolean showPreview = Pref.Bool.ShowPreview.getValue();
+		
+		int btRightStyle = showPreview && ! previewBottom ? SWT.RIGHT : SWT.LEFT;
+		togglePreviewRightBt = new ThinArrowButton(this, btRightStyle | SWT.BORDER);
+		togglePreviewRightBt.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 2));
+		
+		searchPanelWithButtons = new Composite(sash, SWT.NONE);
+		searchPanelWithButtons.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).create());
+		
+		searchPanel = new SearchPanel(searchPanelWithButtons);
+		searchPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		
+		int btRightStyle2 = showPreview && ! previewBottom ? SWT.RIGHT : SWT.LEFT;
+		togglePreviewRightBt2 = new ThinArrowButton(searchPanelWithButtons, btRightStyle2 | SWT.BORDER);
+		togglePreviewRightBt2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 2));
+		
+		int btBottomStyle = showPreview && previewBottom ? SWT.DOWN : SWT.UP;
+		togglePreviewBottomBt = new ThinArrowButton(searchPanelWithButtons, btBottomStyle | SWT.BORDER);
+		togglePreviewBottomBt.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false));
+		updatePreviewButtons();
+		
 		previewPanel = new PreviewPanel(sash);
 		if (Pref.Bool.ShowPreview.getValue()) {
 			loadSashWeights();
 			previewPanel.setActive(true);
 		}
 		else 
-			sash.setMaximizedControl(searchPanel);
+			sash.setMaximizedControl(searchPanelWithButtons);
+		
+		// Toogle filter panel
+		toggleFilterPanelBt.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				boolean showFilterPanel = ! Pref.Bool.ShowFilterPanel.getValue();
+				Pref.Bool.ShowFilterPanel.setValue(showFilterPanel);
+			}
+		});
+		
+		// Toggle preview panel
+		togglePreviewBottomBt.addMouseListener(new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (Pref.Bool.ShowPreview.getValue() && Pref.Bool.PreviewBottom.getValue())
+					Pref.Bool.ShowPreview.setValue(false);
+				else {
+					Pref.Bool.ShowPreview.setValue(true);
+					Pref.Bool.PreviewBottom.setValue(true);
+				}
+			}
+		});
+		MouseAdapter previewRightBtHandler = new MouseAdapter() {
+			public void mouseDown(MouseEvent e) {
+				if (Pref.Bool.ShowPreview.getValue() && ! Pref.Bool.PreviewBottom.getValue())
+					Pref.Bool.ShowPreview.setValue(false);
+				else {
+					Pref.Bool.ShowPreview.setValue(true);
+					Pref.Bool.PreviewBottom.setValue(false);
+				}
+			}
+		};
+		togglePreviewRightBt.addMouseListener(previewRightBtHandler);
+		togglePreviewRightBt2.addMouseListener(previewRightBtHandler);
+		
+		Pref.Bool.ShowFilterPanel.evtChanged.add(new Event.Listener<Boolean> () {
+			public void update(Boolean eventData) {
+				toggleFilterPanelBt.setOrientation(eventData ? SWT.LEFT : SWT.RIGHT);
+			}
+		});
 		
 		Pref.Bool.ShowPreview.evtChanged.add(new Event.Listener<Boolean> () {
 			public void update(Boolean eventData) {
+				updatePreviewButtons();
 				setPreviewVisible(eventData);
 			}
 		});
 		
 		Pref.Bool.PreviewBottom.evtChanged.add(new Event.Listener<Boolean> () {
 			public void update(Boolean eventData) {
+				updatePreviewButtons();
 				setPreviewBottom(eventData);
 			}
 		});
+	}
+	
+	/**
+	 * Sets the orientation and visibility of the three buttons that toggle the
+	 * preview panel according to the current preferences settings.
+	 */
+	private void updatePreviewButtons() {
+		boolean showPreview = Pref.Bool.ShowPreview.getValue();
+		boolean previewBottom = Pref.Bool.PreviewBottom.getValue();
+		boolean bottomVisible = showPreview && previewBottom;
+		boolean rightVisible = showPreview && ! previewBottom;
+		
+		togglePreviewBottomBt.setOrientation(bottomVisible ? SWT.DOWN : SWT.UP);
+		togglePreviewRightBt.setOrientation(rightVisible ? SWT.RIGHT : SWT.LEFT);
+		togglePreviewRightBt2.setOrientation(rightVisible ? SWT.RIGHT : SWT.LEFT);
+		
+		togglePreviewRightBt.setVisible(bottomVisible);
+		((GridData) togglePreviewRightBt.getLayoutData()).exclude = ! bottomVisible;
+		((GridLayout) getLayout()).numColumns = bottomVisible ? 3 : 2;
+
+		togglePreviewRightBt2.setVisible(! bottomVisible);
+		((GridData) togglePreviewRightBt2.getLayoutData()).exclude = bottomVisible;
+		((GridLayout) searchPanelWithButtons.getLayout()).numColumns = bottomVisible ? 1 : 2;
+		
+		layout();
 	}
 	
 	/**
@@ -95,7 +196,7 @@ public class MainPanel extends Composite {
 			
 			saveWeights();
 			previewPanel.setActive(false);
-			sash.setMaximizedControl(searchPanel);
+			sash.setMaximizedControl(searchPanelWithButtons);
 		}
 		if (show != Pref.Bool.ShowPreview.getValue())
 			Pref.Bool.ShowPreview.setValue(show);

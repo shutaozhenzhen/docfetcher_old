@@ -53,6 +53,13 @@ public class UtilGUI {
 	}
 	
 	/**
+	 * Checks if the given SWT style bit contains the second SWT style bit.
+	 */
+	public static boolean contains(int styleBit, int otherStyleBit) {
+		return (styleBit & otherStyleBit) == otherStyleBit;
+	}
+	
+	/**
 	 * Places <tt>shell</tt> at the center of the shell <tt>parent</tt>, or
 	 * in the middle of the screen if <tt>parent</tt> is null. Note that the
 	 * shell size must have already been set in order to get a correct result.

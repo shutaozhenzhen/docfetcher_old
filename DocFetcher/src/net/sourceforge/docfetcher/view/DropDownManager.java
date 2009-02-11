@@ -28,6 +28,8 @@ import org.eclipse.swt.widgets.ToolItem;
  * constructed. The <tt>add</tt> method of this class can then be used to add
  * menu items to the drop-down menu.
  * 
+ * TODO This class is currently not in use.
+ * 
  * @author Tran Nam Quang
  */
 public class DropDownManager {

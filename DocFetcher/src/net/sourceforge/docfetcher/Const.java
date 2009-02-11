@@ -134,7 +134,7 @@ public class Const {
 		if (propFile.exists() && propFile.isFile()) {
 			USER_PROPERTIES_FILE = propFile;
 			INDEX_PARENT_FILE = new File("indexes"); //$NON-NLS-1$
-			MANUAL_PATH = "help"; //$NON-NLS-1$
+			MANUAL_PATH = UtilFile.join(USER_DIR, "help"); //$NON-NLS-1$
 			IS_PORTABLE = true;
 		}
 		// Installed version
@@ -146,7 +146,7 @@ public class Const {
 				appDataPath = System.getProperty("user.home") + FS + ".docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
 			USER_PROPERTIES_FILE = new File(appDataPath, USER_PROPERTIES_FILENAME);
 			INDEX_PARENT_FILE = new File(appDataPath);
-			MANUAL_PATH = IS_WINDOWS ? "help" : "/usr/share/doc/docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
+			MANUAL_PATH = IS_WINDOWS ? UtilFile.join(USER_DIR, "help") : "/usr/share/doc/docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
 			new File(appDataPath).mkdirs();
 			IS_PORTABLE = false;
 		}

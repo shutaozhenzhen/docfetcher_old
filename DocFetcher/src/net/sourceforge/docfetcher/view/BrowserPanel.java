@@ -14,8 +14,10 @@ package net.sourceforge.docfetcher.view;
 import java.io.File;
 import java.net.URI;
 
+import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Msg;
+import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
 import org.eclipse.swt.SWT;
@@ -130,8 +132,10 @@ public class BrowserPanel extends Composite {
 		launchBt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				String url = browser.getUrl();
-				if (! url.equals("")) //$NON-NLS-1$
-					Program.launch(url);
+				if (url.equals("")) return; //$NON-NLS-1$
+				Program.launch(url);
+				if (Pref.Bool.HideOnOpen.getValue())
+					DocFetcher.getInstance().toSystemTray();
 			}
 		});
 		

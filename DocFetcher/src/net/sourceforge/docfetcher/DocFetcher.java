@@ -318,6 +318,14 @@ public class DocFetcher extends ApplicationWindow {
 			}
 		});
 		
+		// Display manual when the help button is clicked
+		searchPanel.evtHelpBtClicked.add(new Event.Listener<Widget> () {
+			public void update(Widget eventData) {
+				if (previewPanel.showHelpPage())
+					Pref.Bool.ShowPreview.setValue(true);
+			}
+		});
+		
 		// Open up preferences dialog when the preferences button is clicked
 		searchPanel.evtPrefBtClicked.add(new Event.Listener<Widget> () {
 			public void update(Widget eventData) {
@@ -463,6 +471,16 @@ public class DocFetcher extends ApplicationWindow {
 	}
 
 	public boolean close() {
+		/*
+		 * If an indexing process is running in the background, ask the user
+		 * before terminating it and exiting.
+		 */
+		if (ScopeRegistry.getInstance().getCurrentJob() != null) {
+			int ans = UtilGUI.showConfirmMsg(null, Msg.force_quit.value());
+			if (ans != SWT.OK) return false;
+			ScopeRegistry.getInstance().clearQueue();
+		}
+		
 		if (clipboard != null && ! clipboard.isDisposed())
 			clipboard.dispose();
 		
