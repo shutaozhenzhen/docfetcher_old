@@ -651,6 +651,15 @@ public class ResultPanel extends Composite {
 			if (columnIndex == 0) {
 				ResultDocument result = (ResultDocument) element;
 				String extension = UtilFile.getExtension(result.getFile());
+				
+				/*
+				 * FIXME On Ubuntu 8.10 the SVG icon returned from the OS would
+				 * be too big, causing the result panel rows to expand beyond
+				 * their normal height.
+				 */
+				if (Const.IS_LINUX && extension.equals("svg")) //$NON-NLS-1$
+					return Icon.FILE.getImage();
+				
 				Program program = Program.findProgram(extension);
 				if (program == null)
 					return Icon.FILE.getImage(); // Program icon not available, return generic file icon

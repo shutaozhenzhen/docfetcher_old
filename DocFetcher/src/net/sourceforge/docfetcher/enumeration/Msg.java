@@ -71,6 +71,8 @@ public enum Msg {
 	rebuild_index,
 	remove_index,
 	remove_sel_indexes,
+	remove_orphaned_indexes,
+	remove_orphaned_indexes_msg,
 	check_toplevel_only,
 	uncheck_toplevel_only,
 	check_all,

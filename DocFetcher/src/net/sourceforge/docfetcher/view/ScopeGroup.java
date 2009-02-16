@@ -92,6 +92,7 @@ public class ScopeGroup extends GroupWrapper {
 		viewerMenu.addRootAction(new RebuildIndexAction(), null);
 		viewerMenu.addSeparator();
 		viewerMenu.addRootAction(new RemoveIndexAction(), Key.Delete);
+		viewerMenu.addUnmanagedAction(new RemoveMissingAction(), null);
 		viewerMenu.addSeparator();
 		viewerMenu.addUnmanagedAction(new CheckAllAction(true), null);
 		viewerMenu.addUnmanagedAction(new CheckAllAction(false), null);
@@ -461,6 +462,26 @@ public class ScopeGroup extends GroupWrapper {
 			int ans = UtilGUI.showConfirmMsg(null, Msg.remove_sel_indexes.value());
 			if (ans == SWT.OK)
 				ScopeRegistry.getInstance().remove(selRootScopes.toArray(new RootScope[selRootScopes.size()]));
+		}
+	}
+	
+	/**
+	 * Action to remove indexes whose folders are missing.
+	 */
+	class RemoveMissingAction extends Action {
+		public RemoveMissingAction() {
+			setText(Msg.remove_orphaned_indexes.value());
+		}
+		public void run() {
+			ScopeRegistry scopeReg = ScopeRegistry.getInstance();
+			RootScope[] rootScopes = scopeReg.getEntries();
+			if (rootScopes.length == 0) return;
+			
+			int ans = UtilGUI.showConfirmMsg(null, Msg.remove_orphaned_indexes_msg.value());
+			if (ans != SWT.OK) return;
+			for (RootScope rootScope : rootScopes)
+				if (! rootScope.getFile().exists())
+					scopeReg.remove(rootScope);
 		}
 	}
 	

@@ -18,7 +18,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.sourceforge.docfetcher.enumeration.Msg;
-
+import net.sourceforge.docfetcher.model.Document;
+import au.id.jericho.lib.html.CharacterReference;
+import au.id.jericho.lib.html.Element;
 import au.id.jericho.lib.html.Source;
 
 /**
@@ -35,6 +37,22 @@ public class SVGParser extends Parser {
 	public String getFileType() {
 		return Msg.filetype_svg.value();
 	}
+	
+	public Document parse(File file) throws ParseException {
+		try {
+			InputStream in = new FileInputStream(file);
+			Source source = new Source(in);
+			in.close();
+			source.setLogger(null);
+			String title = getElementContent(source, "dc:title"); //$NON-NLS-1$
+			String author = getElementContent(source, "dc:creator"); //$NON-NLS-1$
+			return new Document(file, title, source.getTextExtractor().toString()).addAuthor(author);
+		} catch (FileNotFoundException e) {
+			throw new ParseException(file, Msg.file_not_found.value());
+		} catch (IOException e) {
+			throw new ParseException(file, Msg.file_not_readable.value());
+		}
+	}
 
 	public String renderText(File file) throws ParseException {
 		try {
@@ -50,6 +68,15 @@ public class SVGParser extends Parser {
 		catch (IOException e) {
 			throw new ParseException(file, Msg.file_not_readable.value());
 		}
+	}
+	
+	/**
+	 * Returns the textual content inside the given HTML element from the given
+	 * HTML source. Returns null if the HTML element is not found.
+	 */
+	private String getElementContent(Source source, String elementName) {
+		Element el = source.findNextElement(0, elementName);
+		return el == null ? null : CharacterReference.decode(el.getTextExtractor().toString());
 	}
 
 }
