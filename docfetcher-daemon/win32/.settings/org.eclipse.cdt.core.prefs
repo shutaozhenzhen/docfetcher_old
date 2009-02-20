@@ -1,3 +1,0 @@
-#Sat Jan 17 09:11:09 CET 2009
-eclipse.preferences.version=1
-environment/project/cdt.managedbuild.config.gnu.mingw.exe.debug.750319800=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<environment append\="true" appendContributed\="true">\r\n<variable delimiter\=";" name\="PATH" operation\="replace" value\="c\:\\applis\\mingw\\bin"/>\r\n</environment>\r\n
