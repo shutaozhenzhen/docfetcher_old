@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.util;
 
 
+import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Msg;
 
@@ -21,10 +22,14 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
@@ -320,5 +325,49 @@ public class UtilGUI {
 	 */
 	public static boolean isCRKey (KeyEvent e){
 		return (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR);
+	}
+	
+	/**
+	 * Creates a Composite with the given parent and a custom border. This
+	 * method is used because creating a normal SWT Composite with SWT.BORDER
+	 * style results in an ugly "etched in" look on Windows when the classic
+	 * theme is used.
+	 * <p>
+	 * The additional parameter <tt>setFormLayout</tt> sets a FormLayout with
+	 * margins specifically adjusted for the custom border as the layout of the
+	 * returned Composite.
+	 */
+	public static Composite createCompositeWithBorder(Composite parent, boolean setFormLayout) {
+		// Draw custom border on Windows
+		final Composite comp = new Composite(parent, Const.IS_WINDOWS ? SWT.NONE : SWT.BORDER);
+		if (Const.IS_WINDOWS)
+			paintBorder(comp);
+		
+		// Add FormLayout with adjusted margins
+		if (setFormLayout) {
+			FormLayout formLayout = new FormLayout();
+			if (Const.IS_WINDOWS)
+				formLayout.marginWidth = formLayout.marginHeight = 2;
+			comp.setLayout(formLayout);
+		}
+		
+		return comp;
+	}
+	
+	/**
+	 * Paints a border around the given Composite. This can be used as a
+	 * replacement for the ugly native border of Composites with SWT.BORDER
+	 * style on Windows with classic theme turned on.
+	 */
+	public static void paintBorder(final Composite comp) {
+		comp.addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent e) {
+				Point size = comp.getSize();
+				e.gc.setForeground(getColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+				e.gc.drawRectangle(0, 0, size.x - 1, size.y - 1);
+				e.gc.setForeground(getColor(SWT.COLOR_WHITE));
+				e.gc.drawRectangle(1, 1, size.x - 3, size.y - 3);
+			}
+		});
 	}
 }

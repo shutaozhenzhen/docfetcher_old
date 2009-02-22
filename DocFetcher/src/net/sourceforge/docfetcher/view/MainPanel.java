@@ -44,35 +44,43 @@ public class MainPanel extends Composite {
 		super(parent, SWT.NONE);
 		setLayout(GridLayoutFactory.fillDefaults().numColumns(3).spacing(0, 0).create());
 		
+		// Button to toggle filter panel
 		int btLeftStyle = Pref.Bool.ShowFilterPanel.getValue() ? SWT.LEFT : SWT.RIGHT;
-		final ThinArrowButton toggleFilterPanelBt = new ThinArrowButton(this, btLeftStyle | SWT.BORDER);
+		final ThinArrowButton toggleFilterPanelBt = new ThinArrowButton(this, btLeftStyle);
 		toggleFilterPanelBt.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		
+		// The sash that separates the result panel from the preview panel
 		sash = new SashForm(this, Pref.Bool.PreviewBottom.getValue() ? SWT.VERTICAL : SWT.HORIZONTAL);
 		sash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
 		boolean previewBottom = Pref.Bool.PreviewBottom.getValue();
 		boolean showPreview = Pref.Bool.ShowPreview.getValue();
 		
+		// Button to toggle preview panel #1
 		int btRightStyle = showPreview && ! previewBottom ? SWT.RIGHT : SWT.LEFT;
-		togglePreviewRightBt = new ThinArrowButton(this, btRightStyle | SWT.BORDER);
+		togglePreviewRightBt = new ThinArrowButton(this, btRightStyle);
 		togglePreviewRightBt.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 2));
 		
+		// Wrapper composite
 		searchPanelWithButtons = new Composite(sash, SWT.NONE);
 		searchPanelWithButtons.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).create());
 		
+		// Panel for search results and the toolbar above it
 		searchPanel = new SearchPanel(searchPanelWithButtons);
 		searchPanel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		
+		// Button to toggle preview panel #2
 		int btRightStyle2 = showPreview && ! previewBottom ? SWT.RIGHT : SWT.LEFT;
-		togglePreviewRightBt2 = new ThinArrowButton(searchPanelWithButtons, btRightStyle2 | SWT.BORDER);
+		togglePreviewRightBt2 = new ThinArrowButton(searchPanelWithButtons, btRightStyle2);
 		togglePreviewRightBt2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 2));
 		
+		// Button to toggle preview panel #3
 		int btBottomStyle = showPreview && previewBottom ? SWT.DOWN : SWT.UP;
-		togglePreviewBottomBt = new ThinArrowButton(searchPanelWithButtons, btBottomStyle | SWT.BORDER);
+		togglePreviewBottomBt = new ThinArrowButton(searchPanelWithButtons, btBottomStyle);
 		togglePreviewBottomBt.setLayoutData(new GridData(SWT.CENTER, SWT.BOTTOM, false, false));
 		updatePreviewButtons();
 		
+		// Preview panel
 		previewPanel = new PreviewPanel(sash);
 		if (Pref.Bool.ShowPreview.getValue()) {
 			loadSashWeights();

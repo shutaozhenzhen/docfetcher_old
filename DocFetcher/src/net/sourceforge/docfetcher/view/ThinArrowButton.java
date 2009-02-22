@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.view;
 
+import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
 import org.eclipse.swt.SWT;
@@ -39,13 +40,15 @@ public class ThinArrowButton extends Canvas {
 	
 	/**
 	 * @param style
-	 *            Either SWT.LEFT, SWT.RIGHT, SWT.UP or SWT.DOWN. SWT.BORDER is
-	 *            also accepted.
+	 *            Either SWT.LEFT, SWT.RIGHT, SWT.UP or SWT.DOWN.
 	 */
 	public ThinArrowButton(Composite parent, int style) {
-		super(parent, style);
-		this.style = style;
+		super(parent, Const.IS_WINDOWS ? SWT.NONE : SWT.BORDER);
 		
+		if (Const.IS_WINDOWS)
+			UtilGUI.paintBorder(this);
+		
+		this.style = style;
 		if ((style & SWT.UP) == SWT.UP || (style & SWT.DOWN) == SWT.DOWN) {
 			int tmp = btWidth;
 			btWidth = btHeight;
