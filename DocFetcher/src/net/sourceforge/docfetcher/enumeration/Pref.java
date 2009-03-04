@@ -59,6 +59,7 @@ public class Pref {
 		HideOnOpen (true),
 		HighlightSearchTerms (true),
 		HotkeyEnabled (true),
+		CloseIndexingTabs (true),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();

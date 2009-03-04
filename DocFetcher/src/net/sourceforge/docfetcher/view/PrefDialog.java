@@ -114,6 +114,10 @@ public class PrefDialog {
 				Pref.Bool.ShowWelcomePage
 		);
 		createCheckButton(container,
+				Msg.pref_close_tabs.value(),
+				Pref.Bool.CloseIndexingTabs
+		);
+		createCheckButton(container,
 				Msg.pref_watch_fs.value(),
 				Pref.Bool.WatchFS
 		);

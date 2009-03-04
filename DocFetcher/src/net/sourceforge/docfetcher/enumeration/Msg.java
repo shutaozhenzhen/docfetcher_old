@@ -147,6 +147,7 @@ public enum Msg {
 	
 	// Preferences
 	pref_manual_on_startup,
+	pref_close_tabs,
 	pref_watch_fs,
 	pref_hide_in_systray,
 	pref_highlight,

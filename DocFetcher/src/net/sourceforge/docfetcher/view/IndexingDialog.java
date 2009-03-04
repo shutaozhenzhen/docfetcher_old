@@ -255,7 +255,7 @@ public class IndexingDialog {
 					&& !UtilList.containsIdentity(queueJobs, job)) {
 				if (!job.getScope().isFinishedWithErrors()
 						|| (!job.isAddToRegistry() && !job.isDoRebuild())) {
-					if (!tabItem.isDisposed())
+					if (!tabItem.isDisposed() && Pref.Bool.CloseIndexingTabs.getValue())
 						tabItem.dispose(); // Finished without parse errors, close it
 				} else
 					tabItem.setImage(Icon.WARNING_BIG.getImage()); // Finished with parse errors
