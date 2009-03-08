@@ -13,6 +13,7 @@ package net.sourceforge.docfetcher.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -438,6 +439,14 @@ public class ScopeRegistry implements Serializable {
 	 */
 	public void save() throws IOException {
 		Serializer.save(this, Const.INDEX_PARENT_FILE);
+		
+		// Write indexes.txt file used by the daemon
+		FileWriter writer = new FileWriter(Const.INDEX_DAEMON_FILE);
+		for (RootScope rootScope : rootScopes) {
+			writer.write(rootScope.file.getAbsolutePath());
+			writer.write(Const.LS);
+		}
+		writer.close();
 	}
 	
 	/**
