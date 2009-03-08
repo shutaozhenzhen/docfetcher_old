@@ -39,7 +39,12 @@
 <tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.421351887" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1915132166" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
 <option id="gnu.cpp.link.option.flags.1560913081" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="" valueType="string"/>
-<option id="gnu.cpp.link.option.libs.636318725" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs"/>
+<option id="gnu.cpp.link.option.libs.636318725" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+<listOptionValue builtIn="false" value="Psapi"/>
+</option>
+<option id="gnu.cpp.link.option.paths.973721489" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+<listOptionValue builtIn="false" value=""/>
+</option>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.141325270" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>
