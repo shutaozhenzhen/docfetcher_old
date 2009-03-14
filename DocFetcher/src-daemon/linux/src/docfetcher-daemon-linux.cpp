@@ -23,6 +23,11 @@ int main(){
 	if(!watcher.initialize()) {
 		log("initialize failed");
 	}
+
+	watcher.run();
+
+	log("exit");
+
 }
 
 

@@ -15,9 +15,11 @@ public:
 
 	bool initialize();
 
-	static void callback(int watchID, int action, const char* rootPath, const char* filePath);
+	void run();
 
 private:
+	void callback(int watchID, int action);
+
 	std::string _indexes_file_path;
 	const char CHAR_MODIFIED;
 

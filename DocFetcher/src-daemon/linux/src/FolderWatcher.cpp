@@ -9,13 +9,15 @@
 #include <linux/inotify.h>
 #include <errno.h>
 #include <stdio.h>
+
 #include <unistd.h>
+
+#include <sys/stat.h>
+#include <stdlib.h>
 
 #include "FolderWatcher.h"
 
 #include "inotify-syscalls.h"
-
-FolderWatcher *_this = NULL;
 
 #include "Logger.h"
 
@@ -31,7 +33,7 @@ int fd = -1;
  *
  */
 FolderWatcher::FolderWatcher():CHAR_MODIFIED('#') {
-	_this = this;
+	fd = inotify_init();
 }
 
 /**
@@ -39,7 +41,6 @@ FolderWatcher::FolderWatcher():CHAR_MODIFIED('#') {
  *
  */
 FolderWatcher::~FolderWatcher() {
-	_this = NULL;
 }
 
 /**
@@ -68,8 +69,7 @@ bool FolderWatcher::initialize() {
 
 	std::string file_name;
 	int error;
-	const long notifyFilter = 0;
-	const bool watchSubdirs = true;
+	const long notifyFilter = IN_ALL_EVENTS;
 
 	WatchedFolder aWatchedFolder;
 	aWatchedFolder._modified = false;
@@ -90,9 +90,9 @@ bool FolderWatcher::initialize() {
 			int watchId = inotify_add_watch(fd, file_name.c_str(), notifyFilter);
 
 			if(watchId == 0 ) {
-				log("error add_watch for dir=%s err=%d",line.c_str(),error);
+				log("error add_watch for dir=%s err=%d", line.c_str(), error);
 			}else{
-				log("Watch installed for directory %s",line.c_str());
+				log("Watch installed for directory %s", line.c_str());
 				aWatchedFolder._path = line;
 				_indexed_folders.insert(std::make_pair(watchId, aWatchedFolder));
 			}
@@ -111,15 +111,10 @@ bool FolderWatcher::initialize() {
  * Removes the watch and updates the indexes file
  *
  */
-void FolderWatcher::callback(int watchID, int action, const char* rootPath, const char* filePath) {
-	log("callback : watchID=%d,action=%d,rootPath=%ls,filePath=%ls",watchID,action,rootPath,filePath);
+void FolderWatcher::callback(int watchID, int action) {
+	log("callback : watchID=%d,action=%d", watchID, action);
 
-	if(_this == NULL) {
-		log("_this == NULL ???");
-		return;
-	}
-
-	if(_this->_indexed_folders.find(watchID) == _this->_indexed_folders.end()) {
+	if(_indexed_folders.find(watchID) == _indexed_folders.end()) {
 		log("id unknown ???");
 		return;
 	}
@@ -127,16 +122,16 @@ void FolderWatcher::callback(int watchID, int action, const char* rootPath, cons
 	// impossible to remove here,
 	inotify_rm_watch(fd, watchID);
 
-	if(_this->_indexed_folders[watchID]._modified == true){
+	if(_indexed_folders[watchID]._modified == true){
 		log("already done...");
 		return;
 
 	}
 
 
-	_this->_indexed_folders[watchID]._modified = true;
+	_indexed_folders[watchID]._modified = true;
 
-	if(!_this->updateIndexesFile()){
+	if(!updateIndexesFile()){
 		log("updateIndexesFile failed");
 		return;
 	}
@@ -145,6 +140,37 @@ void FolderWatcher::callback(int watchID, int action, const char* rootPath, cons
 
 bool FolderWatcher::getIndexesFile() {
 
+	// Portable version -> the file ./indexes/indexes.txt exists
+	struct stat st;
+
+	char * wd = getcwd(NULL, 0);
+	std::string portable_path = wd;
+	free(wd);
+
+	portable_path += "/indexes/indexes.txt";
+
+
+	if(stat(portable_path.c_str(), &st) == 0) {
+		_indexes_file_path = portable_path;
+		log("Portable version");
+		return true;
+	}else{
+		log("NOT portable version, file %s not found.", portable_path.c_str());
+	}
+
+
+
+	// Normal : indexes.txt is in HOME/.docfetcher/
+
+	std::string normal_path = getenv("HOME");
+	normal_path += "/.docfetcher/indexes.txt";
+	if(stat(normal_path.c_str(), &st) == 0) {
+		_indexes_file_path = normal_path;
+		log("Normal version");
+		return true;
+	}else{
+		log("File %s not found.", normal_path.c_str());
+	}
 
 
 	return false;
@@ -177,21 +203,15 @@ bool FolderWatcher::updateIndexesFile() {
 
 	if(bAllFoldersModified) {
 		log("asking to quit");
-
-//		::PostMessage(_hwndMain,WM_DESTROY,0,0);
+		exit(0);
 	}
 
 	return true;
 }
 
 
-int runLoop()
+void FolderWatcher::run()
 {
-	if (fd == -1)
-	{
-		return 1;
-	}
-
 	static int BUF_LEN = 4096;
     char buf[BUF_LEN];
     int len, i = 0;
@@ -203,17 +223,11 @@ int runLoop()
 	    while (i < len)
 	    {
 	        struct inotify_event *event = (struct inotify_event *) &buf[i];
-	       	_this->callback(event->wd, event->mask, event->name, event->name);
+	       	callback(event->wd, event->mask);
 
 	        i += sizeof (struct inotify_event) + event->len;
 	    }
 	    i=0;
 	}
-
-
-	return 0;
 }
 
-void dispatch(struct inotify_event *event)
-{
-}
