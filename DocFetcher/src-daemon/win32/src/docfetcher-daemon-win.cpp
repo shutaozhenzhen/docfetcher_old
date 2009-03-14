@@ -41,9 +41,6 @@ Win32FSHook *_win32FSHook;
  */
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 bool InitInstance();
-bool isDocFectcherRunning();
-BOOL CALLBACK FindDocFetcherWindow( HWND hwnd, LPARAM lParam ) ;
-bool isDocFetcherProcess(DWORD pid);
 
 /**
  * Entry point
@@ -82,11 +79,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	if(::CreateMutex(NULL, TRUE, mutex_name) == NULL) {
 		log("cannot create unicity mutex");
-		return 1;
-	}
-
-	if(isDocFectcherRunning()) {
-		log("DocFectcher is running !");
 		return 1;
 	}
 
@@ -187,78 +179,4 @@ bool InitInstance() {
 	return true;
 }
 
-/**
- * Searchs all windows, and finds Docfetcher's
- *
- *
- */
-bool isDocFectcherRunning() {
-    // Get the list of process identifiers.
-
-    DWORD aProcesses[10024], cbNeeded, cProcesses;
-    unsigned int i;
-
-    log("before enum");
-    if ( !::EnumProcesses( aProcesses, sizeof(aProcesses), &cbNeeded ) )
-        return false;
-
-    log("after enum");
-    // Calculate how many process identifiers were returned.
-
-    cProcesses = cbNeeded / sizeof(DWORD);
-
-    // Print the name and process identifier for each process.
-
-    for ( i = 0; i < cProcesses; i++ ){
-        if( aProcesses[i] != 0 ){
-        	if(isDocFetcherProcess( aProcesses[i] )){
-        		return true;
-        	}
-
-        }
-    }
-    return false;
-
-
-//	bool docfethcer_running_is = false;
-//
-//    ::EnumWindows((WNDENUMPROC)FindDocFetcherWindow, (LPARAM) &docfethcer_running_is) ;
-//	return docfethcer_running_is;
-}
-
-bool isDocFetcherProcess(DWORD pid) {
-    // Get a handle to the process.
-
-    HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION |
-                                   PROCESS_VM_READ,
-                                   FALSE, pid );
-
-    TCHAR path[MAX_PATH+1] = {0};
-	::GetModuleFileNameEx(hProcess, NULL, path, MAX_PATH);
-	log(path);
-	return false;
-}
-
-
-
-/**
- * Callback passed to EnumWindows
- *
- * lParam contains a pointer to a boolean, to be set if Docfetcher window is found
- *
- */
-BOOL CALLBACK FindDocFetcherWindow( HWND hwnd, LPARAM lParam ){
-	TCHAR title [MAX_PATH];
-
-	::GetWindowText(hwnd, title, MAX_PATH);
-
-	if(_tcscmp(title, "DocFetcher") == 0) {
-		bool *docfethcer_running_is = (bool*)lParam;
-		*docfethcer_running_is = true;
-		return FALSE;
-	}else{
-		// continue searching
-		return TRUE ;
-	}
-}
 

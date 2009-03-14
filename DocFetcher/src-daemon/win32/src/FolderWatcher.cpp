@@ -59,7 +59,7 @@ FolderWatcher::~FolderWatcher() {
 }
 
 /**
- * Initializtion, called at the beginning
+ * Initialization, called at the beginning
  *
  * initializes the map of indexed folders and adds the watches
  *
@@ -169,6 +169,23 @@ void FolderWatcher::callback(int watchID, int action, const WCHAR* rootPath, con
 
 bool FolderWatcher::getIndexesFile() {
 
+	// Portable version -> the file ./indexes/indexes.txt exists
+	TCHAR current_path [MAX_PATH] = {0};
+	::GetCurrentDirectory(MAX_PATH, current_path);
+	std::string portable_path = current_path;
+
+	portable_path += "\\indexes\\indexes.txt";
+
+	std::ifstream ifs(portable_path.c_str());
+	if(ifs) {
+		_indexes_file_path = portable_path;
+		log("Portable version");
+		return true;
+	}else{
+		log("NOT portable version, file %s not found.", portable_path.c_str());
+	}
+
+
 
 	TCHAR szPath[MAX_PATH];
 
@@ -176,6 +193,15 @@ bool FolderWatcher::getIndexesFile() {
 	{
 		_indexes_file_path = szPath;
 		_indexes_file_path += "\\DocFetcher\\indexes.txt";
+
+		std::ifstream ifs(_indexes_file_path.c_str());
+		if(ifs) {
+			log("Normal version, file %s found.", _indexes_file_path.c_str());
+			return true;
+		}else{
+			log("File %s not found.", _indexes_file_path.c_str());
+		}
+
 		return true;
 	}
 
