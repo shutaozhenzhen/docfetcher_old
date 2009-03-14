@@ -11,7 +11,10 @@
 
 package net.sourceforge.docfetcher;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +24,7 @@ import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.model.Job;
 import net.sourceforge.docfetcher.model.ResultDocument;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.model.Scope;
@@ -142,7 +146,7 @@ public class DocFetcher extends ApplicationWindow {
 				shell.setText((count == 0 ? "" : prefix) + DocFetcher.appName); //$NON-NLS-1$
 			}
 		});
-		
+	
 		folderWatcher = new FolderWatcher(); // must be done after loading the Prefs
 	}
 	
@@ -452,6 +456,41 @@ public class DocFetcher extends ApplicationWindow {
 		});
 		hotkeyHandler.registerHotkey();
 
+		
+		/*
+		 * Check if daemon has detected changes in the indexed folders.
+		 * For each change, launches an update
+		 */
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(Const.INDEX_DAEMON_FILE));
+			String line;
+			while((line = in.readLine()) != null){
+				// comment line
+				if(line.length() >= 2 && line.substring(0, 1).equals("//")) 
+					continue;
+				
+				// changed file
+				if(line.length() > 1 && line.charAt(0) == '#'){
+					String folder_changed = line.substring(1);
+					RootScope rs = scopeReg.getEntryFromDirectory(new File(folder_changed));
+
+					if(rs==null){
+						// directory unknown ???
+						continue;
+					}
+
+					// update index
+					indexingDialog.addJob(new Job(rs, false, false));
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+
+		
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
 		 * main) so developers can see a stacktrace in the Eclipse console if

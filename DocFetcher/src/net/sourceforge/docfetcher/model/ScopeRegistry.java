@@ -214,7 +214,18 @@ public class ScopeRegistry implements Serializable {
 		}
 		return false;
 	}
-	
+
+	/**
+	 * Returns the rootScope for a given directory
+	 */
+	public RootScope getEntryFromDirectory(File directory) {
+		for (RootScope rootScope : rootScopes) {
+			if (rootScope.file.equals(directory))
+				return rootScope;
+		}
+		return null;
+	}
+
 	/**
 	 * Returns whether the given <tt>RootScope</tt> is already registered
 	 * herein.
