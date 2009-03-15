@@ -7,6 +7,7 @@
  *
  * Contributors:
  *    Tran Nam Quang - initial API and implementation
+ *    Tonio Rush - interaction with the daemon
  *******************************************************************************/
 
 package net.sourceforge.docfetcher;
@@ -77,6 +78,7 @@ import org.eclipse.swt.widgets.Widget;
  * The main application window.
  * 
  * @author Tran Nam Quang
+ * @author Tonio Rush
  */
 public class DocFetcher extends ApplicationWindow {
 	
@@ -455,16 +457,16 @@ public class DocFetcher extends ApplicationWindow {
 			}
 		});
 		hotkeyHandler.registerHotkey();
-
 		
 		/*
 		 * Check if daemon has detected changes in the indexed folders.
 		 * For each change, launches an update
 		 */
+		BufferedReader reader = null;
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(Const.INDEX_DAEMON_FILE));
+			reader = new BufferedReader(new FileReader(Const.INDEX_DAEMON_FILE));
 			String line;
-			while((line = in.readLine()) != null){
+			while((line = reader.readLine()) != null){
 				// comment line
 				if(line.length() >= 2 && line.substring(0, 1).equals("//")) //$NON-NLS-1$
 					continue;
@@ -487,10 +489,14 @@ public class DocFetcher extends ApplicationWindow {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
 
-		
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
 		 * main) so developers can see a stacktrace in the Eclipse console if

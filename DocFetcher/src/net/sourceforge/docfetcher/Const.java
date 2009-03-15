@@ -23,6 +23,7 @@ import net.sourceforge.docfetcher.util.UtilFile;
  * A collection of system-wide constants.
  * 
  * @author Tran Nam Quang
+ * @author Tonio Rush
  */
 public class Const {
 	
