@@ -146,7 +146,7 @@ public class ScopeRegistry implements Serializable {
 	}
 	
 	/**
-	 * Checks whether the given <tt>RootScope</tt> intersect with registered
+	 * Checks whether the given <tt>RootScope</tt>s intersect with registered
 	 * entries or entries in the indexing queue. If so, a string containing a
 	 * warning message is returned, which can be used for display in a message
 	 * box. Otherwise, null is returned.
@@ -262,7 +262,7 @@ public class ScopeRegistry implements Serializable {
 	/**
 	 * Adds a new indexing job to the queue. It does not check for intersection
 	 * with registered entries or entries in the queue. If the indexing box is
-	 * visible, the appropriate method in the <tt>IndexingBox</tt> class
+	 * visible, the appropriate method in the <tt>IndexingDialog</tt> class
 	 * should be used istead.
 	 */
 	public void addJob(Job newJob) {
@@ -380,7 +380,7 @@ public class ScopeRegistry implements Serializable {
 	 * terminated and processing of the next entry will start.
 	 * <p>
 	 * If the indexing box is open, the appropriate method in the
-	 * <tt>IndexingBox</tt> should be used instead.
+	 * <tt>IndexingDialog</tt> should be used instead.
 	 */
 	public void removeFromQueue(Job job) {
 		// Remove entries from queue
@@ -406,8 +406,8 @@ public class ScopeRegistry implements Serializable {
 	}
 	
 	/**
-	 * Removes all entries from the indexing queue. If the indexing box is open
-	 * the appropriate method in the <tt>IndexingBox</tt> should be used
+	 * Removes all entries from the indexing queue. If the indexing box is open,
+	 * the appropriate method in the <tt>IndexingDialog</tt> should be used
 	 * instead.
 	 */
 	public void clearQueue() {

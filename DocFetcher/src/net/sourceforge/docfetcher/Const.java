@@ -140,7 +140,7 @@ public class Const {
 			USER_PROPERTIES_FILE = propFile;
 			INDEX_PARENT_FILE = new File("indexes"); //$NON-NLS-1$
 			MANUAL_PATH = UtilFile.join(USER_DIR, "help"); //$NON-NLS-1$
-			INDEX_DAEMON_FILE = new File("indexes" + FS + "indexes.txt");
+			INDEX_DAEMON_FILE = new File("indexes" + FS + "indexes.txt"); //$NON-NLS-1$ //$NON-NLS-2$
 			IS_PORTABLE = true;
 		}
 		// Installed version
@@ -153,7 +153,7 @@ public class Const {
 			USER_PROPERTIES_FILE = new File(appDataPath, USER_PROPERTIES_FILENAME);
 			INDEX_PARENT_FILE = new File(appDataPath);
 			MANUAL_PATH = IS_WINDOWS ? UtilFile.join(USER_DIR, "help") : "/usr/share/doc/docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
-			INDEX_DAEMON_FILE = new File(appDataPath + FS + "indexes.txt");
+			INDEX_DAEMON_FILE = new File(appDataPath + FS + "indexes.txt"); //$NON-NLS-1$
 			new File(appDataPath).mkdirs();
 			IS_PORTABLE = false;
 		}

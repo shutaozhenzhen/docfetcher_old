@@ -330,7 +330,7 @@ public class RootScope extends Scope {
 			separateChildrenHTMLUnpaired(scope, subFiles, subDirs, subHTMLPairs);
 		
 		/*
-		 * The regex-based file exclusion must be applied after the HTML pairing.
+		 * The regex-based file exclusion must be applied *after* the HTML pairing.
 		 */
 
 		// Process normal files in the current directory

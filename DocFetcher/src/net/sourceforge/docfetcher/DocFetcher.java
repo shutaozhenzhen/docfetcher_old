@@ -466,7 +466,7 @@ public class DocFetcher extends ApplicationWindow {
 			String line;
 			while((line = in.readLine()) != null){
 				// comment line
-				if(line.length() >= 2 && line.substring(0, 1).equals("//")) 
+				if(line.length() >= 2 && line.substring(0, 1).equals("//")) //$NON-NLS-1$
 					continue;
 				
 				// changed file
