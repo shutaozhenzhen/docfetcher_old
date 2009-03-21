@@ -12,6 +12,7 @@
 #include "windows.h"
 #include "TCHAR.h"
 
+#include <process.h>
 #include <psapi.h>
 
 #include "jnotify_win32/Logger.h"
@@ -34,6 +35,7 @@ extern bool dbg;
 HINSTANCE _hInstance;
 HWND _hwndMain;
 Win32FSHook *_win32FSHook;
+FolderWatcher _folderWatcher;
 
 /**
  * This module functions
@@ -41,6 +43,8 @@ Win32FSHook *_win32FSHook;
  */
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 bool InitInstance();
+void watchLockFile(void *);
+bool isUniqueInstance();
 
 /**
  * Entry point
@@ -62,52 +66,87 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		return 1;
 	}
 
-	// Check if this is the only instance
-	// It is done by creating a mutex with the daemon exe's full path
-	// to distinguish various installations of Docfetcher
-	TCHAR mutex_name [MAX_PATH] = {0};
-	::GetModuleFileName(NULL, mutex_name, MAX_PATH);
-
-	// replace \ by _
-	for(TCHAR* ch = mutex_name; *ch != _T('\0'); ++ch)
-		if(*ch == _T('\\')) *ch = _T('_');
-
-	if(::OpenMutex(MUTEX_ALL_ACCESS, FALSE, mutex_name) != NULL) {
-		log("a daemon is already running");
-		return 1;
-	}
-
-	if(::CreateMutex(NULL, TRUE, mutex_name) == NULL) {
-		log("cannot create unicity mutex");
-		return 1;
-	}
-
 	// JNotify_win32 traces
 	dbg = false;
+
+	if(!isUniqueInstance()) {
+		log("another instance is running...");
+		return 1;
+	}
+
+	// find indexes.txt file
+	if(!_folderWatcher.findIndexesFile()) {
+		log("Cannot get indexes file.");
+		return 1;
+	}
+
 	_win32FSHook = new Win32FSHook();
 	_win32FSHook->init(NULL);
 
+    HANDLE lockThread = (HANDLE)_beginthread(watchLockFile, 0, NULL);
 
-	FolderWatcher watcher;
-
-	if (!watcher.initialize()) {
-		log("Initialization failed. Exit.");
-		return 1;
-	}
-
-	MSG msg;
 
 	// Main message loop:
+	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
 
 	log("docfetcher-daemon-win exiting...");
-
+	delete _win32FSHook;
 	return 0;
 }
 
+void watchLockFile(void *){
+	std::string lock_file = _folderWatcher.getLockFile();
+	log("lock file : %s", lock_file.c_str());
+	bool watching = false;
+	for(;;){
+		::DeleteFile(lock_file.c_str());
+		if(GetLastError() == ERROR_SHARING_VIOLATION){
+			if(watching) {
+				log("stopWatch");
+				_folderWatcher.stopWatch();
+				watching = false;
+			}
+		}else{
+			if(!watching) {
+				log("startWatch");
+				_folderWatcher.startWatch();
+				watching = true;
+			}
+		}
+		Sleep(2000);
+	}
+}
+
+/**
+ * Check if this is the only instance
+ * It is done by creating a mutex with the daemon exe's full path
+ * to distinguish various installations of Docfetcher
+ *
+ */
+bool isUniqueInstance(){
+	TCHAR mutex_name [MAX_PATH] = {0};
+	::GetModuleFileName(NULL, mutex_name, MAX_PATH);
+
+	// replace "\" by "_"
+	for(TCHAR* ch = mutex_name; *ch != _T('\0'); ++ch)
+		if(*ch == _T('\\')) *ch = _T('_');
+
+	if(::OpenMutex(MUTEX_ALL_ACCESS, FALSE, mutex_name) != NULL) {
+		log("a daemon is already running");
+		return false;
+	}
+
+	if(::CreateMutex(NULL, TRUE, mutex_name) == NULL) {
+		log("cannot create unicity mutex");
+		return false;
+	}
+
+	return true;
+}
 /**
  * Messages received by the window
  * 	WM_DESTROY

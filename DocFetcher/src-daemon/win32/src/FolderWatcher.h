@@ -28,7 +28,12 @@ public:
 	FolderWatcher();
 	virtual ~FolderWatcher();
 
-	bool initialize();
+	bool findIndexesFile();
+
+	std::string FolderWatcher::getLockFile();
+
+	bool startWatch();
+	bool stopWatch();
 
 private:
 	std::string _indexes_file_path;
@@ -36,7 +41,6 @@ private:
 
 	static void callback(int watchID, int action, const WCHAR* rootPath, const WCHAR* filePath);
 
-	bool getIndexesFile();
 	bool updateIndexesFile();
 
 	folders_container_type _indexed_folders;

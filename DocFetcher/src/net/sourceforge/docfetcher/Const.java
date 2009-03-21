@@ -12,6 +12,8 @@
 package net.sourceforge.docfetcher;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -117,6 +119,11 @@ public class Const {
 	public static final File INDEX_DAEMON_FILE;
 
 	/**
+	 * The file let opened to let know DocFetcher is running 
+	 */
+	private static FileOutputStream DAEMON_LOCK;
+
+	/**
 	 * The current working directory.
 	 */
 	public static final File PROGRAM_FOLDER = new File("").getAbsoluteFile(); //$NON-NLS-1$
@@ -135,7 +142,6 @@ public class Const {
 	 */
 	static {
 		File propFile = new File(USER_PROPERTIES_FILENAME);
-		
 		// Portable version
 		if (propFile.exists() && propFile.isFile()) {
 			USER_PROPERTIES_FILE = propFile;
@@ -157,6 +163,18 @@ public class Const {
 			INDEX_DAEMON_FILE = new File(appDataPath + FS + "indexes.txt"); //$NON-NLS-1$
 			new File(appDataPath).mkdirs();
 			IS_PORTABLE = false;
+		}
+
+		// the lock file 
+		String daemon_lock_file_path;
+		daemon_lock_file_path = INDEX_DAEMON_FILE.getAbsolutePath() + ".lock"; //$NON-NLS-1$ 
+
+		// Open the lock file for writing, all DocFetcher's life
+		try {
+			DAEMON_LOCK = new FileOutputStream(daemon_lock_file_path);
+		} catch (FileNotFoundException e) {
+			// This can occure if to instances or running, or someone is using the file
+			e.printStackTrace();
 		}
 	}
 	

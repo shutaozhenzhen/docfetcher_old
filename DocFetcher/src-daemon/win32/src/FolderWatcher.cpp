@@ -64,16 +64,9 @@ FolderWatcher::~FolderWatcher() {
  * initializes the map of indexed folders and adds the watches
  *
  */
-bool FolderWatcher::initialize() {
-
-	// find indexes.txt file
-	if(!getIndexesFile()) {
-		log("Cannot get indexes file.");
-		return false;
-	}
+bool FolderWatcher::startWatch() {
 
 	// read file
-
 	std::string line;
 	std::ifstream in (_indexes_file_path.c_str());
 
@@ -84,7 +77,23 @@ bool FolderWatcher::initialize() {
 
 	WCHAR  file_name [MB_CUR_MAX];
 	DWORD error;
-	const long notifyFilter = FILE_NOTIFY_CHANGE_LAST_WRITE;
+
+	const long notifyFilter =
+		FILE_NOTIFY_CHANGE_FILE_NAME         //  A file has been added, deleted, or renamed in this directory.
+		| FILE_NOTIFY_CHANGE_DIR_NAME        //  A subdirectory has been created, removed, or renamed.
+		| FILE_NOTIFY_CHANGE_NAME            //  This directory's name has changed.
+//		| FILE_NOTIFY_CHANGE_ATTRIBUTES      //  The value of an attribute of this file, such as last access time, has changed.
+		| FILE_NOTIFY_CHANGE_SIZE            //  This file's size has changed.
+		| FILE_NOTIFY_CHANGE_LAST_WRITE      //  This file's last modification time has changed.
+//		| FILE_NOTIFY_CHANGE_LAST_ACCESS     //  This file's last access time has changed.
+//		| FILE_NOTIFY_CHANGE_CREATION        //  This file's creation time has changed.
+//		| FILE_NOTIFY_CHANGE_EA              //  This file's extended attributes have been modified.
+//		| FILE_NOTIFY_CHANGE_SECURITY        //  This file's security information has changed.
+//		| FILE_NOTIFY_CHANGE_STREAM_NAME     //  A file stream has been added, deleted, or renamed in this directory.
+//		| FILE_NOTIFY_CHANGE_STREAM_SIZE     //  This file stream's size has changed.
+//		| FILE_NOTIFY_CHANGE_STREAM_WRITE    //  This file stream's data has changed.
+	;
+
 	const bool watchSubdirs = true;
 
 	WatchedFolder aWatchedFolder;
@@ -109,7 +118,7 @@ bool FolderWatcher::initialize() {
 			// null terminated string
 			file_name[count_chars] = 0;
 
-			int watchId = _win32FSHook->add_watch((const WCHAR *)file_name,notifyFilter,watchSubdirs,error,&callback);
+			int watchId = _win32FSHook->add_watch((const WCHAR *)file_name, notifyFilter, watchSubdirs, error, &callback);
 			if(watchId == 0 ) {
 				log("error add_watch for dir=%s err=%d",line.c_str(),error);
 			}else{
@@ -123,9 +132,21 @@ bool FolderWatcher::initialize() {
 	}
 
 	return (_indexed_folders.size() > 0);
-
 }
 
+
+/**
+ * Remove all watches
+ *
+ */
+bool FolderWatcher::stopWatch() {
+	folders_container_type::const_iterator itFolder;
+	for(itFolder = _indexed_folders.begin() ; itFolder != _indexed_folders.end() ; ++itFolder) {
+		::PostMessage(_hwndMain, WM_REMOVE_WATCH, 0, itFolder->first);
+	}
+	_indexed_folders.clear();
+	return true;
+}
 /**
  * Watches' callback
  *
@@ -146,17 +167,14 @@ void FolderWatcher::callback(int watchID, int action, const WCHAR* rootPath, con
 		return;
 	}
 
-	// impossible to remove here,
-	::PostMessageW(_hwndMain, WM_REMOVE_WATCH, 0, watchID);
-
-//	_win32FSHook->remove_watch(watchID);
+	// impossible to remove here, we tell the main thread to do it
+	::PostMessage(_hwndMain, WM_REMOVE_WATCH, 0, watchID);
 
 	if(_this->_indexed_folders[watchID]._modified == true){
 		log("already done...");
 		return;
 
 	}
-
 
 	_this->_indexed_folders[watchID]._modified = true;
 
@@ -167,7 +185,11 @@ void FolderWatcher::callback(int watchID, int action, const WCHAR* rootPath, con
 
 }
 
-bool FolderWatcher::getIndexesFile() {
+std::string FolderWatcher::getLockFile() {
+	return _indexes_file_path + ".lock";
+}
+
+bool FolderWatcher::findIndexesFile() {
 
 	// Portable version -> the file ./indexes/indexes.txt exists
 	TCHAR current_path [MAX_PATH] = {0};
@@ -234,9 +256,8 @@ bool FolderWatcher::updateIndexesFile() {
 	}
 
 	if(bAllFoldersModified) {
-		log("asking to quit");
-
-		::PostMessage(_hwndMain,WM_DESTROY,0,0);
+		log("nothing to do");
+//		::PostMessage(_hwndMain,WM_DESTROY,0,0);
 	}
 
 	return true;
