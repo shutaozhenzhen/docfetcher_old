@@ -28,7 +28,7 @@ import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilFile;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -43,26 +43,18 @@ import org.apache.lucene.index.IndexWriter.MaxFieldLength;
  */
 public class RootScope extends Scope {
 	
-	static final long serialVersionUID = 1;
+	static final long serialVersionUID = 2;
 	
-	/**
-	 * The Lucene Analyzer used.
-	 */
-	public static final Analyzer analyzer = new StandardAnalyzer(new String[0]);
+	/** The Lucene Analyzer used. */
+	public static final Analyzer analyzer = new SimpleAnalyzer();
 	
-	/**
-	 * The Lucene IndexWriter used.
-	 */
+	/** The Lucene IndexWriter used. */
 	private transient IndexWriter writer;
 	
-	/**
-	 * The Lucene IndexReader used.
-	 */
+	/** The Lucene IndexReader used. */
 	private transient IndexReader reader;
 	
-	/**
-	 * The directory in which the index files for this RootScope are stored.
-	 */
+	/** The directory in which the index files for this RootScope are stored. */
 	private File indexDir;
 	
 	/**
@@ -79,14 +71,17 @@ public class RootScope extends Scope {
 	
 	private String[] exclusionFilters = Pref.Str.ExclusionFilter.getValue().split("\\s*\\$+\\s*"); //$NON-NLS-1$
 	
+	/** The parse errors that occurred during indexing */
 	private List<ParseException> parseExceptions = new ArrayList<ParseException> ();
 	
-	/**
-	 * Duration of the parse process in milliseconds.
-	 */
+	/** Duration of the parse process in milliseconds. */
 	private long parseTime = -1;
 	
+	/** Whether any errors occurred during indexing */
 	private boolean finishedWithErrors = false;
+	
+	/** Whether this object and its indexes should be deleted on program termination */
+	private boolean deleteOnExit = false;
 
 	/**
 	 * Creates an instance of this class that represents the given file, which
@@ -120,7 +115,7 @@ public class RootScope extends Scope {
 	 *             if the directory represented by this class does not exist
 	 *             anymore.
 	 */
-	void updateIndex() throws FileNotFoundException {
+	void updateIndex() throws FileNotFoundException, IOException {
 		if (! file.exists()) {
 			setFinishedWithErrors(true);
 			throw new FileNotFoundException(file.getAbsolutePath());
@@ -186,8 +181,6 @@ public class RootScope extends Scope {
 				indexNewFiles(this);
 				writer.optimize();
 			}
-		} catch (IOException e) {
-			// Ignore
 		} finally {
 			ParserRegistry.resetExtensions();
 			if (writer != null) {
@@ -511,7 +504,7 @@ public class RootScope extends Scope {
 	 *             if the directory represented by this class does not exist
 	 *             anymore.
 	 */
-	void reindex() throws FileNotFoundException {
+	void reindex() throws FileNotFoundException, IOException {
 		UtilFile.delete(indexDir, false);
 		subFiles.clear();
 		subScopes.clear();
@@ -596,6 +589,14 @@ public class RootScope extends Scope {
 		this.finishedWithErrors = finishedWithErrors || ! parseExceptions.isEmpty();
 	}
 	
+	public boolean isDeleteOnExit() {
+		return deleteOnExit;
+	}
+
+	public void setDeleteOnExit(boolean deleteOnExit) {
+		this.deleteOnExit = deleteOnExit;
+	}
+
 	/**
 	 * Returns all documents under the given <tt>Scope</tt>s.
 	 */
@@ -617,9 +618,11 @@ public class RootScope extends Scope {
 				rootScopeDocs[i] = new ResultDocument(multiReader.document(i), 0);
 			multiReader.close();
 			
-			// From the documents of the previous step,
-			// filter out those that aren't inside the given scopes,
-			// and return the remaining documents.
+			/*
+			 * From the documents of the previous step, filter out those that
+			 * aren't inside the given scopes, and return the remaining
+			 * documents.
+			 */
 			Set<ResultDocument> scopeDocs = new HashSet<ResultDocument> ();
 			for (ResultDocument rootScopeDoc : rootScopeDocs)
 				for (Scope scope : scopes)
@@ -634,6 +637,21 @@ public class RootScope extends Scope {
 			e.printStackTrace();
 		}
 		return new ResultDocument[0];
+	}
+	
+	/**
+	 * Special comparison function: RootScopes where deleteOnExit is true always
+	 * go first.
+	 */
+	public int compareTo(Indexable o) {
+		if (! (o instanceof RootScope))
+			return super.compareTo(o);
+		RootScope oRootScope = (RootScope) o;
+		if (deleteOnExit && ! oRootScope.deleteOnExit)
+			return -1;
+		else if (! deleteOnExit && oRootScope.deleteOnExit)
+			return 1;
+		return super.compareTo(o);
 	}
 
 }

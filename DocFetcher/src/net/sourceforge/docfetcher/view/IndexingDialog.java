@@ -60,6 +60,9 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public class IndexingDialog {
  
+	/** Fired after the indexing dialog is closed. */
+	public final Event<IndexingDialog> evtClosed = new Event<IndexingDialog> ();
+	
 	private Shell shell;
 	private CTabFolder tabFolder;
 	private ToolItem addButton;
@@ -175,6 +178,9 @@ public class IndexingDialog {
 	/**
 	 * Adds the given job the indexing queue. Does nothing if the given job
 	 * intersects with registered entries or entries in the indexing queue.
+	 * <p>
+	 * Note: This does not make the indexing dialog visible. An additional call
+	 * to IndexingDialog.open() is needed for that.
 	 */
 	public void addJob(Job newJob) {
 		ScopeRegistry scopeReg = ScopeRegistry.getInstance();
@@ -384,6 +390,7 @@ public class IndexingDialog {
 	 */
 	public void close() {
 		shell.setVisible(false);
+		evtClosed.fireUpdate(this);
 	}
 
 	/**

@@ -362,11 +362,11 @@ public class PreviewPanel extends Composite {
 				textViewer.setFont(previewFont);
 		}
 		
-		textViewer.setText(Msg.loading.value());
+		textViewer.setText(Msg.loading.value()); // display loading message
 		
-		new Thread() {
+		new Thread() { // run in a thread because parsing the file takes some time
 			public void run() {
-				String text;
+				String text; // the raw text extracted from the file
 				try {
 					text = parser.renderText(file);
 				} catch (ParseException e) {
@@ -383,7 +383,7 @@ public class PreviewPanel extends Composite {
 				if (PreviewPanel.this.file != file)
 					return; // Another preview request had been started while we were parsing
 				
-				// Apply character limit
+				// Create the message that will displayed when the character limit is reached
 				int maxLength = Pref.Int.PreviewLimit.getValue();
 				final String msg = "...\n\n\n[" //$NON-NLS-1$
 					+ Msg.preview_limit_hint.format(new Object[] {
@@ -396,7 +396,7 @@ public class PreviewPanel extends Composite {
 					text = text.substring(0, maxLength - msg.length());
 				final String fText = text;
 				
-				// Create StyleRange ranges for search term highlighting
+				// Create StyleRange ranges (i.e. start-end integer pairs) for search term highlighting
 				ranges = new int[0];
 				if (terms.length != 0) { // Only tokenize preview text if there are tokens to highlight
 					List<Integer> rangesList = new ArrayList<Integer> ();
@@ -404,6 +404,13 @@ public class PreviewPanel extends Composite {
 					TokenStream tokenStream = analyzer.tokenStream("", new StringReader(text)); //$NON-NLS-1$
 					Token token = new Token();
 					try {
+						/*
+						 * Read one token after another from the token stream.
+						 * If a token is in the set of words to be highlighted,
+						 * create an (int, int) pair to remember the start and
+						 * length of the token, then put the integer pair into a
+						 * list.
+						 */
 						while ((token = tokenStream.next(token)) != null) {
 							int start = token.startOffset();
 							int end = token.endOffset();
@@ -415,18 +422,20 @@ public class PreviewPanel extends Composite {
 					} catch (IOException e) {
 						// We can do without the search term highlighting
 					}
+					// List to array (will be used by the method 'setHighlighting(..)')
 					ranges = new int[rangesList.size()];
 					for (int i = 0; i < ranges.length; i++)
 						ranges[i] = rangesList.get(i);
 				}
 				
+				// Parsing and tokenizing done; display the results
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						textViewer.setText(fText);
 						setHighlighting(Pref.Bool.HighlightSearchTerms.getValue());
 						occurrenceCounter.setText(Integer.toString(ranges.length / 2));
 						if (exceeded)
-							textViewer.append(msg);
+							textViewer.append(msg); // character limit exceeded, append hint
 					}
 				});
 			}
@@ -448,7 +457,7 @@ public class PreviewPanel extends Composite {
 				col = highlightColor;
 			}
 			else {
-				col = textViewer.getBackground();
+				col = textViewer.getBackground(); // no highlighting
 			}
 			StyleRange style = new StyleRange(0, 0, null, col);
 			StyleRange[] styles = new StyleRange[ranges.length / 2];

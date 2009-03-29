@@ -74,6 +74,11 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.swt.widgets.Widget;
 
+import ca.beq.util.win32.registry.RegistryException;
+import ca.beq.util.win32.registry.RegistryKey;
+import ca.beq.util.win32.registry.RegistryValue;
+import ca.beq.util.win32.registry.RootKey;
+
 /**
  * The main application window.
  * 
@@ -83,6 +88,7 @@ import org.eclipse.swt.widgets.Widget;
 public class DocFetcher extends ApplicationWindow {
 	
 	private static DocFetcher docFetcher;
+	private static String[] startParams;
 	private HotkeyHandler hotkeyHandler;
 	private ExceptionHandler exceptionHandler;
 	public static String appName;
@@ -104,6 +110,39 @@ public class DocFetcher extends ApplicationWindow {
 	private ScopeGroup scopeGroup;
 
 	public static void main(String[] args) {
+		/*
+		 * Register or unregister context menu entry on Windows. We would like
+		 * to print to the command prompt here, but for unknown reasons no
+		 * messages are displayed with System.out.println. Therefore all
+		 * System.out.println calls have been disabled.
+		 */
+		if (Const.IS_WINDOWS && args.length == 1 && args[0].startsWith("-")) { //$NON-NLS-1$
+			String param = args[0].toLowerCase();
+			File exe = new File("DocFetcher.exe"); //$NON-NLS-1$
+			String exePath = exe.getAbsolutePath();
+			if (exe.exists()) {
+				String regkey = "Directory\\shell\\" + Msg.search_with_docfetcher.value(); //$NON-NLS-1$
+				if (param.equals("--register-contextmenu")) { //$NON-NLS-1$
+					RegistryKey key = new RegistryKey(RootKey.HKEY_CLASSES_ROOT, regkey + "\\command"); //$NON-NLS-1$
+					key.create();
+					key.setValue(new RegistryValue("\"" + exePath + "\" \"%1\"")); //$NON-NLS-1$ //$NON-NLS-2$
+//					System.out.println("Registered: " + exePath);
+				}
+				else if (param.equals("--unregister-contextmenu")) { //$NON-NLS-1$
+					try {
+						new RegistryKey(RootKey.HKEY_CLASSES_ROOT, regkey).delete();
+					} catch (RegistryException e) {
+//						System.out.println("Registry entry not found.");
+					}
+//					System.out.println("Unregistered: " + exePath);
+				}
+			}
+//			else
+//				System.out.println("File not found: " + exePath);
+			return;
+		}
+		
+		startParams = args;
 		docFetcher = new DocFetcher();
 		docFetcher.setBlockOnOpen(true);
 		docFetcher.open();
@@ -486,15 +525,60 @@ public class DocFetcher extends ApplicationWindow {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			// Can't print stacktrace here, no GUI available
 		} catch (IOException e) {
-			e.printStackTrace();
+			// Can't print stacktrace here, no GUI available
 		} finally {
 			try {
-				reader.close();
+				if (reader != null)
+					reader.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				// Can't print stacktrace here, no GUI available
 			}
+		}
+		
+		// Create temporary indexes from start parameters
+		if (startParams != null && startParams.length != 0) {
+			// Create RootScope objects from start parameters
+			final List<RootScope> newRootScopes = new ArrayList<RootScope> ();
+			for (File file : UtilFile.getDissociatedDirectories(startParams))
+				newRootScopes.add(new RootScope(file));
+			
+			if (! newRootScopes.isEmpty()) {
+				// Check all created RootScopes after the indexing, uncheck everything else
+				indexingDialog.evtClosed.add(new Event.Listener<IndexingDialog> () {
+					public void update(IndexingDialog eventData) {
+						for (RootScope candidate : scopeReg.getEntriesList())
+							candidate.setCheckedDeep(newRootScopes.contains(candidate));
+						scopeGroup.updateCheckStates();
+						indexingDialog.evtClosed.remove(this); // unregister listener
+					}
+				});
+
+				// Start indexing and open up the indexing dialog
+				boolean jobsAdded = false;
+				for (RootScope rs : newRootScopes) {
+					if (scopeReg.containsEntry(rs.getFile()))
+						continue;
+					rs.setDeleteOnExit(true);
+					indexingDialog.addJob(new Job(rs, true, true));
+					jobsAdded = true;
+				}
+				if (jobsAdded) { // Only open indexing dialog if at least one new folder was indexed
+					new Thread() {
+						public void run() {
+							Display.getDefault().asyncExec(new Runnable() {
+								public void run() {
+									// This wouldn't work outside the thread
+									indexingDialog.open();
+								}
+							});
+						}
+					}.start();
+				}
+			}
+			else
+				setStatus(Msg.invalid_start_params.value());
 		}
 
 		/*
@@ -520,11 +604,15 @@ public class DocFetcher extends ApplicationWindow {
 		 * If an indexing process is running in the background, ask the user
 		 * before terminating it and exiting.
 		 */
-		if (ScopeRegistry.getInstance().getCurrentJob() != null) {
+		if (scopeReg.getCurrentJob() != null) {
 			int ans = UtilGUI.showConfirmMsg(null, Msg.force_quit.value());
 			if (ans != SWT.OK) return false;
-			ScopeRegistry.getInstance().clearQueue();
+			scopeReg.clearQueue();
 		}
+		
+		// Delete the RootScopes that were marked for deletion
+		for (RootScope rootScope : scopeReg.getTemporaryEntries())
+			scopeReg.remove(rootScope);
 		
 		if (clipboard != null && ! clipboard.isDisposed())
 			clipboard.dispose();

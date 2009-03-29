@@ -6,16 +6,17 @@ Jar runtime path: lib\
 Don't wrap the jar, launch only: checked
 Icon: (Path to ico-file)
 Change dir: .
+Stay alive after launching a GUI application: checked
 Java download URL: http://java.com
 
 Classpath
 ==============================
 Custom classpath: checked
 Main class: net.sourceforge.docfetcher.DocFetcher
-Classpath: lib\*.jar
+Classpath: lib\*.jar, lang\*.*
 	(lib\windows\*.jar in addition to that for the portable version)
 
 JRE
 ==============================
-Min JRE version: 1.5.0
+Min JRE version: 1.6.0
 JVM options: -Djava.library.path="lib"

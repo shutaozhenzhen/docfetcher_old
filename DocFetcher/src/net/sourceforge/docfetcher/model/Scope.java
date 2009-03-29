@@ -121,6 +121,16 @@ public class Scope extends Indexable {
 	}
 
 	/**
+	 * Recursively checks or unchecks all Scopes under the receiver,
+	 * including the latter.
+	 */
+	public void setCheckedDeep(boolean checked) {
+		setChecked(checked);
+		for (Scope child : getChildren())
+			child.setCheckedDeep(checked);
+	}
+
+	/**
 	 * Returns all scopes under this Scope object.
 	 */
 	public Scope[] getChildren() {

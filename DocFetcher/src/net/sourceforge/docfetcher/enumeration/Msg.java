@@ -25,6 +25,7 @@ import net.sourceforge.docfetcher.Const;
 public enum Msg {
 	
 	// Generic
+	search_with_docfetcher,
 	confirm_operation,
 	invalid_operation,
 	system_error,
@@ -33,11 +34,11 @@ public enum Msg {
 	write_error,
 	write_warning,
 	hotkey_in_use,
+	invalid_start_params,
 	yes,
 	no,
 	ok,
 	cancel,
-	already_running,
 	force_quit,
 	close,
 	
@@ -93,6 +94,7 @@ public enum Msg {
 	delete_folder,
 	delete_folder_q,
 	paste_into_folder,
+	toggle_delete_on_exit,
 	open_target_folder,
 	file_already_exists,
 	file_already_exists_dot,
@@ -107,7 +109,6 @@ public enum Msg {
 	// Main panel
 	prev_page,
 	next_page,
-	show_preview,
 	preferences,
 	to_systray,
 	occurrence_count,
@@ -173,6 +174,7 @@ public enum Msg {
 	select_exts,
 	ipref_skip_regex,
 	ipref_detect_html_pairs,
+	ipref_delete_on_exit,
 	run,
 	regex_matches_file_yes,
 	regex_matches_file_no,

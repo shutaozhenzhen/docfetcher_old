@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -545,6 +546,35 @@ public class UtilFile {
 				return Msg.untitled.value() + i;
 			i++;
 		}
+	}
+	
+	/**
+	 * Expects a string array containing file or directory paths and returns
+	 * existing, "dissociated" directories. That means, the returned set of
+	 * files does not contain directories that are subdirectories of other
+	 * directories from the input list.
+	 */
+	public static Set<File> getDissociatedDirectories(String... input) {
+		List<File> existingDirs = new ArrayList<File> (input.length);
+		for (String candidate : input) {
+			File file = new File(candidate);
+			if (file.exists() && file.isDirectory())
+				existingDirs.add(file);
+		}
+		Set<File> output = new HashSet<File> (existingDirs.size()); 
+		for (int i = 0; i < existingDirs.size(); i++) {
+			boolean foundParent = false;
+			File parent = existingDirs.get(i).getParentFile();
+			for (int j = 0; j < existingDirs.size(); j++) {
+				if (parent.equals(existingDirs.get(j))) {
+					foundParent = true;
+					break;
+				}
+			}
+			if (! foundParent)
+				output.add(existingDirs.get(i));
+		}
+		return output;
 	}
 
 }

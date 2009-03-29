@@ -22,6 +22,64 @@ AutoCloseWindow true
 !include "FileFunc.nsh"
 !insertmacro GetTime
 
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Afrikaans.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Albanian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Arabic.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Basque.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Belarusian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Bosnian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Breton.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Bulgarian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Catalan.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Croatian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Czech.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Danish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Dutch.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Estonian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Farsi.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Finnish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\French.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Galician.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\German.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Greek.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Hebrew.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Hungarian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Icelandic.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Indonesian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Irish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Italian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Japanese.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Korean.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Kurdish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Latvian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Lithuanian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Luxembourgish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Macedonian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Malay.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Mongolian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Norwegian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\NorwegianNynorsk.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Polish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Portuguese.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\PortugueseBR.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Romanian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Russian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Serbian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\SerbianLatin.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\SimpChinese.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Slovak.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Slovenian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Spanish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\SpanishInternational.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Swedish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Thai.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\TradChinese.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Turkish.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Ukrainian.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Uzbek.nlf"
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\Welsh.nlf"
+
 Function .onInit
 	ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DocFetcher" "UninstallString"
 	StrCmp $R0 "" done
@@ -57,6 +115,9 @@ Section "DocFetcher"
     
     SetOutPath $INSTDIR\icons
     File /r /x .svn resources\icons\*.*
+    
+    SetOutPath $INSTDIR\lang
+    File /r /x .svn resources\lang\*.*
     
     SetOutPath $INSTDIR\lib
     File /x *.so /x *.so.* /x swt-*-linux-gtk.jar /x .svn lib\*.*
@@ -121,9 +182,15 @@ Section "DocFetcher"
     ; The ReplaceInFile calls can leave "*.old" files behind
     Delete $INSTDIR\*.old
 	Delete $INSTDIR\help\*.old
+	
+	; Register context menu entry
+	ExecWait '"$INSTDIR\DocFetcher.exe" --register-contextmenu'
 SectionEnd
 
 Section "un.Uninstall"
+	; Unregister context menu entry
+	ExecWait '"$INSTDIR\DocFetcher.exe" --unregister-contextmenu'
+	
 	; Remove program folder
 	Delete $INSTDIR\DocFetcher.exe
 	Delete $INSTDIR\uninstaller.exe

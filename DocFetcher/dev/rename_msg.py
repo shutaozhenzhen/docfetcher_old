@@ -50,44 +50,47 @@ else:
 	print 'Entry not found in Msg.java.'
 	exit(0)
 
-# Replace references in properties files and source code
+# Replace references in properties files
+langpath = join(project_root, 'resources/lang')
+for filename in os.listdir(langpath):
+	if not filename.startswith('Resource') or not filename.endswith('.properties'):
+		continue
+	filepath = join(langpath, filename)
+	f = open(filepath, 'r')
+	newfile = []
+	for line in f:
+		if line.startswith(msg_oldname + '='):
+			line = line.replace(msg_oldname, msg_newname)
+			print 'Occurrence in %s replaced.' % filename
+		newfile.append(line)
+	f.close()
+	f = open(filepath, 'w')
+	f.writelines(newfile)
+	f.close()
+
+# Replace references in source code
 for root, dirs, files in os.walk(join(project_root), 'src'):
 	for filename in files:
+		if not filename.endswith('.java') and not filename.endswith('.aj'):
+			continue
 		filepath = join(root, filename)
+		f = open(filepath, 'r')
+		newfile = []
+		replaced = False
+		for line in f:
+			if line.strip().endswith('Msg.'):
+				print 'Warning: \'Msg.\' in %s omitted.' % filename
+			elif 'Msg.' + msg_oldname in line:
+				line = line.replace('Msg.' + msg_oldname, 'Msg.' + msg_newname)
+				replaced = True
+				print 'Occurrence in %s replaced.' % filename
+			newfile.append(line)
+		f.close()
 		
-		# Handle Properties-files
-		if filename.startswith('Resource') and filename.endswith('.properties'):
-			f = open(filepath, 'r')
-			newfile = []
-			for line in f:
-				if line.startswith(msg_oldname + '='):
-					line = line.replace(msg_oldname, msg_newname)
-					print 'Occurrence in %s replaced.' % filename
-				newfile.append(line)
-			f.close()
+		# Only write new file if reference was found
+		if replaced:
 			f = open(filepath, 'w')
 			f.writelines(newfile)
 			f.close()
-			
-		# Handle source files
-		elif filename.endswith('.java') or filename.endswith('.aj'):
-			f = open(filepath, 'r')
-			newfile = []
-			replaced = False
-			for line in f:
-				if line.strip().endswith('Msg.'):
-					print 'Warning: \'Msg.\' in %s omitted.' % filename
-				elif 'Msg.' + msg_oldname in line:
-					line = line.replace('Msg.' + msg_oldname, 'Msg.' + msg_newname)
-					replaced = True
-					print 'Occurrence in %s replaced.' % filename
-				newfile.append(line)
-			f.close()
-			
-			# Only write new file if reference was found
-			if replaced:
-				f = open(filepath, 'w')
-				f.writelines(newfile)
-				f.close()
 
 print 'Done!'

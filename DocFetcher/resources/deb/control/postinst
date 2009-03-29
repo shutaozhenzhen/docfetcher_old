@@ -7,5 +7,3 @@ chmod a+x /usr/share/docfetcher/DocFetcher.sh
 if [ -d /usr/share/app-install/desktop ]; then
 	cp /usr/share/applications/docfetcher.desktop /usr/share/app-install/desktop
 fi
-
-update-app-install

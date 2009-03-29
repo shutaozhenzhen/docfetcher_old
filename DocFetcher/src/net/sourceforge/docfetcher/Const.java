@@ -119,9 +119,10 @@ public class Const {
 	public static final File INDEX_DAEMON_FILE;
 
 	/**
-	 * The file let opened to let know DocFetcher is running 
+	 * This OutputStream is left open to tell the daemon that DocFetcher is
+	 * running.
 	 */
-	private static FileOutputStream DAEMON_LOCK;
+	public static FileOutputStream DAEMON_LOCK;
 
 	/**
 	 * The current working directory.
@@ -173,7 +174,7 @@ public class Const {
 		try {
 			DAEMON_LOCK = new FileOutputStream(daemon_lock_file_path);
 		} catch (FileNotFoundException e) {
-			// This can occure if to instances or running, or someone is using the file
+			// This can occur if two instances are running, or someone is using the file
 			e.printStackTrace();
 		}
 	}

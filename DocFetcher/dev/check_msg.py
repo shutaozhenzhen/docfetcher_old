@@ -88,7 +88,7 @@ else:
 # Get message strings out of all properties files
 #======================================================
 
-props_path = join(project_root, 'src')
+props_path = join(project_root, 'resources/lang')
 propfilenames = [x for x in os.listdir(props_path) if x.startswith('Resource') and x.endswith('.properties')]
 
 properties = []

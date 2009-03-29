@@ -106,6 +106,8 @@ public class ScopeGroup extends GroupWrapper {
 		viewerMenu.addSingleElementAction(new RenameFolderAction(), Key.Rename);
 		viewerMenu.addNonEmptyAction(new DeleteFolderAction(), Key.ShiftDelete);
 		viewerMenu.addSingleElementAction(new PasteIntoFolderAction(), Key.Paste);
+		viewerMenu.addSeparator();
+		viewerMenu.addRootAction(new ToggleDeleteOnExitAction(), null);
 		viewerMenu.setManagedActionsEnabled(false);
 
 		// Update self on add/remove in scope registry
@@ -159,6 +161,12 @@ public class ScopeGroup extends GroupWrapper {
 					label = file.getAbsolutePath();
 				else if(scope instanceof RootScope)
 					label += " --- " + file.getAbsolutePath(); //$NON-NLS-1$
+				
+				// "temp" prefix for RootScopes that will be deleted on exit
+				if (scope instanceof RootScope)
+					if (((RootScope) scope).isDeleteOnExit())
+						label = "[X]  " + label; //$NON-NLS-1$
+				
 				return label;
 			}
 		});
@@ -186,22 +194,12 @@ public class ScopeGroup extends GroupWrapper {
 		viewer.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				Event.hold();
-				checkDeep((Scope) event.getElement(), event.getChecked());
+				((Scope) event.getElement()).setCheckedDeep(event.getChecked());
 				Event.flush();
 				updateVisibleCheckStates(new Object[] {event.getElement()});
 			}
 			
 		});
-	}
-	
-	/**
-	 * Recursively checks or unchecks all Scopes under the given Scope,
-	 * including the latter.
-	 */
-	private void checkDeep(Scope scope, boolean checked) {
-		scope.setChecked(checked);
-		for (Scope child : scope.getChildren())
-			checkDeep(child, checked);
 	}
 	
 	/**
@@ -322,6 +320,15 @@ public class ScopeGroup extends GroupWrapper {
 	}
 	
 	/**
+	 * Update the check states displayed in this widget. This method must be
+	 * called manually after altering the check states in the model because
+	 * efficiently detecting these changes is too complicated.
+	 */
+	public void updateCheckStates() {
+		updateVisibleCheckStates(new Scope[0]);
+	}
+	
+	/**
 	 * Adds all Scopes under the given Scope which are visible and checked
 	 * according to the model to the given list of Scopes.
 	 */
@@ -406,10 +413,10 @@ public class ScopeGroup extends GroupWrapper {
 	 * displayed.
 	 */
 	private void updateSelectedIndexes(boolean doRebuild) {
-		RootScope[] checkedScopes = getExistingRootSelection();
-		if (checkedScopes.length == 0) return;
+		RootScope[] selRootScopes = getExistingRootSelection();
+		if (selRootScopes.length == 0) return;
 		IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
-		for (RootScope scope : checkedScopes)
+		for (RootScope scope : selRootScopes)
 			indexingDialog.addJob(new Job(scope, false, doRebuild));
 		indexingDialog.open();
 	}
@@ -528,7 +535,7 @@ public class ScopeGroup extends GroupWrapper {
 		public void run() {
 			Event.hold();
 			for (RootScope rootScope : ScopeRegistry.getInstance().getEntries())
-				checkDeep(rootScope, checked);
+				rootScope.setCheckedDeep(checked);
 			Event.flush();
 			updateVisibleCheckStates(new Scope[0]);
 		}
@@ -834,6 +841,20 @@ public class ScopeGroup extends GroupWrapper {
 			// Update indexes, but silently
 			IndexingDialog indexingDialog = DocFetcher.getInstance().getIndexingDialog();
 			indexingDialog.addJob(new Job(rootScopeToUpdate, false, false));
+		}
+	}
+	
+	class ToggleDeleteOnExitAction extends Action {
+		ToggleDeleteOnExitAction() {
+			setText(Msg.toggle_delete_on_exit.value());
+		}
+		public void run() {
+			RootScope[] selRootScopes = getExistingRootSelection();
+			if (selRootScopes.length == 0) return;
+			for (RootScope rs : selRootScopes) {
+				rs.setDeleteOnExit(! rs.isDeleteOnExit());
+				viewer.update(rs, null);
+			}
 		}
 	}
 	

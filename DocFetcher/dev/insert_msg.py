@@ -69,7 +69,7 @@ msg_file.writelines(new_msg_file)
 msg_file.close()
 
 # Insert entry in properties files
-src_dir = join(project_root, 'src')
+src_dir = join(project_root, 'resources/lang')
 propfiles = os.listdir(src_dir)
 for filename in propfiles:
 	if not (filename.startswith('Resource') and filename.endswith('.properties')):

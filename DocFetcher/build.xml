@@ -78,6 +78,10 @@
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher">
 			<fileset dir="resources/deb" includes="**/*.sh"/>
+			<fileset dir="resources" includes="**/*.schemas"/>
+		</copy>
+		<copy todir="build/tmp/usr/share/docfetcher/lang">
+			<fileset dir="resources/lang"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher/icons">
 			<fileset dir="resources/icons"/>
@@ -131,7 +135,7 @@
 			<fileset dir="lib" includes="**/*linux*.jar"/>
 		</copy>
 		<copy todir="${programdir}">
-			<fileset dir="resources" includes="icons/*, user.properties"/>
+			<fileset dir="resources" includes="icons/*, lang/*, user.properties, *.schemas"/>
 			<fileset dir="${versiondir}" includes="**/*.txt"/>
 		</copy>
 		<copy todir="${programdir}">

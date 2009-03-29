@@ -17,17 +17,20 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import com.catcode.odf.OpenDocumentTextInputStream;
-
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.Document;
+import net.sourceforge.docfetcher.util.UtilList;
 import au.id.jericho.lib.html.CharacterReference;
 import au.id.jericho.lib.html.Element;
 import au.id.jericho.lib.html.Source;
 import au.id.jericho.lib.html.StartTag;
+
+import com.catcode.odf.OpenDocumentTextInputStream;
 
 /**
  * @author Tran Nam Quang
@@ -67,18 +70,28 @@ public abstract class OOoParser extends Parser {
 					getElementContent(metaSource, "meta:keyword") //$NON-NLS-1$
 			};
 
-			// Get contents from content.xml file
-			InputStream contentInputStream = zipFile.getInputStream(contentZipEntry);
-			Source contentSource = new Source(contentInputStream);
-			contentInputStream.close();
-			contentSource.setLogger(null);
-			Element contentElement = contentSource.findNextElement(0, "office:body"); //$NON-NLS-1$
-			String contents = contentElement.getContent().getTextExtractor().toString();
-			StringBuffer sb = new StringBuffer(contents);
+			// Get contents from all content.xml files
+			List<ZipEntry> contentEntries = UtilList.toList(contentZipEntry);
+			Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+			for (ZipEntry entry = zipEntries.nextElement(); zipEntries.hasMoreElements(); entry = zipEntries.nextElement())
+				if (entry.getName().endsWith("/content.xml")) //$NON-NLS-1$
+					contentEntries.add(entry);
+			StringBuffer sb = new StringBuffer();
+			for (ZipEntry entry : contentEntries) {
+				InputStream contentInputStream = zipFile.getInputStream(entry);
+				Source contentSource = new Source(contentInputStream);
+				contentInputStream.close();
+				contentSource.setLogger(null);
+				Element contentElement = contentSource.findNextElement(0, "office:body"); //$NON-NLS-1$
+				String content = contentElement.getContent().getTextExtractor().toString();
+				sb.append(content).append(" "); //$NON-NLS-1$
+			}
+
+			// Append metadata
 			for (String field : metaData)
 				if (field != null)
 					sb.append(" ").append(field); //$NON-NLS-1$
-
+			
 			return new Document(file, metaData[0], sb).addAuthor(metaData[1]);
 		} catch (IOException e) {
 			throw new ParseException(file, Msg.file_not_readable.value());

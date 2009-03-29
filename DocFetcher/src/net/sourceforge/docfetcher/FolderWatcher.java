@@ -214,7 +214,7 @@ public class FolderWatcher {
 	 * Disables the folder watching.
 	 */
 	public void shutdown() {
-		setThreadWatchEnabled(false);
+		setWatchEnabled(false);
 	}
 	
 	/**

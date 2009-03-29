@@ -38,6 +38,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.TopDocCollector;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * A registry for managing registered scopes.
@@ -143,6 +144,17 @@ public class ScopeRegistry implements Serializable {
 				checkedEntries.add(entry);
 		}
 		return checkedEntries.toArray(new RootScope[checkedEntries.size()]);
+	}
+	
+	/**
+	 * Returns the entries that are marked for deletion on exit.
+	 */
+	public List<RootScope> getTemporaryEntries() {
+		List<RootScope> tempEntries = new ArrayList<RootScope> (rootScopes.size());
+		for (RootScope entry : rootScopes)
+			if (entry.isDeleteOnExit())
+				tempEntries.add(entry);
+		return tempEntries;
 	}
 	
 	/**
@@ -361,7 +373,14 @@ public class ScopeRegistry implements Serializable {
 					}
 					evtRegistryChanged.fireUpdate(ScopeRegistry.this);
 				} catch (FileNotFoundException e) {
-					// Nothing; appropriate measures will be taken by aspects
+					// Do nothing here, this will be handled by aspect 'IndexingFeedback'
+				} catch (IOException e) {
+					// This happens when the file system is not writable for some reason
+					Display.getDefault().syncExec(new Runnable() {
+						public void run() {
+							UtilGUI.showErrorMsg(null, Msg.write_error.value());
+						}
+					});
 				} finally {
 					indexingThread = null;
 					indexingJobs.remove(currentJob);

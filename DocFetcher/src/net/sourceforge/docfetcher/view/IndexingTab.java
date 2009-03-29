@@ -59,6 +59,7 @@ public class IndexingTab extends Composite {
 	private Text htmlExtBox;
 	private Text exclusionBox;
 	private Button checkHTMLPairing;
+	private Button checkDeleteOnExit;
 	ProgressPanel progressPanel;
 	private List<ParseException> errorCache = new ArrayList<ParseException> ();
 	private Set<String> extensionsFromDisk; // Caching file extensions so we need to load them only once
@@ -110,8 +111,11 @@ public class IndexingTab extends Composite {
 		pathBox.setLayoutData(GridDataFactory.copyData(fillGD));
 		exclusionBox.setLayoutData(fillGD);
 		
+		// Check buttons
 		checkHTMLPairing = new Button(this, SWT.CHECK);
 		checkHTMLPairing.setText(Msg.ipref_detect_html_pairs.value());
+		checkDeleteOnExit = new Button(this, SWT.CHECK);
+		checkDeleteOnExit.setText(Msg.ipref_delete_on_exit.value());
 		
 		Label spacing = new Label(this, SWT.NONE);
 		Label separator = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -135,7 +139,8 @@ public class IndexingTab extends Composite {
 		FormDataFactory fdf = FormDataFactory.getInstance();
 		fdf.top().left().right().applyTo(textBoxComp);
 		fdf.top(textBoxComp, 10).applyTo(checkHTMLPairing);
-		fdf.top(checkHTMLPairing).applyTo(spacing);
+		fdf.top(checkHTMLPairing).applyTo(checkDeleteOnExit);
+		fdf.top(checkDeleteOnExit).applyTo(spacing);
 		fdf.top(spacing).applyTo(separator);
 		fdf.reset().minWidth(Const.MIN_BT_WIDTH).top(separator).left().applyTo(helpButton);
 		fdf.reset().minWidth(Const.MIN_BT_WIDTH).top(separator).left(helpButton).applyTo(defaultButton);
@@ -307,6 +312,7 @@ public class IndexingTab extends Composite {
 		scope.setHtmlExtensions(htmlExts);
 		scope.setExclusionFilters(exclFilters);
 		scope.setDetectHTMLPairs(checkHTMLPairing.getSelection());
+		scope.setDeleteOnExit(checkDeleteOnExit.getSelection());
 		return true;
 	}
 	
@@ -320,6 +326,7 @@ public class IndexingTab extends Composite {
 		htmlExtBox.setText(UtilList.toString(" ", scope.getHtmlExtensions())); //$NON-NLS-1$
 		exclusionBox.setText(UtilList.toString(" $ ", scope.getExclusionFilters())); //$NON-NLS-1$
 		checkHTMLPairing.setSelection(scope.isDetectHTMLPairs());
+		checkDeleteOnExit.setSelection(scope.isDeleteOnExit());
 	}
 	
 	/**
@@ -352,6 +359,7 @@ public class IndexingTab extends Composite {
 		progressPanel.appendInfo(Msg.ipref_html_ext.value() + " " + UtilList.toString(" ", scope.getHtmlExtensions())); //$NON-NLS-1$ //$NON-NLS-2$
 		progressPanel.appendInfo(Msg.ipref_skip_regex.value() + " " + UtilList.toString(" $ ", scope.getExclusionFilters())); //$NON-NLS-1$ //$NON-NLS-2$
 		progressPanel.appendInfo(Msg.html_pairing.value() + " " + (scope.isDetectHTMLPairs() ? Msg.yes.value() : Msg.no.value())); //$NON-NLS-1$
+		progressPanel.appendInfo(Msg.ipref_delete_on_exit.value() + ": " + (scope.isDeleteOnExit() ? Msg.yes.value() : Msg.no.value())); //$NON-NLS-1$
 		progressPanel.appendInfo(Msg.waiting_in_queue.value());
 		
 		// Context menu of error table
