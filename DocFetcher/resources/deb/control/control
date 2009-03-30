@@ -9,4 +9,4 @@ Homepage: http://docfetcher.sourceforge.net
 Description: Find documents that contain specific keywords
  DocFetcher is a desktop search application: It allows you to quickly access documents on your computer by typing keywords. - You can think of it as Google for your local document repository.
  .
- The program runs on GTK-based desktop environments (e.g. GNOME). It is recommended to use the Java Runtime Environments from Sun instead of alternative implementations, both for compatibility and performance reasons.
+ The program runs on GTK-based desktop environments (e.g. GNOME, Xfce). It is recommended to use the Java Runtime Environments from Sun instead of alternative implementations, both for compatibility and performance reasons.

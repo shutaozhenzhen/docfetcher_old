@@ -98,3 +98,22 @@ a:hover {
 	color: goldenrod;
 }
 
+table {
+	padding: 0;
+	border: 1px solid silver;
+	border-collapse: collapse;
+	text-align: center;
+	width: 100%
+}
+
+table th {
+	padding: 8px 4px;
+	border: 1px solid silver;
+	background-color: rgb(255, 255, 204);
+}
+
+table td {
+	padding: 2px 4px;
+	border: 1px solid silver;
+	text-align: left;
+}

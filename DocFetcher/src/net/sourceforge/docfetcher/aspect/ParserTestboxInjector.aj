@@ -17,7 +17,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.sourceforge.docfetcher.DocFetcher;
-import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParseException;
@@ -83,21 +83,19 @@ public aspect ParserTestboxInjector {
 					testBox.setSize(500, 500);
 					UtilGUI.centerShell(null, testBox);
 				}
-				testBox.setText("Parser Testbox"); //$NON-NLS-1$
+				testBox.setText(Msg.parser_testbox.value());
 				testBox.setLayout(new FormLayout());
 
 				// Populate testbox
 				chooseBt = new Button(testBox, SWT.PUSH);
-				chooseBt.setText("Choose File..."); //$NON-NLS-1$
+				chooseBt.setText(Msg.choose_file.value());
 				pathField = new Text(testBox, SWT.BORDER | SWT.SINGLE);
-				pathField.setText("Enter a path here and press Enter or click on the button to the right."); //$NON-NLS-1$
+				pathField.setText(Msg.enter_path_msg.value());
 				contentBox = new StyledText(testBox, SWT.BORDER | SWT.V_SCROLL | SWT.WRAP);
 				originalBt = new Button(testBox, SWT.CHECK);
-				originalBt.setText("Original parser output"); //$NON-NLS-1$
+				originalBt.setText(Msg.original_parser_output.value());
 				infoField = new Text(testBox, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL);
-				infoField.setText("Please note:\n* HTML pairing is disabled." + //$NON-NLS-1$
-						"\n* The parse time shown here will decrease significantly if you parse the same " + //$NON-NLS-1$
-						"document several times over."); //$NON-NLS-1$
+				infoField.setText(Msg.parser_testbox_info.value());
 
 				// Layout
 				FormDataFactory fdf = FormDataFactory.getInstance();
@@ -139,9 +137,9 @@ public aspect ParserTestboxInjector {
 									if (file.exists())
 										showResults(file.getAbsolutePath());
 								} catch (MalformedURLException e1) {
-									contentBox.setText("File does not exist, or path string is unsupported or malformed."); //$NON-NLS-1$
+									contentBox.setText(Msg.parser_testbox_invalid_input.value());
 								} catch (URISyntaxException e2) {
-									contentBox.setText("File does not exist, or path string is unsupported or malformed.");  //$NON-NLS-1$
+									contentBox.setText(Msg.parser_testbox_invalid_input.value());
 								}
 							}
 						}
@@ -179,7 +177,7 @@ public aspect ParserTestboxInjector {
 				if (parser == null) {
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
-							contentBox.setText("Unknown document format."); //$NON-NLS-1$
+							contentBox.setText(Msg.unknown_document_format.value());
 						}
 					});
 					return;
@@ -189,7 +187,7 @@ public aspect ParserTestboxInjector {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						pathField.setText(path);
-						contentBox.setText("Parsing..."); //$NON-NLS-1$
+						contentBox.setText(Msg.parsing.value());
 					}
 				});
 				
@@ -203,8 +201,7 @@ public aspect ParserTestboxInjector {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						if (doc == null) {
-							contentBox.setText("Parser not supported: " + //$NON-NLS-1$
-									parser.getClass().getSimpleName());
+							contentBox.setText(Msg.parser_not_supported.format(parser.getClass().getSimpleName()));
 							return;
 						}
 						content = doc.getContents();
@@ -212,30 +209,32 @@ public aspect ParserTestboxInjector {
 							contentBox.setText(content);
 						else
 							contentBox.setText(content.replaceAll("\\s+", " ").trim()); //$NON-NLS-1$ //$NON-NLS-2$
-						String infos = ""; //$NON-NLS-1$
-						infos += "Parsed by " + parser.getClass().getSimpleName(); //$NON-NLS-1$
-						infos += " in " + (t_end - t_start) + " ms"; //$NON-NLS-1$ //$NON-NLS-2$
-						infos += Const.LS + "Title: \"" + doc.getTitle() + "\""; //$NON-NLS-1$ //$NON-NLS-2$
-						infos += Const.LS + "Author: \"" + doc.getAuthor() + "\""; //$NON-NLS-1$ //$NON-NLS-2$
-						infoField.setText(infos);
+						infoField.setText(
+								Msg.parsed_by.format(
+										parser.getClass().getSimpleName(),
+										(t_end - t_start),
+										doc.getTitle(),
+										doc.getAuthor()
+								)
+						);
 					}
 				});
 			} catch (final ParseException e) {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
-						contentBox.setText("Parse Exception: " + e.getMessage()); //$NON-NLS-1$
+						contentBox.setText(Msg.parse_exception.format(e.getMessage()));
 					}
 				});
 			} catch (Exception e) {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
-						contentBox.setText("Something went really bad..."); //$NON-NLS-1$
+						contentBox.setText(Msg.parser_testbox_unknown_error.value());
 					}
 				});
 			} catch (OutOfMemoryError e) {
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
-						contentBox.setText("Not enough memory!"); //$NON-NLS-1$
+						contentBox.setText(Msg.out_of_jvm_memory.value());
 					}
 				});
 			}

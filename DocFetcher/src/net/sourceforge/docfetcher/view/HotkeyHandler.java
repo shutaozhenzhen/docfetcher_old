@@ -191,7 +191,7 @@ public class HotkeyHandler {
 
 		public void registerHotkey(int id, int mask, int key) {
 			try {
-				JXGrabKey.getInstance().registerAWTHotkey(id, 
+				JXGrabKey.getInstance().registerAwtHotkey(id, 
 						KeyCodeTranslator.translateSWTModifiers(mask),
 						KeyCodeTranslator.translateSWTKey(key));
 			} catch (HotkeyConflictException e) {

@@ -10,20 +10,7 @@ to main page<br>
 </a></div>
 <div id="main">
 <h1 id="title">Known
-bugs and limitations</h1>
-<h2>General<br></h2><ul>
-
-
-<li>If you've encountered a bug not listed here, chances
-are&nbsp;it will
-disappear after upgrading to a <a href="http://java.com">Java
-Runtime</a> as new as or newer as
-version 1.6.0, which is the version DocFetcher has been developed on.
-To determine what version of the Java Runtime
-you're running on, open a command prompt and type in "java -version"
-(without the parentheses).</li>
-<li>If you use virtual desktops, switching between them may
-cause DocFetcher to hide in the System Tray.</li></ul><h2>On Windows</h2><ul><li>DocFetcher may crash after removing two or more indexes at
+bugs and limitations</h1><h2>On Windows</h2><ul><li>DocFetcher may crash after removing two or more indexes at
 once or after shutting down the program if the "Watch indexed folders"
 option was
 turned on. It may also crash if that option is turned off via the
@@ -45,10 +32,14 @@ files out of watched folders does not cause an index update. You have
 to update the affected index manually. Automatic index updates on
 deletions do work, however.</li>
 </ul>
-<h2>Indexing-related<br>
+<h2>User Interface</h2><ul><li>The highlighting in the preview panel is not fully implemented yet.
+Most importantly, if you perform an AND search, such as "dog cat"
+(including the quotes), then both "dog" and "cat" will be highlighted
+in the preview panel.</li></ul><h2>Indexing-related<br>
 </h2>
 <ul>
-<li>You may see a "Not enough memory left in the java virtual machine" error if the file to be indexed is sufficiently big. Read <a href="Indexing_Huge_Documents.html">this</a> for more info.</li><li>All
+<li>To find out what is actually extracted from a particular document, you
+can use the built-in "Parser Testbox" by pressing F11.</li><li>You may see a "Not enough memory left in the java virtual machine" error if the file to be indexed is sufficiently big. Read <a href="Indexing_Huge_Documents.html">this</a> for more info.</li><li>All
 password protected documents are omitted during the parse process.</li><li>Sometimes a PDF file will be omitted even though you can view its
 contents in a normal PDF viewer without having to enter a password. The
 likely reason is that this file allows you to view its contents, <span style="font-style: italic;">but</span>
@@ -59,7 +50,7 @@ to extract text from them. This can be interpreted as some kind of
 cannot. Files like that can easily be spotted by the gibberish in their
 meta data fields (e.g. in the title field).</li>
 <li>Some
-parts of OpenDocument and Microsoft Word files are not extracted and
+parts of Microsoft Word files are not extracted and
 are thus not searchable, such as
 text inside formulas and charts.</li>
 <li>DocFetcher
@@ -70,8 +61,7 @@ should close all CHM files you want to index.</li>
 not be indexed at all even if they appear to be completely valid
 documents. This is the case with some PowerPoint and PDF files, which
 appear to contain text, but actually consist of (scanned) images only.
-To find out what is really extracted from a particular document, you
-can use the built-in "Parser Testbox" by pressing F11.</li>
+You can use the parser testbox mentioned above to identify these files.</li><li>SVG text extraction does not work if the text is stored as paths (rather than actual text strings).</li>
 <li>A word that spans two or more lines (i.e. is
 divided by line breaks) is not searchable.</li>
 </ul>

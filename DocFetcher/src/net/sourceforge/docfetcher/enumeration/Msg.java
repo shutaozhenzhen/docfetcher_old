@@ -223,6 +223,18 @@ public enum Msg {
 	property_path,
 	property_author,
 	property_lastModified,
+	parser_testbox,
+	choose_file,
+	enter_path_msg,
+	original_parser_output,
+	parser_testbox_info,
+	parser_testbox_invalid_input,
+	unknown_document_format,
+	parsing,
+	parser_not_supported,
+	parsed_by,
+	parse_exception,
+	parser_testbox_unknown_error,
 	
 	;
 	

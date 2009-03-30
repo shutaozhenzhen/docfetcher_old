@@ -6,8 +6,7 @@
 <meta name="author" content="Tran Nam Quang">
 <link type="text/css" href="web.css" rel="stylesheet">
 <meta name="keywords" content="DocFetcher, desktop search, file management, search, document, retrieval, indexing, Apache Lucene">
-<meta name="description" content="Homepage of DocFetcher, a desktop search application for fast document retrieval">
-</head>
+<meta name="description" content="Homepage of DocFetcher, a desktop search application for fast document retrieval"></head>
 <body>
 <div id="header"><img style="width: 750px; height: 209px;" alt="" src="docfetcher-logo.png"></div>
 <div id="page">
@@ -31,28 +30,55 @@ GTK-based Linux
 distributions.</p>
 <h1>How It Works</h1>
 <ul>
-<li>You specify one or more folders to make searchable, e.g.
-"C:\MyDocuments".</li>
-<li>DocFetcher
-extracts the text from all documents in "C:\MyDocuments" that it is
-able to read, e.g. HTML, MS Word&nbsp;and PDF, and stores
-the result of this processing in "index files".&nbsp;The indexing
+<li>DocFetcher creates so-called index files on which the searches are
+performed. You can either create permanent indexes&nbsp;for large
+document repositories that change infrequently, or temporary ones for
+quick full-text searches in small folders.</li><li>Temporary indexes
+can be created&nbsp;by rightclicking on a folder and selecting the menu
+item "Search With DocFetcher", and they are automatically disposed of
+after program termination. (You can of course tell DocFetcher to keep
+them.)</li><li>The
+indexing
 process
-might take a few minutes (600 documents = about 3 min.).</li>
-<li>Now you can type keywords into DocFetcher's search box,
-e.g. "fourier analysis",
-hit Enter, and DocFetcher will list all documents inside
-"C:\MyDocuments" that contain these&nbsp;words - most of the time
+might take a few minutes for larger repositories, and is usually a
+matter of seconds for small folders (200 documents = about 1 min.).</li>
+<li>After index creation, you can type keywords into DocFetcher's
+search box,
+e.g. "fourier analysis" and
+hit Enter. Then&nbsp;DocFetcher will list all documents inside the
+selected folders that contain these&nbsp;words - most of the time
 in
-less than a second.</li>
-<li>What if the original document repository is
-changed? Then the index files will get out of sync with the repository,
-obviously. However: (1) DocFetcher can listen to file system events and
-automatically update its index files when it's running. (2) In
-constrast to completely (re-)building an index, an index update is
-usually a matter of seconds.<br>
-</li>
-</ul>
+less than a second.</li></ul><h1>But There's More To It...</h1><ul>
+<li><span style="font-weight: bold;">Automatic index updates</span>:
+Indexes are updated automatically when files in the corresponding
+folders are modified, even when DocFetcher isn't running. This is done
+via a&nbsp;daemon that waits in the background and watches all indexed
+folders. The daemon has very low memory footprint and CPU usage,
+because, rather than indexing&nbsp;files itself, it only remembers
+which indexes need to be updated the next time DocFetcher is launched.</li><li><span style="font-weight: bold;">A portable version</span>:
+Runs on both Windows and Linux.
+You can put all your documents in it and then freely move&nbsp;the
+entire folder around (i.e., DocFetcher + indexes + documents). Possible
+destinations include other computers, encrypted volumes (<a href="http://www.truecrypt.org/">TrueCrypt</a>),
+CD-ROMs and USB drives. The portable version can also be used for sharing an indexed
+document repository across a local area network, or across the OS'ses of a
+Windows/Linux dual boot system.</li><li><span style="font-weight: bold;">Detection of HTML pairs</span>,
+e.g. "foo.htm" and a folder named
+"foo_files".
+Each pair will be treated as a single document. This feature may seem
+rather useless on first sight, but it turned out that this dramatically
+increases the quality of the search results when you're searching for
+HTML files, since all the "clutter" inside the HTML folders disappears
+from the results.</li><li><span style="font-weight: bold;">Search in source code files</span>:
+The file extensions by which DocFetcher recognizes plain text and HTML
+files can be fully customized. Therefore you can use DocFetcher to
+search in any kind of source code.</li>
+</ul><h1>Other Notable Features<br></h1><ul><li>Regular expression based exclusion of files from indexing.</li><li>Various
+file operations on the document repository&nbsp;can be performed through DocFetcher's interface (e.g. creating folders,
+inserting new files).</li><li>Preview panel with search-term highlighting and a simple
+built-in web browser.</li><li>Search results can be sorted and filtered by different
+criteria (filetype, filesize, path, etc.).</li><li>Global hotkey to bring DocFetcher to the front.</li></ul>
+
 <ul>
 </ul>
 <h1>Supported Document Formats</h1>
@@ -66,30 +92,9 @@ PowerPoint (ppt)</li>
 <li>Rich Text Format (rtf)</li>
 <li>AbiWord (abw, abw.gz, zabw)</li>
 <li>Microsoft Compiled HTML Help (chm)</li>
-<li>Microsoft Visio (vsd)</li>
-<li>(In the works: MS Office 2007)</li>
-</ul>
-<h1>Features</h1>
-<ul>
-<li>Detection of HTML pairs (e.g. "foo.htm" and a folder named
-"foo_files")</li>
-<li>Various
-file operations on the document repository (e.g. creating folders,
-inserting new files) can be performed through DocFetcher's interface.</li>
-<li>Customizable text and HTML file extensions (e.g. "nfo",
-"cpp", "java", "py", "shtml", and so on)</li>
-<li>Regular expression based exclusion of files from indexing</li>
-<li>Automatic index updates on changes to the indexed documents
-(optional).</li>
-<li>Preview panel with search-term highlighting and a simple
-built-in web browser</li>
-<li>Search results can be sorted and filtered by different
-criteria (filetype, filesize, path, etc.).</li>
-<li>A portable version for both Windows and Linux is available,
-which,
-amongst other things, is useful in combination with volume encryption (<a href="http://www.truecrypt.org/">TrueCrypt</a>).</li>
-</ul>
-<h1>What Some People Think About This Program...</h1>
+<li>Microsoft Visio (vsd)</li><li>Scalable Vector Graphics (svg)</li>
+<li>(In the works: MS Office 2007)<br></li>
+</ul><h1>What Some People Think About This Program...</h1>
 <table style="width: 100px; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
 <tbody>
 <tr>
@@ -104,57 +109,44 @@ amongst other things, is useful in combination with volume encryption (<a href="
 </tbody>
 </table>
 <h1>Comparison To Other Desktop Search Applications</h1>
-Why would you use this program instead of other, more popular and even
-apparently more feature-laden desktop search applications such as
-Google Desktop Search, Copernic Desktop Search or Beagle? Here's why:
+Why would you use this program instead of other, more popular desktop search applications such as
+Google Desktop Search, Copernic Desktop Search and Beagle? Here's why:
 Programs such as these can index a lot more than just documents
 (images, videos, e-mails, IM sessions, programs, etc.), and the
-author(s) of DocFetcher believe&nbsp;this is mostly a <span style="font-style: italic;">bad</span> thing, for the
+authors of DocFetcher believe&nbsp;this is mostly a <span style="font-style: italic;">bad</span> thing, for the
 following reasons:<br>
 <ul>
-<li>Why install yet another program to search for images,
-music, videos, e-mails, etc., if you can access all of that much more
-effectively with your favorite picture browser, media player, e-mail
-client, and so on? So, no images, no music, no videos... - what's
-left?&nbsp;Documents. And that's what DocFetcher is good for. (By
-the
-way, <a href="http://www.launchy.net/">Launchy</a>
-is recommended for quickly launching start menu programs.)</li>
 <li>The real power of Google and other web search engines comes
 from
 document indexing, because it gives a very good approximation of
 the <span style="font-style: italic;">content</span>
 of a document. Indexing images or videos however isn't all that useful,
 because the real&nbsp;content of an image or a video is not
-accessible via text extraction.</li>
-<li>Now
-that we have web services such as Google Mail that allow you to
-maintain
-a central e-mail repository which can be&nbsp;accessed from any
-computer with
-internet connection, what's the point of indexing locally stored
-e-mails, other than to make life harder for both developers and users
-of desktop search applications? </li>
+accessible via text extraction.</li><li>Why install yet another program to access&nbsp;images,
+music, videos, e-mails, etc., if your favorite picture browser, media player, e-mail
+client, and so on, has been optimized for many years to do <span style="font-style: italic;">just that</span>? Why would you use a half-baken, generic search interface then? So, no images, no music, no videos... - what's
+left?&nbsp;Documents. And that's what DocFetcher is good for. (By
+the
+way, <a href="http://www.launchy.net/">Launchy</a>
+is recommended for quickly launching start menu programs.)</li>
 <li>The bigger the search scope, the more "noise" there will be
-on the search result lists. This is why you will find that,
-when searching for documents, document-only search
-applications such as DocFetcher generally give better
-search results than those which also index
-non-document files.</li>
+on the search results. Accordingly, you will find that DocFetcher
+generally gives better search results than similar programs, because,
+first, it only indexes documents, and second, it deliberately restricts
+itself to a few selected folders instead of indexing the entire
+harddrive.</li>
 <li>Less files to index = faster indexing and decreased CPU
 usage. (Don't
 you just hate it when there's always some program busily working in the
 background?)</li>
 </ul>
 Other than that, if you don't need eye candy, but want a powerful
-Open Source tool that just does what it's supposed to do and nothing
-else (e.g. violating your privacy, installing extra stuff you never
-wanted), then this program is for you!
+Open Source tool that just does what it's supposed to do, <span style="font-style: italic;">without</span> violating your privacy and <span style="font-style: italic;">without</span> installing "extras", then this program is for you!
 <ul>
 </ul>
 </div>
 <div id="footer">
-<div id="sf-logo"><a href="http://sourceforge.net/donate/index.php?group_id=197779"><img src="http://images.sourceforge.net/images/project-support.jpg" alt="Support This Project" border="0" height="32" width="88"></a><a href="http://sourceforge.net/projects/docfetcher"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=197779&type=13" width="120" height="30" border="0" alt="Get DocFetcher at SourceForge.net. Fast, secure and Free Open Source software downloads"/></a></div>
+<div id="sf-logo"><a href="http://sourceforge.net/donate/index.php?group_id=197779"><img src="http://images.sourceforge.net/images/project-support.jpg" alt="Support This Project" border="0" height="32" width="88"></a><a href="http://sourceforge.net/projects/docfetcher"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=197779&amp;type=13" alt="Get DocFetcher at SourceForge.net. Fast, secure and Free Open Source software downloads" border="0" height="30" width="120"></a></div>
 <div id="copyright">Copyright
 © 2009 Tran Nam Quang</div>
 </div>
