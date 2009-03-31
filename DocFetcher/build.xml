@@ -89,9 +89,8 @@
 		<copy todir="build/tmp/usr/share/doc/docfetcher">
 			<fileset dir="${versiondir}" includes="**/*.txt"/>
 		</copy>
-		<copy todir="build/tmp/usr/share/doc/docfetcher">
-			<fileset dir="resources/help" excludes="DocFetcher_Manual*.html"/>
-			<fileset dir="${versiondir}" includes="DocFetcher_Manual*.html"/>
+		<copy todir="build/tmp/usr/share/doc/docfetcher/help">
+			<fileset dir="resources/help"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/doc/docfetcher/licenses">
 			<fileset dir="${versiondir}/licenses"/>
@@ -142,8 +141,7 @@
 			<fileset dir="resources/portable"/>
 		</copy>
 		<copy todir="${programdir}/help">
-			<fileset dir="resources/help" excludes="DocFetcher_Manual*.html"/>
-			<fileset dir="${versiondir}" includes="DocFetcher_Manual*.html"/>
+			<fileset dir="resources/help"/>
 		</copy>
 		<copy todir="${programdir}/licenses">
 			<fileset dir="${versiondir}/licenses"/>

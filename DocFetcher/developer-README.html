@@ -72,7 +72,16 @@ The working directory of this configuration has to be set to
 look for the icons folder, which is located inside <span style="font-family: monospace;">DocFetcher/bin</span>. Now
 try to run DocFetcher with this run configuration.</li><li>If you see an error message resembling this one: "<span style="font-family: monospace;">Exception in thread "main" java.lang.UnsatisfiedLinkError: no
 swt-gtk-3448 or swt-gtk in swt.library.path, java.library.path or the
-jar file</span>" that means you haven't put the correct SWT library on your classpath.</li></ul><h1>What's inside&nbsp;all the folders</h1><ul><li>project root: This file, the build scripts and files related to the build scripts (i.e. Ant tasks).</li><li>src: The source code.</li><li>resources: Everything that will be shipped with the release builds.</li><ul><li>deb: Files related to the debian package.</li><li>help: The manual.</li><li>icons: The image files used by the program.</li><li>licenses: License information for all libraries used.</li><li>portable: Files related to the portable version.</li><li>windows: Files related to the Windows version.</li></ul><li>build:
+jar file</span>" that means you haven't put the correct SWT library on your classpath.</li></ul><h1>How to compile the daemons</h1><ul><li>First, you'll have install the&nbsp;<a href="http://www.eclipse.org/cdt">C/C++ Development Toolkit (CDT)</a>,
+a plugin for Eclipse to compile C/C++ projects. Then set up the build
+toolchain by following the instructions on the first page(s) of this
+section of Eclipse's Help System: <span style="font-family: monospace;">Help &gt; Help Contents &gt; C/C++ Development&nbsp;User Guide</span>.</li><li>The
+source code for the two daemons (Linux, Windows) ships with the
+DocFetcher source code package. However, you'll have to import them as
+separate Eclipse projects.</li><ul><li>From the Eclipse menu select: <span style="font-family: monospace;">File &gt; Import&nbsp;&gt; Existing Projects into Workspace</span></li><li>In
+"Select root directory" enter the folder where the daemon source code
+can be found. For Windows, this is the folder "src-daemon/win32", for
+Linux, it's "src-daemon/linux".</li><li>Check the option "Copy projects into workspace".</li></ul><li>Select the daemon project in the package view, then, from the Eclipse menu, select <span style="font-family: monospace;">Project &gt; Build Project</span>.</li></ul><h1>What's inside&nbsp;all the folders</h1><ul><li>project root: This file, the build scripts and files related to the build scripts (i.e. Ant tasks).</li><li>src: The source code for DocFetcher.</li><li>src-daemon: The source code for the daemons.</li><li>resources: Everything that will be shipped with the release builds.</li><ul><li>deb: Files related to the debian package.</li><li>help: The manual.</li><li>icons: The image files used by the program.</li><li>lang: Translations of the GUI.</li><li>licenses: License information for all libraries used.</li><li>portable: Files related to the portable version.</li><li>windows: Files related to the Windows version.</li></ul><li>build:
 This is where the output of the build scripts goes to. Warning: Don't
 put anything of value into this folder, it will be deleted when running
 the Ant build script.</li><li>dev:

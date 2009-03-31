@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.eclipse.swt.SWT;
 
@@ -132,7 +133,7 @@ public class Const {
 	/**
 	 * Path to where the manual is stored.
 	 */
-	public static final String MANUAL_PATH;
+	public static final String MANUAL_PARENT_PATH;
 	
 	/**
 	 * Sets up the path to the user.properties file and the index parent folder.
@@ -147,7 +148,7 @@ public class Const {
 		if (propFile.exists() && propFile.isFile()) {
 			USER_PROPERTIES_FILE = propFile;
 			INDEX_PARENT_FILE = new File("indexes"); //$NON-NLS-1$
-			MANUAL_PATH = UtilFile.join(USER_DIR, "help"); //$NON-NLS-1$
+			MANUAL_PARENT_PATH = getManualParentPath(USER_DIR);
 			INDEX_DAEMON_FILE = new File("indexes" + FS + "indexes.txt"); //$NON-NLS-1$ //$NON-NLS-2$
 			IS_PORTABLE = true;
 		}
@@ -160,7 +161,7 @@ public class Const {
 				appDataPath = System.getProperty("user.home") + FS + ".docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
 			USER_PROPERTIES_FILE = new File(appDataPath, USER_PROPERTIES_FILENAME);
 			INDEX_PARENT_FILE = new File(appDataPath);
-			MANUAL_PATH = IS_WINDOWS ? UtilFile.join(USER_DIR, "help") : "/usr/share/doc/docfetcher"; //$NON-NLS-1$ //$NON-NLS-2$
+			MANUAL_PARENT_PATH = getManualParentPath(IS_WINDOWS ? USER_DIR : "/usr/share/doc/docfetcher"); //$NON-NLS-1$
 			INDEX_DAEMON_FILE = new File(appDataPath + FS + "indexes.txt"); //$NON-NLS-1$
 			new File(appDataPath).mkdirs();
 			IS_PORTABLE = false;
@@ -180,6 +181,49 @@ public class Const {
 	}
 	
 	/**
+	 * This method takes the parent folder of the help folder as input and
+	 * returns the locale-dependent absolute path of the parent folder of the
+	 * manual. The method tries to return the most specific manual possible and
+	 * falls back gradually.
+	 * <p>
+	 * For example, if the user runs in the locale "de_DE", this method tries to
+	 * find the manual in a folder "Germany (Germany)". If there is none, it
+	 * looks for a folder with the name "Germany". If that isn't found either,
+	 * it will try to return the English version. If not even the latter exists,
+	 * an IllegalStateException is thrown.
+	 */
+	private static String getManualParentPath(String helpFolderParent) {
+		File helpFolder = new File(UtilFile.join(helpFolderParent, "help")); //$NON-NLS-1$
+		File[] manualFolders = UtilFile.getSubDirs(helpFolder);
+		
+		// The target folder names to search for
+		String[] targets = new String[] {
+				Locale.getDefault().getDisplayName(Locale.ENGLISH), // e.g. Germany (Germany)
+				new Locale(Locale.getDefault().getLanguage()).getDisplayName(Locale.ENGLISH), // e.g. Germany
+				Locale.ENGLISH.getDisplayName(Locale.ENGLISH) // English
+		};
+		
+		// Save matches here; all entries can be null
+		String[] matches = new String[3];
+		
+		// Search for matches
+		for (File manualFolder : manualFolders) {
+			for (int i = 0; i < targets.length; i++)
+				if (manualFolder.getName().equals(targets[i])) {
+					matches[i] = manualFolder.getAbsolutePath();
+					break;
+				}
+		}
+		
+		// Return the most specific match
+		for (int i = 0; i < matches.length; i++)
+			if (matches[i] != null)
+				return matches[i];
+		
+		throw new IllegalStateException("Cannot find manual!"); //$NON-NLS-1$
+	}
+	
+	/**
 	 * Name of the directory containing icons for this application.
 	 */
 	public static final String ICON_DIRNAME = "icons"; //$NON-NLS-1$
@@ -187,17 +231,17 @@ public class Const {
 	/**
 	 * Absolute path to the application's help file.
 	 */
-	public static final String HELP_FILE = UtilFile.join(MANUAL_PATH, "DocFetcher_Manual.html"); //$NON-NLS-1$
+	public static final String HELP_FILE = UtilFile.join(MANUAL_PARENT_PATH, "DocFetcher_Manual.html"); //$NON-NLS-1$
 	
 	/**
 	 * Absolute path to the preferences section of the application's help file.
 	 */
-	public static final String HELP_FILE_PREF = UtilFile.join(MANUAL_PATH, "DocFetcher_Manual_files/Preferences.html"); //$NON-NLS-1$
+	public static final String HELP_FILE_PREF = UtilFile.join(MANUAL_PARENT_PATH, "DocFetcher_Manual_files/Preferences.html"); //$NON-NLS-1$
 	
 	/**
 	 * Absolute path to the indexing preferences section of the application's help file.
 	 */
-	public static final String HELP_FILE_INDEXING = UtilFile.join(MANUAL_PATH, "DocFetcher_Manual_files/Indexing_Options.html"); //$NON-NLS-1$
+	public static final String HELP_FILE_INDEXING = UtilFile.join(MANUAL_PARENT_PATH, "DocFetcher_Manual_files/Indexing_Options.html"); //$NON-NLS-1$
 	
 	/**
 	 * Base name of the resource files containing translations.

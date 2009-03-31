@@ -130,7 +130,6 @@ Section "DocFetcher"
     CreateDirectory $SMPROGRAMS\DocFetcher
     CreateShortCut $SMPROGRAMS\DocFetcher\DocFetcher.lnk $INSTDIR\DocFetcher.exe
     CreateShortCut "$SMPROGRAMS\DocFetcher\Uninstall DocFetcher.lnk" $INSTDIR\uninstaller.exe
-    CreateShortCut $SMPROGRAMS\DocFetcher\Manual.lnk $INSTDIR\help\DocFetcher_Manual.html
     CreateShortCut $SMPROGRAMS\DocFetcher\Readme.lnk $INSTDIR\Readme.txt
     CreateShortCut $SMPROGRAMS\DocFetcher\ChangeLog.lnk $INSTDIR\ChangeLog.txt
     
@@ -174,14 +173,8 @@ Section "DocFetcher"
     Push "${VERSION}"
     Call ReplaceInFile
     
-    Push "$INSTDIR\help\DocFetcher_Manual.html"
-    Push "@VERSION@"
-    Push "${VERSION}"
-    Call ReplaceInFile
-    
     ; The ReplaceInFile calls can leave "*.old" files behind
     Delete $INSTDIR\*.old
-	Delete $INSTDIR\help\*.old
 	
 	; Register context menu entry
 	ExecWait '"$INSTDIR\DocFetcher.exe" --register-contextmenu'
@@ -200,21 +193,23 @@ Section "un.Uninstall"
 	Delete $INSTDIR\Readme.txt
     Delete $INSTDIR\hs_err_pid*.log
     
-	Delete $INSTDIR\help\DocFetcher_Manual*.html
-	RMDir /r $INSTDIR\help\DocFetcher_Manual_files
-    RMDir $INSTDIR\help
+	RMDir /r $INSTDIR\help\
     
 	Delete $INSTDIR\icons\*.gif
 	Delete $INSTDIR\icons\*.png
     RMDir $INSTDIR\icons
     
+	Delete $INSTDIR\lang\*.properties
+	RMDir $INSTDIR\lang
+	
 	Delete $INSTDIR\lib\*.jar
 	Delete $INSTDIR\lib\*.dll
+	Delete $INSTDIR\lib\*.lib
     RMDir $INSTDIR\lib
     
     RMDir /r $INSTDIR\indexes
 	RMDir /r $INSTDIR\licenses
-	RMDIR $INSTDIR
+	RMDir $INSTDIR
     
     ; Remove application data folder
     RMDir /r $APPDATA\DocFetcher

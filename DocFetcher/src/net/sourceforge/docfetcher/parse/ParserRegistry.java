@@ -48,7 +48,7 @@ public class ParserRegistry {
 		new PDFParser(),
 		new RTFParser(),
 		new SVGParser(),
-		new WordPerfectParser()
+		//new WordPerfectParser()
 	};
 
 	// Additional reference to the text parser for faster access.
