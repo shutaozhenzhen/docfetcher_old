@@ -18,8 +18,8 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl2a_3.2.0.v200606220026.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nlBidi_3.2.0.v200606220026.jar"/>
 	<classpathentry kind="lib" path="lib/PDFBox-0.7.3.jar"/>
-	<classpathentry kind="lib" path="lib/poi-3.1-FINAL-20080629.jar"/>
-	<classpathentry kind="lib" path="lib/poi-scratchpad-3.1-FINAL-20080629.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.5-beta5-20090219.jar"/>
+	<classpathentry kind="lib" path="lib/poi-scratchpad-3.5-beta5-20090219.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html-2.6.jar"/>
 	<classpathentry kind="lib" path="lib/odf-utils-20051129.jar"/>
 	<classpathentry kind="lib" path="lib/chm4j.jar">
@@ -44,5 +44,10 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/lucene-core-2.4.0.jar" sourcepath="/media/Data/Dev/Software/Java Libraries/lucene-2.4.0-src.zip"/>
 	<classpathentry kind="lib" path="lib/jRegistryKey.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/jsr173_1.0_api.jar"/>
+	<classpathentry kind="lib" path="lib/ooxml-schemas-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/poi-ooxml-3.5-beta5-20090219.jar"/>
+	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

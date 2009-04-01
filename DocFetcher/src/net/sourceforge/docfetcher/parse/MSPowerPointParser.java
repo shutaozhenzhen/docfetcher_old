@@ -17,7 +17,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Msg;
 
 import org.apache.poi.hslf.extractor.PowerPointExtractor;
@@ -35,15 +34,7 @@ public class MSPowerPointParser extends MSOfficeParser {
 			in = new FileInputStream(file);
 			PowerPointExtractor extractor = null;
 			try {
-				/*
-				 * FIXME Apache POI 3.1 sometimes writes to System.err without
-				 * throwing an exception, therefore we have to temporarily
-				 * deactivate the custom exception handler in order to avoid
-				 * stacktrace pop-ups.
-				 */
-				DocFetcher.getInstance().setExceptionHandlerEnabled(false);
 				extractor = new PowerPointExtractor(in);
-				DocFetcher.getInstance().setExceptionHandlerEnabled(true);
 			}
 			catch (Exception e) {
 				// This can happen if the file has the "ppt" extension, but is not a PowerPoint document

@@ -5,7 +5,7 @@
 ;
 ; When building a new release, remember to update the version number in the next command.
 
-!define VERSION 0.9.5.1
+!define VERSION 1.0
 
 SetCompress force
 SetCompressor /SOLID lzma
@@ -104,6 +104,7 @@ Section "DocFetcher"
     SetOutPath $INSTDIR
     File resources\windows\DocFetcher.exe
     File resources\windows\DocFetcher.bat
+    File resources\daemon\docfetcher-daemon-win.exe
     File resources\ChangeLog.txt
     File resources\Readme.txt
     
@@ -188,6 +189,7 @@ Section "un.Uninstall"
 	Delete $INSTDIR\DocFetcher.exe
 	Delete $INSTDIR\uninstaller.exe
 	Delete $INSTDIR\DocFetcher.bat
+	Delete $INSTDIR\docfetcher-daemon-win.exe
 	Delete $INSTDIR\user.properties
 	Delete $INSTDIR\ChangeLog.txt
 	Delete $INSTDIR\Readme.txt

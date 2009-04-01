@@ -7,7 +7,7 @@
 		</tstamp>
 		<property name="appname" value="DocFetcher"/>
 		<property name="package" value="net.sourceforge.docfetcher"/>
-		<property name="version" value="0.9.5.1"/>
+		<property name="version" value="1.0"/>
 		<property name="versiondir" value="build/temp_${version}"/>
 		<property name="deploy.name" value="${appname}-${version}"/>
 		<property name="jar.name" value="${package}_${version}.jar"/>
@@ -79,6 +79,7 @@
 		<copy todir="build/tmp/usr/share/docfetcher">
 			<fileset dir="resources/deb" includes="**/*.sh"/>
 			<fileset dir="resources" includes="**/*.schemas"/>
+			<fileset dir="resources/daemon" includes="docfetcher-daemon-linux"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher/lang">
 			<fileset dir="resources/lang"/>
@@ -136,9 +137,11 @@
 		<copy todir="${programdir}">
 			<fileset dir="resources" includes="icons/*, lang/*, user.properties, *.schemas"/>
 			<fileset dir="${versiondir}" includes="**/*.txt"/>
+			<fileset dir="resources/daemon"/>
 		</copy>
 		<copy todir="${programdir}">
 			<fileset dir="resources/portable"/>
+			<fileset dir="resources/daemon"/>
 		</copy>
 		<copy todir="${programdir}/help">
 			<fileset dir="resources/help"/>
