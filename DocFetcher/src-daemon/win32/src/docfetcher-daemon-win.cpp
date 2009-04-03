@@ -1,10 +1,13 @@
-//============================================================================
-// Name        : docfetcher-daemon-win.cpp
-// Author      : Tonio Rush
-// Version     :
-// Copyright   :
-// Description : Entry point for docfetcher-daemon-win
-//============================================================================
+/*******************************************************************************
+ * Copyright (c) 2009 Tonio Rush.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Tonio Rush - initial API and implementation
+ *******************************************************************************/
 
 #include <iostream>
 #include <sstream>
@@ -83,7 +86,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	_win32FSHook = new Win32FSHook();
 	_win32FSHook->init(NULL);
 
-    HANDLE lockThread = (HANDLE)_beginthread(watchLockFile, 0, NULL);
+    _beginthread(watchLockFile, 0, NULL);
 
 
 	// Main message loop:
