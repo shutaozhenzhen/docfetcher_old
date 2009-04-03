@@ -17,6 +17,8 @@
 	</target>
 	
 	<target name="compile-windows" if="isWindows" depends="init">
+		<delete dir="build/daemon-win32"/>
+		<delete file="resources/daemon/docfetcher-daemon-win.exe"/>
 		<mkdir dir="build/daemon-win32//obj"/>
 		<cc
 			name="g++"
@@ -36,6 +38,8 @@
 	</target>
 	
 	<target name="compile-linux" if="isLinux" depends="init">
+		<delete dir="build/daemon-linux"/>
+		<delete file="resources/daemon/docfetcher-daemon-linux"/>
 		<mkdir dir="build/daemon-linux/obj"/>
 		<cc
 			name="g++"

@@ -20,7 +20,7 @@ Platform-specific notes
 How to start DocFetcher
 =============================================
   * Windows: Doubleclick on DocFetcher.exe (recommended) or DocFetcher.bat
-  * Linux: Doubleclick on DocFetcher.sh. You might have to set the executable flag first (open a terminal, cd to the DocFetcher folder, then enter "chmod +x DocFetcher.sh").
+  * Linux: Doubleclick on DocFetcher.sh. You'll probably have to set the executable flag first: Open a terminal, cd to the DocFetcher folder, then enter "chmod +x DocFetcher.sh". The same applies to the DocFetcher daemon (docfetcher-daemon-linux).
 
 
 More information

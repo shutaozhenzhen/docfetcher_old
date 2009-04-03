@@ -108,6 +108,9 @@ Section "DocFetcher"
     File resources\ChangeLog.txt
     File resources\Readme.txt
     
+    SetOutPath $APPDATA\DocFetcher
+    File resources\indexes.txt
+    
     SetOutPath $INSTDIR\licenses
 	File /r /x .svn resources\licenses\*.*
 	
@@ -149,6 +152,7 @@ Section "DocFetcher"
     WriteRegStr HKLM $regkey "DisplayVersion" "${VERSION}"
     WriteRegDWORD HKLM $regkey "NoModify" 1
     WriteRegDWORD HKLM $regkey "NoRepair" 1
+    WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "DocFetcher-Daemon" "$INSTDIR\docfetcher-daemon-win.exe"
     
     ; Convert Unix line terminators to Windows line terminators
     Push "$INSTDIR\ChangeLog.txt"
@@ -226,6 +230,7 @@ Section "un.Uninstall"
     
     ; Remove registry key
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\DocFetcher"
+    DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "DocFetcher-Daemon"
 SectionEnd
 
 ; Function for converting Unix line terminators to Windows line terminators
