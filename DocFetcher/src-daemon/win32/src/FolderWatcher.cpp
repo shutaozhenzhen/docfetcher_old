@@ -121,13 +121,18 @@ bool FolderWatcher::startWatch() {
 			// null terminated string
 			file_name[count_chars] = 0;
 
-			int watchId = _win32FSHook->add_watch((const WCHAR *)file_name, notifyFilter, watchSubdirs, error, &callback);
-			if(watchId == 0 ) {
-				log("error add_watch for dir=%s err=%d",line.c_str(),error);
-			}else{
-				log("Watch installed for directory %s",line.c_str());
-				aWatchedFolder._path = line;
-				_indexed_folders.insert(std::make_pair(watchId, aWatchedFolder));
+			log("add_watch for dir=%s", line.c_str());
+			try {
+				int watchId = _win32FSHook->add_watch((const WCHAR *)file_name, notifyFilter, watchSubdirs, error, &callback);
+				if(watchId == 0 ) {
+					log("error add_watch for dir=%s err=%d",line.c_str(),error);
+				}else{
+					log("Watch installed for directory %s",line.c_str());
+					aWatchedFolder._path = line;
+					_indexed_folders.insert(std::make_pair(watchId, aWatchedFolder));
+				}
+			}catch(...){
+				log("error add_watch : default catch");
 			}
 
 		}
@@ -194,43 +199,40 @@ std::string FolderWatcher::getLockFile() {
 
 bool FolderWatcher::findIndexesFile() {
 
-	// Portable version -> the file ./indexes/indexes.txt exists
+	// Portable version -> the directory ./indexes exists
 	TCHAR current_path [MAX_PATH] = {0};
 	::GetCurrentDirectory(MAX_PATH, current_path);
-	std::string portable_path = current_path;
 
-	portable_path += "\\indexes\\indexes.txt";
+	std::string indexes_directory = current_path;
+	indexes_directory += "\\indexes";
 
-	std::ifstream ifs(portable_path.c_str());
-	if(ifs) {
-		_indexes_file_path = portable_path;
-		log("Portable version");
+	HANDLE hFind;
+	WIN32_FIND_DATA FindFileData;
+	hFind = ::FindFirstFile(indexes_directory.c_str(), &FindFileData);
+	if(hFind != INVALID_HANDLE_VALUE) {
+		// Portable version
+		::FindClose(hFind);
+		_indexes_file_path = current_path;
+		_indexes_file_path += "\\indexes\\indexes.txt";
+		log("Portable version : working with file %s", _indexes_file_path.c_str());
 		return true;
 	}else{
-		log("NOT portable version, file %s not found.", portable_path.c_str());
-	}
+		// Normal version -> indexes.txt is in APPDATA\DocFetcher folder
+		log("Directory %s does not exist -> installed version", indexes_directory.c_str());
 
+		TCHAR szPath[MAX_PATH];
 
-
-	TCHAR szPath[MAX_PATH];
-
-	if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, szPath)))
-	{
-		_indexes_file_path = szPath;
-		_indexes_file_path += "\\DocFetcher\\indexes.txt";
-
-		std::ifstream ifs(_indexes_file_path.c_str());
-		if(ifs) {
-			log("Normal version, file %s found.", _indexes_file_path.c_str());
+		if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, szPath)))
+		{
+			_indexes_file_path = szPath;
+			_indexes_file_path += "\\DocFetcher\\indexes.txt";
+			log("Normal version : working with file %s", _indexes_file_path.c_str());
 			return true;
 		}else{
-			log("File %s not found.", _indexes_file_path.c_str());
+			log("Cannot get APPDATA ???? ");
+			return false;
 		}
-
-		return true;
 	}
-
-	return false;
 }
 
 /**

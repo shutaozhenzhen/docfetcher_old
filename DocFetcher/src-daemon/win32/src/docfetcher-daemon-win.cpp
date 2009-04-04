@@ -46,7 +46,7 @@ FolderWatcher _folderWatcher;
  */
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 bool InitInstance();
-void watchLockFile(void *);
+void watchLoop(void *);
 bool isUniqueInstance();
 
 /**
@@ -70,7 +70,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	}
 
 	// JNotify_win32 traces
-	dbg = false;
+	dbg = true;
 
 	if(!isUniqueInstance()) {
 		log("another instance is running...");
@@ -86,7 +86,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	_win32FSHook = new Win32FSHook();
 	_win32FSHook->init(NULL);
 
-    _beginthread(watchLockFile, 0, NULL);
+    _beginthread(watchLoop, 0, NULL);
 
 
 	// Main message loop:
@@ -101,26 +101,38 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	return 0;
 }
 
-void watchLockFile(void *){
+
+
+/**
+ * Watches regulary if the .lock file is opened by DocFetcher
+ *
+ * installs and removes the watches in consequence
+ *
+ */
+void watchLoop(void *){
 	std::string lock_file = _folderWatcher.getLockFile();
 	log("lock file : %s", lock_file.c_str());
 	bool watching = false;
 	for(;;){
 		::DeleteFile(lock_file.c_str());
 		if(GetLastError() == ERROR_SHARING_VIOLATION){
+			// the file is used by DocFetcher, so stop watching
 			if(watching) {
 				log("stopWatch");
 				_folderWatcher.stopWatch();
 				watching = false;
 			}
 		}else{
+			// the file is not used by DocFetcher, so start watching
 			if(!watching) {
 				log("startWatch");
 				_folderWatcher.startWatch();
 				watching = true;
 			}
 		}
-		Sleep(2000);
+
+		// Check is done every 2 seconds
+		::Sleep(2000);
 	}
 }
 
@@ -179,12 +191,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
  */
 bool InitInstance() {
 
-	HICON hDocFetcherIcon = ::ExtractIcon(_hInstance, "DocFetcher.ico", 0);
-
-	if (hDocFetcherIcon == NULL) {
-		log("icon not found...");
-		hDocFetcherIcon = LoadIcon((HINSTANCE) NULL, IDI_APPLICATION);
-	}
+// We don't need icon, since daemon is invisible
+//	HICON hDocFetcherIcon = ::ExtractIcon(_hInstance, "DocFetcher.ico", 0);
+//	if (hDocFetcherIcon == NULL) {
+//		log("icon not found...");
+//		hDocFetcherIcon = LoadIcon((HINSTANCE) NULL, IDI_APPLICATION);
+//	}
 
 
 	WNDCLASS wc;
@@ -196,7 +208,7 @@ bool InitInstance() {
 	wc.cbClsExtra = 0;
  	wc.cbWndExtra = 0;
 	wc.hInstance = _hInstance;
-	wc.hIcon = hDocFetcherIcon;
+	wc.hIcon = NULL;
 	wc.hCursor = LoadCursor((HINSTANCE) NULL, IDC_ARROW);
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = "MainMenu";
@@ -214,9 +226,6 @@ bool InitInstance() {
 	if (!_hwndMain) {
 		return false;
 	}
-
-	//   ShowWindow(hWnd, nCmdShow);
-	//   UpdateWindow(hWnd);
 
 	return true;
 }
