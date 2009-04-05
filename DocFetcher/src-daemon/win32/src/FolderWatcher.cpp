@@ -71,6 +71,7 @@ bool FolderWatcher::startWatch() {
 
 	// read file
 	std::string line;
+	log("opennig file %s", _indexes_file_path.c_str());
 	std::ifstream in (_indexes_file_path.c_str());
 
 	if(!in){
@@ -102,9 +103,11 @@ bool FolderWatcher::startWatch() {
 	WatchedFolder aWatchedFolder;
 	aWatchedFolder._modified = false;
 
+	log("locking");
 	RaiiLocker aLock(_lock);
 
 	while(std::getline(in,line)){
+		log("line=%s", line.c_str());
 		if(line.empty()){
 			continue;
 		}else if(line.at(0) == CHAR_MODIFIED){
@@ -114,18 +117,21 @@ bool FolderWatcher::startWatch() {
 			// a comment line, ignore
 			continue;
 		}else{
+			log("add_watch for dir=%s", line.c_str());
 
 			int count_chars = mbstowcs( NULL, line.c_str(), 0);
 			mbstowcs(file_name, line.c_str(), count_chars);
 
+			log("path converted to wide string");
+
 			// null terminated string
 			file_name[count_chars] = 0;
 
-			log("add_watch for dir=%s", line.c_str());
 			try {
+				log("calling add_watch");
 				int watchId = _win32FSHook->add_watch((const WCHAR *)file_name, notifyFilter, watchSubdirs, error, &callback);
 				if(watchId == 0 ) {
-					log("error add_watch for dir=%s err=%d",line.c_str(),error);
+					log("error add_watch for dir=%s err=%d", line.c_str(), error);
 				}else{
 					log("Watch installed for directory %s",line.c_str());
 					aWatchedFolder._path = line;
