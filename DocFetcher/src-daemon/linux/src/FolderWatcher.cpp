@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2009 Tonio Rush.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Tonio Rush - initial API and implementation
+ *******************************************************************************/
+
 #include <string>
 #include <map>
 #include <iostream>
@@ -21,19 +32,12 @@
 
 #include "Logger.h"
 
-/**
- * inotify fd.
- */
-int fd = -1;
-
-
 
 /**
  * constructor
  *
  */
 FolderWatcher::FolderWatcher():CHAR_MODIFIED('#') {
-	fd = inotify_init();
 }
 
 /**
@@ -43,22 +47,46 @@ FolderWatcher::FolderWatcher():CHAR_MODIFIED('#') {
 FolderWatcher::~FolderWatcher() {
 }
 
+
+bool FolderWatcher::findIndexesFile() {
+	// Portable version -> the directory ./indexes exists
+	// Portable version -> the file ./indexes/indexes.txt exists
+	struct stat st;
+
+	char * wd = getcwd(NULL, 0);
+
+	std::string indexes_directory = wd;
+
+	free(wd);
+
+	indexes_directory += "/indexes";
+
+
+	if(stat(indexes_directory.c_str(), &st) == 0) {
+		_indexes_file_path = indexes_directory + "/indexes.txt";
+		log("Portable version : working with file %s", _indexes_file_path.c_str());
+		return true;
+	}else{
+		// Normal version -> indexes.txt is in HOME/.docfetcher/
+		log("Directory %s does not exist -> installed version", indexes_directory.c_str());
+
+		_indexes_file_path = getenv("HOME");
+		_indexes_file_path += "/.docfetcher/indexes.txt";
+		log("Normal version : working with file %s", _indexes_file_path.c_str());
+    	return true;
+	}
+}
+
+
 /**
  * Initialization, called at the beginning
  *
  * initializes the map of indexed folders and adds the watches
  *
  */
-bool FolderWatcher::initialize() {
-
-	// find indexes.txt file
-	if(!getIndexesFile()) {
-		log("Cannot get indexes file.");
-		return false;
-	}
+bool FolderWatcher::startWatch() {
 
 	// read file
-
 	std::string line;
 	std::ifstream in (_indexes_file_path.c_str());
 
@@ -67,9 +95,26 @@ bool FolderWatcher::initialize() {
 		return false;
 	}
 
+	_fd = inotify_init();
+
+
 	std::string file_name;
-	int error;
-	const long notifyFilter = IN_ALL_EVENTS;
+
+	const long notifyFilter =  	//  IN_ACCESS			//File was accessed (read) (*)
+								//|IN_ATTRIB			//Metadata changed (permissions, timestamps, extended attributes, etc.) (*)
+								 IN_CLOSE_WRITE		//File opened for writing was closed (*)
+								//|IN_CLOSE_NOWRITE	//File not opened for writing was closed (*)
+								|IN_CREATE			//File/directory created in watched directory (*)
+								|IN_DELETE			//File/directory deleted from watched directory (*)
+								|IN_DELETE_SELF		//Watched file/directory was itself deleted
+								|IN_MODIFY			//File was modified (*)
+								|IN_MOVE_SELF		//Watched file/directory was itself moved
+								|IN_MOVED_FROM		//File moved out of watched directory (*)
+								|IN_MOVED_TO			//File moved into watched directory (*)
+								//|IN_OPEN				//File was opened (*)
+								;
+
+
 
 	WatchedFolder aWatchedFolder;
 	aWatchedFolder._modified = false;
@@ -87,10 +132,10 @@ bool FolderWatcher::initialize() {
 
 			file_name = line;
 
-			int watchId = inotify_add_watch(fd, file_name.c_str(), notifyFilter);
+			int watchId = inotify_add_watch(_fd, file_name.c_str(), notifyFilter);
 
 			if(watchId == 0 ) {
-				log("error add_watch for dir=%s err=%d", line.c_str(), error);
+				log("error add_watch for dir=%s", line.c_str());
 			}else{
 				log("Watch installed for directory %s", line.c_str());
 				aWatchedFolder._path = line;
@@ -102,8 +147,21 @@ bool FolderWatcher::initialize() {
 	}
 
 	return (_indexed_folders.size() > 0);
-
 }
+
+/**
+ * Initialization, called at the beginning
+ *
+ * initializes the map of indexed folders and adds the watches
+ *
+ */
+bool FolderWatcher::stopWatch() {
+	close(_fd);
+	_fd = -1;
+}
+
+
+
 
 /**
  * Watches' callback
@@ -119,15 +177,13 @@ void FolderWatcher::callback(int watchID, int action) {
 		return;
 	}
 
-	// impossible to remove here,
-	inotify_rm_watch(fd, watchID);
+	inotify_rm_watch(_fd, watchID);
 
 	if(_indexed_folders[watchID]._modified == true){
 		log("already done...");
 		return;
 
 	}
-
 
 	_indexed_folders[watchID]._modified = true;
 
@@ -138,43 +194,7 @@ void FolderWatcher::callback(int watchID, int action) {
 
 }
 
-bool FolderWatcher::getIndexesFile() {
 
-	// Portable version -> the file ./indexes/indexes.txt exists
-	struct stat st;
-
-	char * wd = getcwd(NULL, 0);
-	std::string portable_path = wd;
-	free(wd);
-
-	portable_path += "/indexes/indexes.txt";
-
-
-	if(stat(portable_path.c_str(), &st) == 0) {
-		_indexes_file_path = portable_path;
-		log("Portable version");
-		return true;
-	}else{
-		log("NOT portable version, file %s not found.", portable_path.c_str());
-	}
-
-
-
-	// Normal : indexes.txt is in HOME/.docfetcher/
-
-	std::string normal_path = getenv("HOME");
-	normal_path += "/.docfetcher/indexes.txt";
-	if(stat(normal_path.c_str(), &st) == 0) {
-		_indexes_file_path = normal_path;
-		log("Normal version");
-		return true;
-	}else{
-		log("File %s not found.", normal_path.c_str());
-	}
-
-
-	return false;
-}
 
 /**
  * Writes the indexes file
@@ -216,9 +236,16 @@ void FolderWatcher::run()
     char buf[BUF_LEN];
     int len, i = 0;
 
-	while (fd != -1)
+	while (_fd != -1)
 	{
-	    len = read (fd, buf, BUF_LEN);
+	    len = read (_fd, buf, BUF_LEN);
+
+		if(len == -1){
+			log("read failed");
+			return;
+		}
+
+		log("read");
 
 	    while (i < len)
 	    {
@@ -229,5 +256,10 @@ void FolderWatcher::run()
 	    }
 	    i=0;
 	}
+}
+
+
+std::string FolderWatcher::getLockFile() {
+	return _indexes_file_path + ".lock";
 }
 

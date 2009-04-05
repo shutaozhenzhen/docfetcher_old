@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2009 Tonio Rush.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Tonio Rush - initial API and implementation
+ *******************************************************************************/
+
 #ifndef FOLDERWATCHER_H_
 #define FOLDERWATCHER_H_
 
@@ -13,9 +24,15 @@ public:
 	FolderWatcher();
 	virtual ~FolderWatcher();
 
-	bool initialize();
+	bool findIndexesFile();
+
+	std::string getLockFile();
+
+	bool startWatch();
+	bool stopWatch();
 
 	void run();
+
 
 private:
 	void callback(int watchID, int action);
@@ -24,11 +41,11 @@ private:
 	const char CHAR_MODIFIED;
 
 
-	bool getIndexesFile();
 	bool updateIndexesFile();
 
 	folders_container_type _indexed_folders;
 
+	int _fd;
 };
 
 #endif /*FOLDERWATCHER_H_*/
