@@ -79,7 +79,7 @@ bool FolderWatcher::startWatch() {
 		return false;
 	}
 
-	WCHAR  file_name [MB_CUR_MAX];
+	WCHAR  file_name [MAX_PATH * MB_CUR_MAX];
 	DWORD error;
 
 	const long notifyFilter =
