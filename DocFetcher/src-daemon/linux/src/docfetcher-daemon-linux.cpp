@@ -23,6 +23,8 @@
 
 #include <pthread.h>
 
+#include <fstream>
+#include <stdlib.h>
 #include "FolderWatcher.h"
 #include "Logger.h"
 void dispatch(struct inotify_event *);
@@ -41,15 +43,25 @@ int main(){
 		log("findIndexesFile failed");
 	}
 
+	std::string tmp_file = "daemon.tmp";
+
 	std::string lock_file = _folderWatcher.getLockFile();
+
+	std::string cmd_line = "lsof | grep ";
+	cmd_line += lock_file;
+	cmd_line += " >";
+	cmd_line += tmp_file;
+
 	log("lock file : %s", lock_file.c_str());
+
 	bool watching = false;
 	for(;;){
-		remove(lock_file.c_str());
-		int error = errno;
-		log("errno = %d", error);
-
-		if(error == EACCES){
+		system(cmd_line.c_str());
+		std::string line;
+		std::ifstream in(tmp_file.c_str());
+		std::getline(in, line);
+		if(!line.empty()) {
+			log("lock file used");
 			// the file is used by DocFetcher, so stop watching
 			if(watching) {
 				log("stopWatch");
@@ -57,6 +69,7 @@ int main(){
 				watching = false;
 			}
 		}else{
+			log("lock file not used");
 			// the file is not used by DocFetcher, so start watching
 			if(!watching) {
 				log("startWatch");

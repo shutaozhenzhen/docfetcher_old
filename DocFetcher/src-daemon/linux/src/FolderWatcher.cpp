@@ -240,13 +240,6 @@ void FolderWatcher::run()
 	{
 	    len = read (_fd, buf, BUF_LEN);
 
-		if(len == -1){
-			log("read failed");
-			return;
-		}
-
-		log("read");
-
 	    while (i < len)
 	    {
 	        struct inotify_event *event = (struct inotify_event *) &buf[i];
