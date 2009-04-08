@@ -9,11 +9,12 @@
  *    Tonio Rush - initial API and implementation
  *******************************************************************************/
 
+
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/select.h>
 #include <sys/ioctl.h>
-#include <linux/inotify.h>
+//#include <linux/inotify.h>
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -25,27 +26,46 @@
 
 #include <fstream>
 #include <stdlib.h>
+
+#include <fcntl.h>
+
 #include "FolderWatcher.h"
 #include "Logger.h"
-void dispatch(struct inotify_event *);
-int runLoop();
 
 extern bool dbg;
 
 FolderWatcher _folderWatcher;
 
 
-void *start(void *threadid);
+void *startThreadedWatch(void *threadid);
+bool isUniqueInstance();
+
 
 int main(){
 	dbg = true;
-	if(!_folderWatcher.findIndexesFile()) {
-		log("findIndexesFile failed");
+
+	if(!isUniqueInstance()) {
+		log("another instance is running...");
+		return 1;
 	}
 
-	std::string tmp_file = "daemon.tmp";
+
+
+
+	if(!_folderWatcher.findIndexesFile()) {
+		log("findIndexesFile failed");
+		return 1;
+	}
+
+
+
+	// Check of DocFetcher's lock file every 2 seconds
+	// the command "lsof | grep indexes.txt >daemon.tmp"
+	// tells if the file is used
 
 	std::string lock_file = _folderWatcher.getLockFile();
+
+	std::string tmp_file = "daemon.tmp";
 
 	std::string cmd_line = "lsof | grep ";
 	cmd_line += lock_file;
@@ -61,7 +81,7 @@ int main(){
 		std::ifstream in(tmp_file.c_str());
 		std::getline(in, line);
 		if(!line.empty()) {
-			log("lock file used");
+//			log("lock file used");
 			// the file is used by DocFetcher, so stop watching
 			if(watching) {
 				log("stopWatch");
@@ -69,7 +89,7 @@ int main(){
 				watching = false;
 			}
 		}else{
-			log("lock file not used");
+//			log("lock file not used");
 			// the file is not used by DocFetcher, so start watching
 			if(!watching) {
 				log("startWatch");
@@ -77,7 +97,7 @@ int main(){
 				watching = true;
 
 				pthread_t thread;
-				int err = pthread_create(&thread, NULL, start, NULL);
+				pthread_create(&thread, NULL, startThreadedWatch, NULL);
 			}
 		}
 
@@ -90,9 +110,40 @@ int main(){
 
 }
 
-void *start(void *threadid) {
+/**
+ * Runs INotify in a different thread, to be able to stop it
+ *
+ */
+void *startThreadedWatch(void *threadid) {
 	_folderWatcher.run();
 	return NULL;
 }
 
 
+/**
+ * Check if this is the only instance
+ * It is done by locking a file
+ *
+ */
+bool isUniqueInstance(){
+	struct flock fl;
+
+	fl.l_type = F_WRLCK;
+	fl.l_whence = SEEK_SET;
+	fl.l_start = 0;
+	fl.l_len = 1;
+	int fdlock;
+	if((fdlock = open("daemon.lock", O_WRONLY|O_CREAT, 0666)) == -1) {
+		log("cannot open daemon lock");
+		return false;
+	}
+
+	if(fcntl(fdlock, F_SETLK, &fl) == -1) {
+		log("daemon file locked : another instance is running");
+		return false;
+
+	}
+
+	return true;
+
+ }
