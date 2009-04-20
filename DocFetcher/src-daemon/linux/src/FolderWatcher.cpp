@@ -50,7 +50,6 @@ FolderWatcher::~FolderWatcher() {
 
 bool FolderWatcher::findIndexesFile() {
 	// Portable version -> the directory ./indexes exists
-	// Portable version -> the file ./indexes/indexes.txt exists
 	struct stat st;
 
 	char * wd = getcwd(NULL, 0);
@@ -63,7 +62,7 @@ bool FolderWatcher::findIndexesFile() {
 
 
 	if(stat(indexes_directory.c_str(), &st) == 0) {
-		_indexes_file_path = indexes_directory + "/indexes.txt";
+		_indexes_file_path = indexes_directory + "/.indexes.txt";
 		log("Portable version : working with file %s", _indexes_file_path.c_str());
 		return true;
 	}else{
@@ -71,7 +70,7 @@ bool FolderWatcher::findIndexesFile() {
 		log("Directory %s does not exist -> installed version", indexes_directory.c_str());
 
 		_indexes_file_path = getenv("HOME");
-		_indexes_file_path += "/.docfetcher/indexes.txt";
+		_indexes_file_path += "/.docfetcher/.indexes.txt";
 		log("Normal version : working with file %s", _indexes_file_path.c_str());
     	return true;
 	}
@@ -158,6 +157,7 @@ bool FolderWatcher::startWatch() {
 bool FolderWatcher::stopWatch() {
 	close(_fd);
 	_fd = -1;
+	return true;
 }
 
 

@@ -65,7 +65,11 @@ int main(){
 
 	std::string lock_file = _folderWatcher.getLockFile();
 
-	std::string tmp_file = "daemon.tmp";
+
+
+	// the tmp file is put next to the lock file,
+	// to be sure the daemon has write acces
+	std::string tmp_file = _folderWatcher.getLockFile() + ".tmp";
 
 	std::string cmd_line = "lsof | grep ";
 	cmd_line += lock_file;
