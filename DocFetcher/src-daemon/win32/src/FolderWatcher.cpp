@@ -219,7 +219,7 @@ bool FolderWatcher::findIndexesFile() {
 		// Portable version
 		::FindClose(hFind);
 		_indexes_file_path = current_path;
-		_indexes_file_path += "\\indexes\\indexes.txt";
+		_indexes_file_path += "\\indexes\\.indexes.txt";
 		log("Portable version : working with file %s", _indexes_file_path.c_str());
 		return true;
 	}else{
@@ -231,7 +231,7 @@ bool FolderWatcher::findIndexesFile() {
 		if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, szPath)))
 		{
 			_indexes_file_path = szPath;
-			_indexes_file_path += "\\DocFetcher\\indexes.txt";
+			_indexes_file_path += "\\DocFetcher\\.indexes.txt";
 			log("Normal version : working with file %s", _indexes_file_path.c_str());
 			return true;
 		}else{
