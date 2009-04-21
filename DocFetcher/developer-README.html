@@ -71,11 +71,14 @@ on the classpath.</li><ul><li>To remove a library from the classpath,
 right-click on the appropriate jar file under the entry "Referenced
 Libraries" in Eclipse's "Package" panel and select <span style="font-family: monospace;">Build Path &gt; Remove from Build Path</span>.</li><li>To add a library to the classpath, right-click on the jar file in the lib folder (also on the "Package" panel) and select <span style="font-family: monospace;">Build Path &gt; Add to Build Path</span>.</li></ul>
 <li>Create a new run configuration: <span style="font-family: monospace;">Run &gt; Run
-Configurations...</span>.
-The working directory of this configuration has to be set to
+Configurations...</span>.</li><ul><li>The working directory of this configuration has to be set to
 <span style="font-family: monospace;">DocFetcher/bin</span> (instead of <span style="font-family: monospace;">DocFetcher</span>), because the application will
 look for the icons folder, which is located inside <span style="font-family: monospace;">DocFetcher/bin</span>. Now
-try to run DocFetcher with this run configuration.</li><li>If you see an error message resembling this one: "<span style="font-family: monospace;">Exception in thread "main" java.lang.UnsatisfiedLinkError: no
+try to run DocFetcher with this run configuration.</li><li>Also, the&nbsp;<span style="font-family: monospace;">DocFetcher/resources/lang</span> folder must be on your classpath. Go
+to the "Classpath" tab, click on "User Entries", then on the button
+"Advanced..." to the right and add the lang folder to your classpath.
+Without this folder, DocFetcher would complain that it cannot find some
+"Resources" files.</li></ul><li>If you see an error message resembling this one: "<span style="font-family: monospace;">Exception in thread "main" java.lang.UnsatisfiedLinkError: no
 swt-gtk-3448 or swt-gtk in swt.library.path, java.library.path or the
 jar file</span>" that means you haven't put the correct SWT library on your classpath.</li></ul><h1>The daemons</h1><h2>Setting up the daemons in Eclipse</h2><ul><li>First, you'll have install the&nbsp;<a href="http://www.eclipse.org/cdt">C/C++ Development Toolkit (CDT)</a>,
 a plugin for Eclipse to compile C/C++ projects. Then set up the build

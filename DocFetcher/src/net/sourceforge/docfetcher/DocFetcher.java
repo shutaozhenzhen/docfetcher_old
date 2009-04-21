@@ -172,7 +172,6 @@ public class DocFetcher extends ApplicationWindow {
 		appName = Pref.Str.AppName.getValue();
 		if (appName.trim().equals("")) //$NON-NLS-1$
 			appName = "DocFetcher"; //$NON-NLS-1$
-		
 		Display.setAppName(DocFetcher.appName);
 		scopeReg = ScopeRegistry.getInstance();
 		
@@ -235,12 +234,6 @@ public class DocFetcher extends ApplicationWindow {
 		sashHorizontal.setWeights(Pref.IntArray.SashHorizontalWeights.getValue());
 		sashLeft.setWeights(Pref.IntArray.SashLeftWeights.getValue());
 		
-		/*
-		 * FIXME On GTK Linux (GNOME 2.22.3), when the user changes the shell
-		 * size and closes the program, on the next launch the shell size will
-		 * be slightly smaller. This has not been observed on Windows, so this
-		 * must be an external bug.
-		 */
 		// Couple preferences with shell state
 		shell.addControlListener(new ControlAdapter() {
 			public void controlMoved(ControlEvent e) {
@@ -583,7 +576,11 @@ public class DocFetcher extends ApplicationWindow {
 						public void run() {
 							Display.getDefault().asyncExec(new Runnable() {
 								public void run() {
-									// This wouldn't work outside the thread
+									/*
+									 * This wouldn't work outside the thread,
+									 * because at this point the main shell
+									 * hasn't been created yet.
+									 */
 									indexingDialog.open();
 								}
 							});

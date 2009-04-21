@@ -28,7 +28,7 @@ import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.UtilFile;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -46,7 +46,7 @@ public class RootScope extends Scope {
 	static final long serialVersionUID = 2;
 	
 	/** The Lucene Analyzer used. */
-	public static final Analyzer analyzer = new SimpleAnalyzer();
+	public static final Analyzer analyzer = new StandardAnalyzer();
 	
 	/** The Lucene IndexWriter used. */
 	private transient IndexWriter writer;
