@@ -44,28 +44,21 @@ bool isUniqueInstance();
 int main(){
 	dbg = true;
 
+	if(!_folderWatcher.findIndexesFile()) {
+		log("findIndexesFile failed");
+		return 1;
+	}
+
 	if(!isUniqueInstance()) {
 		log("another instance is running...");
 		return 1;
 	}
 
 
-
-
-	if(!_folderWatcher.findIndexesFile()) {
-		log("findIndexesFile failed");
-		return 1;
-	}
-
-
-
 	// Check of DocFetcher's lock file every 2 seconds
 	// the command "lsof | grep indexes.txt >daemon.tmp"
 	// tells if the file is used
-
 	std::string lock_file = _folderWatcher.getLockFile();
-
-
 
 	// the tmp file is put next to the lock file,
 	// to be sure the daemon has write acces
@@ -132,12 +125,15 @@ void *startThreadedWatch(void *threadid) {
 bool isUniqueInstance(){
 	struct flock fl;
 
+	std::string daemon_lock_file = _folderWatcher.getLockFile();
+	daemon_lock_file += ".daemon.lock";
+
 	fl.l_type = F_WRLCK;
 	fl.l_whence = SEEK_SET;
 	fl.l_start = 0;
 	fl.l_len = 1;
 	int fdlock;
-	if((fdlock = open("daemon.lock", O_WRONLY|O_CREAT, 0666)) == -1) {
+	if((fdlock = open(daemon_lock_file.c_str(), O_WRONLY|O_CREAT, 0666)) == -1) {
 		log("cannot open daemon lock");
 		return false;
 	}
