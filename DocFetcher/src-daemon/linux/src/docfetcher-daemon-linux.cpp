@@ -56,7 +56,7 @@ int main(){
 
 
 	// Check of DocFetcher's lock file every 2 seconds
-	// the command "lsof | grep indexes.txt >daemon.tmp"
+	// the command "lsof | grep .indexes.txt.lock$ >daemon.tmp"
 	// tells if the file is used
 	std::string lock_file = _folderWatcher.getLockFile();
 
@@ -66,7 +66,7 @@ int main(){
 
 	std::string cmd_line = "lsof | grep ";
 	cmd_line += lock_file;
-	cmd_line += " >";
+	cmd_line += "$ >";
 	cmd_line += tmp_file;
 
 	log("lock file : %s", lock_file.c_str());
