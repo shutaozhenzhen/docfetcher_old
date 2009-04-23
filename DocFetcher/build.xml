@@ -150,7 +150,7 @@
 			<fileset dir="${versiondir}/licenses"/>
 		</copy>
 		<copy todir="${programdir}/indexes">
-			<fileset dir="resources" includes="indexes.txt"/>
+			<fileset dir="resources" includes=".indexes.txt"/>
 		</copy>
 		<zip destfile="build/docfetcher_${version}_portable.zip" basedir="build/tmp"/>
 		<delete dir="build/tmp"/>
