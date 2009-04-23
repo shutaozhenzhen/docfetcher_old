@@ -221,11 +221,6 @@ bool FolderWatcher::updateIndexesFile() {
 		out << itFolder->second._path << std::endl;
 	}
 
-	if(bAllFoldersModified) {
-		log("asking to quit");
-		exit(0);
-	}
-
 	return true;
 }
 
