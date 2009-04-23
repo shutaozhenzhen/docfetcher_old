@@ -153,9 +153,11 @@ public class DocFetcher extends ApplicationWindow {
 			if (Const.IS_WINDOWS)
 				Runtime.getRuntime().exec("docfetcher-daemon-win.exe"); //$NON-NLS-1$
 			else if (Const.IS_LINUX) {
-				String daemonPath = "/usr/share/docfetcher/docfetcher-daemon-linux"; //$NON-NLS-1$
-				if (! new File(daemonPath).exists())
+				String daemonPath = null;
+				if (Const.IS_PORTABLE)
 					daemonPath = "docfetcher-daemon-linux"; //$NON-NLS-1$
+				else
+					daemonPath = "/usr/share/docfetcher/docfetcher-daemon-linux"; //$NON-NLS-1$
 				Runtime.getRuntime().exec(daemonPath);
 			}
 		} catch (IOException e) {
