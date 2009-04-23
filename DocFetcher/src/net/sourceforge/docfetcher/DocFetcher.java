@@ -155,7 +155,7 @@ public class DocFetcher extends ApplicationWindow {
 			else if (Const.IS_LINUX) {
 				String daemonPath = null;
 				if (Const.IS_PORTABLE)
-					daemonPath = "docfetcher-daemon-linux"; //$NON-NLS-1$
+					daemonPath = Const.USER_DIR + "/docfetcher-daemon-linux"; //$NON-NLS-1$
 				else
 					daemonPath = "/usr/share/docfetcher/docfetcher-daemon-linux"; //$NON-NLS-1$
 				Runtime.getRuntime().exec(daemonPath);
