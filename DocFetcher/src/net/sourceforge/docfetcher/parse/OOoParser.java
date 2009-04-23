@@ -22,13 +22,13 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import net.htmlparser.jericho.CharacterReference;
+import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.util.UtilList;
-import au.id.jericho.lib.html.CharacterReference;
-import au.id.jericho.lib.html.Element;
-import au.id.jericho.lib.html.Source;
-import au.id.jericho.lib.html.StartTag;
 
 import com.catcode.odf.OpenDocumentTextInputStream;
 
@@ -53,7 +53,7 @@ public abstract class OOoParser extends Parser {
 			Source manifSource = new Source(manifInputStream);
 			manifInputStream.close();
 			manifSource.setLogger(null);
-			StartTag encryptTag = manifSource.findNextStartTag(0, "manifest:encryption-data"); //$NON-NLS-1$
+			StartTag encryptTag = manifSource.getNextStartTag(0, "manifest:encryption-data"); //$NON-NLS-1$
 			if (encryptTag != null)
 				throw new ParseException(file, Msg.doc_pw_protected.value());
 			
@@ -82,7 +82,7 @@ public abstract class OOoParser extends Parser {
 				Source contentSource = new Source(contentInputStream);
 				contentInputStream.close();
 				contentSource.setLogger(null);
-				Element contentElement = contentSource.findNextElement(0, "office:body"); //$NON-NLS-1$
+				Element contentElement = contentSource.getNextElement(0, "office:body"); //$NON-NLS-1$
 				String content = contentElement.getContent().getTextExtractor().toString();
 				sb.append(content).append(" "); //$NON-NLS-1$
 			}
@@ -111,7 +111,7 @@ public abstract class OOoParser extends Parser {
 	 * HTML source. Returns null if the HTML element is not found.
 	 */
 	private String getElementContent(Source source, String elementName) {
-		Element el = source.findNextElement(0, elementName);
+		Element el = source.getNextElement(0, elementName);
 		return el == null ? null : CharacterReference.decode(el.getContent());
 	}
 	

@@ -245,18 +245,24 @@ public class PreviewPanel extends Composite {
 	 * somewhere in between).
 	 */
 	private void scrollToMiddle(int caretOffset) {
-		int lineIndexNow = textViewer.getLineAtOffset(caretOffset);
-		int lineIndexTop = textViewer.getTopIndex();
-		int lineIndexBottom = textViewer.getLineIndex(textViewer.getClientArea().height);
-		double dist = lineIndexBottom - lineIndexTop;
-		int dist3 = (int) (dist / 3);
-		int dist23 = (int) (2 * dist / 3);
-		double lineIndexMiddleTop = lineIndexTop + dist / 3;
-		double lineIndexMiddleBottom = lineIndexBottom - dist / 3;
-		if (lineIndexNow < lineIndexMiddleTop)
-			textViewer.setTopIndex(lineIndexNow - dist3);
-		else if (lineIndexNow > lineIndexMiddleBottom)
-			textViewer.setTopIndex(lineIndexNow - dist23);
+		try {
+			int lineIndexNow = textViewer.getLineAtOffset(caretOffset);
+			int lineIndexTop = textViewer.getTopIndex();
+			int lineIndexBottom = textViewer.getLineIndex(textViewer.getClientArea().height);
+			double dist = lineIndexBottom - lineIndexTop;
+			int dist13 = (int) (dist / 3);
+			int dist23 = (int) (2 * dist / 3);
+			double lineIndexMiddleTop = lineIndexTop + dist / 3;
+			double lineIndexMiddleBottom = lineIndexBottom - dist / 3;
+			if (lineIndexNow < lineIndexMiddleTop)
+				textViewer.setTopIndex(lineIndexNow - dist13);
+			else if (lineIndexNow > lineIndexMiddleBottom)
+				textViewer.setTopIndex(lineIndexNow - dist23);
+		}
+		catch (Exception e) {
+			// textViewer.getLineAtOffset(..) can throw an IllegalArgumentException
+			// See bug #2778204
+		}
 	}
 	
 	/**
@@ -366,24 +372,34 @@ public class PreviewPanel extends Composite {
 		
 		new Thread() { // run in a thread because parsing the file takes some time
 			public void run() {
-				String text; // the raw text extracted from the file
+				// Extract the raw text from the file
+				String text;
+				boolean fileParsed = true;
 				try {
 					text = parser.renderText(file);
-				} catch (ParseException e) {
+				}
+				catch (ParseException e) {
 					text = Msg.cant_read_file.format(e.getMessage());
-				} catch (OutOfMemoryError e) {
+					fileParsed = false;
+				}
+				catch (OutOfMemoryError e) {
 					/*
 					 * We can get here if the user sets a high java heap space
 					 * value during indexing and then sets a lower value for
 					 * search only usage.
 					 */
 					text = Msg.out_of_jvm_memory.value();
+					fileParsed = false;
 				}
 				
 				if (PreviewPanel.this.file != file)
 					return; // Another preview request had been started while we were parsing
 				
-				// Create the message that will displayed when the character limit is reached
+				/*
+				 * Create the message that will displayed if the character limit
+				 * is reached. It is appended to the file contents later; if it
+				 * was appended here, some words in it might get highlighted.
+				 */
 				int maxLength = Pref.Int.PreviewLimit.getValue();
 				final String msg = "...\n\n\n[" //$NON-NLS-1$
 					+ Msg.preview_limit_hint.format(new Object[] {
@@ -396,9 +412,14 @@ public class PreviewPanel extends Composite {
 					text = text.substring(0, maxLength - msg.length());
 				final String fText = text;
 				
-				// Create StyleRange ranges (i.e. start-end integer pairs) for search term highlighting
+				/*
+				 * Create StyleRange ranges (i.e. start-end integer pairs) for
+				 * search term highlighting. Only tokenize preview text if we're
+				 * not displaying any info messages and if there are tokens to
+				 * highlight.
+				 */
 				ranges = new int[0];
-				if (terms.length != 0) { // Only tokenize preview text if there are tokens to highlight
+				if (fileParsed && terms.length != 0) {
 					List<Integer> rangesList = new ArrayList<Integer> ();
 					Analyzer analyzer = RootScope.analyzer;
 					TokenStream tokenStream = analyzer.tokenStream("", new StringReader(text)); //$NON-NLS-1$
@@ -429,10 +450,11 @@ public class PreviewPanel extends Composite {
 				}
 				
 				// Parsing and tokenizing done; display the results
+				final boolean fFileParsed = fileParsed;
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						textViewer.setText(fText);
-						setHighlighting(Pref.Bool.HighlightSearchTerms.getValue());
+						setHighlighting(fFileParsed && Pref.Bool.HighlightSearchTerms.getValue());
 						occurrenceCounter.setText(Integer.toString(ranges.length / 2));
 						if (exceeded)
 							textViewer.append(msg); // character limit exceeded, append hint

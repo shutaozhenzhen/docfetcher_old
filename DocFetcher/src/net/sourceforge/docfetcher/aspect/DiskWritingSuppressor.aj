@@ -11,10 +11,14 @@
 
 package net.sourceforge.docfetcher.aspect;
 
+import java.io.FileWriter;
+
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
+import net.sourceforge.docfetcher.ExceptionHandler;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.model.Serializer;
 
 /**
@@ -46,5 +50,15 @@ public privileged aspect DiskWritingSuppressor {
 	void around(): execution(* Serializer.save(..)) {
 		if (writable) proceed();
 	}
+	
+	void around(): execution(* ScopeRegistry.save(..)) {
+		if (writable) proceed();
+	}
+	
+	declare warning: call(FileWriter+.new(..))
+	&& !withincode(* Pref.save())
+	&& !withincode(* ScopeRegistry.save(..))
+	&& !withincode(* ExceptionHandler.appendError(..)):
+		"Don't write to disk without updating net.sourceforge.docfetcher.aspect.DiskWritingSuppressor."; //$NON-NLS-1$
 
 }

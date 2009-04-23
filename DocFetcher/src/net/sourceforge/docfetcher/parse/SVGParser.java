@@ -17,11 +17,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.htmlparser.jericho.CharacterReference;
+import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.Source;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.Document;
-import au.id.jericho.lib.html.CharacterReference;
-import au.id.jericho.lib.html.Element;
-import au.id.jericho.lib.html.Source;
 
 /**
  * @author Tran Nam Quang
@@ -75,7 +75,7 @@ public class SVGParser extends Parser {
 	 * HTML source. Returns null if the HTML element is not found.
 	 */
 	private String getElementContent(Source source, String elementName) {
-		Element el = source.findNextElement(0, elementName);
+		Element el = source.getNextElement(0, elementName);
 		return el == null ? null : CharacterReference.decode(el.getTextExtractor().toString());
 	}
 

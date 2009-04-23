@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.Source;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.util.UtilFile;
-import au.id.jericho.lib.html.Element;
-import au.id.jericho.lib.html.Source;
 
 /**
  * @author Tran Nam Quang
@@ -46,7 +46,7 @@ public class AbiWordParser extends Parser {
 	 * or null if the key-value-pair was not found.
 	 */
 	private String getMetaData(Source source, String key) {
-		Element metaElement = source.findNextElement(0, "key", key, false); //$NON-NLS-1$
+		Element metaElement = source.getNextElement(0, "key", key, false); //$NON-NLS-1$
 		if (metaElement == null) return null;
 		return metaElement.getTextExtractor().toString();
 	}
@@ -56,9 +56,9 @@ public class AbiWordParser extends Parser {
 		
 		// Find all top level elements, excluding the metadata element
 		List<Element> topLevelNonMetaElements = new ArrayList<Element> ();
-		int pos = source.findNextElement(0, "metadata").getEnd(); //$NON-NLS-1$
+		int pos = source.getNextElement(0, "metadata").getEnd(); //$NON-NLS-1$
 		while (pos < source.length()) {
-			Element next = source.findNextElement(pos);
+			Element next = source.getNextElement(pos);
 			if (next == null) break;
 			topLevelNonMetaElements.add(next);
 			pos = next.getEnd();

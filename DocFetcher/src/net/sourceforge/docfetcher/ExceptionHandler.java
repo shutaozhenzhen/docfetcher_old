@@ -111,6 +111,7 @@ public class ExceptionHandler {
 			fileWriter.write(str);
 			fileWriter.flush();
 		} catch (IOException e) {
+			// This might happen when the DocFetcher is run from a CD-ROM
 		}
 	}
 

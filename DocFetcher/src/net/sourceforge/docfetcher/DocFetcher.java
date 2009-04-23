@@ -153,12 +153,14 @@ public class DocFetcher extends ApplicationWindow {
 			if (Const.IS_WINDOWS)
 				Runtime.getRuntime().exec("docfetcher-daemon-win.exe"); //$NON-NLS-1$
 			else if (Const.IS_LINUX) {
-				String daemonPath = null;
-				if (Const.IS_PORTABLE)
-					daemonPath = Const.USER_DIR + "/docfetcher-daemon-linux"; //$NON-NLS-1$
-				else
-					daemonPath = "/usr/share/docfetcher/docfetcher-daemon-linux"; //$NON-NLS-1$
-				Runtime.getRuntime().exec(daemonPath);
+				if (! Const.IS_PORTABLE)
+					Runtime.getRuntime().exec("/usr/share/docfetcher/docfetcher-daemon-linux"); //$NON-NLS-1$
+				// Don't launch daemon if DocFetcher is portable and runs from a CD-ROM (i.e. not writable)
+				else if (Const.PROGRAM_FOLDER.canWrite()) {
+					String daemonPath = Const.USER_DIR + "/docfetcher-daemon-linux"; //$NON-NLS-1$
+					new File(daemonPath).setExecutable(true, false);
+					Runtime.getRuntime().exec(daemonPath);
+				}
 			}
 		} catch (IOException e) {
 			// nothing?

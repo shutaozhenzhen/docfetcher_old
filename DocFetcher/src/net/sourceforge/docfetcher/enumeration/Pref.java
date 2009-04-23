@@ -248,7 +248,8 @@ public class Pref {
 	public static void load() {
 		File propFile = Const.USER_PROPERTIES_FILE;
 		try {
-			propFile.createNewFile();
+			if (! propFile.exists())
+				propFile.createNewFile();
 			FileInputStream inStream = new FileInputStream(propFile);
 			Properties prop = new Properties();
 			prop.load(inStream);

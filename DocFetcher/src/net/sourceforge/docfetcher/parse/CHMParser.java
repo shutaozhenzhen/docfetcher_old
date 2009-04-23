@@ -17,13 +17,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import net.htmlparser.jericho.Source;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.Document;
 
 import org.chm4j.ChmEntry;
 import org.chm4j.ChmFile;
-
-import au.id.jericho.lib.html.Source;
 
 /**
  * @author Tran Nam Quang

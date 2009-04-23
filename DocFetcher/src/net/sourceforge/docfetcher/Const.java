@@ -175,7 +175,10 @@ public class Const {
 		try {
 			DAEMON_LOCK = new FileOutputStream(daemon_lock_file_path);
 		} catch (FileNotFoundException e) {
-			// This can occur if two instances are running, or someone is using the file
+			/*
+			 * This can occur if two instances are running, if someone is using
+			 * the file or if DocFetcher is run from a CD-ROM.
+			 */
 			e.printStackTrace();
 		}
 	}

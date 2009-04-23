@@ -140,10 +140,10 @@ public class RootScope extends Scope {
 			List<File> removeFromIndex = new ArrayList<File> ();
 			cleanupRegistry(this, removeFromIndex);
 			
+			// Delete missing files from Lucene index
 			try {
-				// Delete missing files from Lucene index
 				reader = IndexReader.open(indexDir);
-
+				
 				/*
 				 * Do not use 'reader.numDocs()' in the for-loop header; it will
 				 * decrease with each deleted document, causing the loop to
@@ -153,6 +153,7 @@ public class RootScope extends Scope {
 				for (int i = 0; i < numDocs; i++) {
 					if (Thread.currentThread().isInterrupted()) break;
 					String pathCandidate = reader.document(i).get(Document.path);
+					pathCandidate = new File(pathCandidate).getAbsolutePath(); // Possible conversion from Linux to Windows paths or vice versa
 					File removeFile = null;
 					for (File f : removeFromIndex)
 						if (f.getAbsolutePath().equals(pathCandidate)) {

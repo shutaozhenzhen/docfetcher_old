@@ -1,13 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
+
+
 <link rel="shortcut icon" href="/docfetcher16.png">
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"><title>DocFetcher - Fast Document Search</title>
 
 <meta name="author" content="Tran Nam Quang">
 <link type="text/css" href="web.css" rel="stylesheet">
 <meta name="keywords" content="DocFetcher, desktop search, file management, search, document, retrieval, indexing, Apache Lucene">
-<meta name="description" content="Homepage of DocFetcher, a desktop search application for fast document retrieval"></head>
-<body>
+<meta name="description" content="Homepage of DocFetcher, a desktop search application for fast document retrieval"></head><body>
 <div id="header"><img style="width: 750px; height: 209px;" alt="" src="docfetcher-logo.png"></div>
 <div id="page">
 <div id="menu">
@@ -53,7 +54,7 @@ less than a second.</li></ul><h1>But There's More To It...</h1><ul>
 Indexes are updated automatically when files in the corresponding
 folders are modified, even when DocFetcher isn't running. This is done
 via a&nbsp;daemon that waits in the background and watches all indexed
-folders. The daemon has very low memory footprint and CPU usage,
+folders. The daemon has very low CPU usage,
 because, rather than indexing&nbsp;files itself, it only remembers
 which indexes need to be updated the next time DocFetcher is launched.</li><li><span style="font-weight: bold;">A portable version</span>:
 Runs on both Windows and Linux.
@@ -86,14 +87,17 @@ criteria (filetype, filesize, path, etc.).</li><li>Global hotkey to bring DocFet
 <li>HTML and plain text (both customizable)</li>
 <li>Portable Document Format (pdf)<br>
 </li>
-<li>Microsoft Office&nbsp;Word (doc), Excel (xls) and
-PowerPoint (ppt)</li>
-<li>OpenOffice.org Writer, Calc, Draw and Impress</li>
+  <li>Microsoft Office (doc, xls, ppt)</li>
+  <li>Microsoft Office 2007 (docx, xlsx, pptx)<br>
+  </li>
+
+<li>OpenOffice.org Writer, Calc, Draw and Impress (odt, ods, odg, odp)<br>
+</li>
 <li>Rich Text Format (rtf)</li>
 <li>AbiWord (abw, abw.gz, zabw)</li>
 <li>Microsoft Compiled HTML Help (chm)</li>
-<li>Microsoft Visio (vsd)</li><li>Scalable Vector Graphics (svg)</li>
-<li>(In the works: MS Office 2007)<br></li>
+<li>Microsoft Visio (vsd)</li>
+<li>Scalable Vector Graphics (svg)<br></li>
 </ul><h1>What Some People Think About This Program...</h1>
 <table style="width: 100px; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
 <tbody>
@@ -108,37 +112,36 @@ PowerPoint (ppt)</li>
 </tr>
 </tbody>
 </table>
-<h1>Comparison To Other Desktop Search Applications</h1>
-Why would you use this program instead of other, more popular desktop search applications such as
-Google Desktop Search, Copernic Desktop Search and Beagle? Here's why:
-Programs such as these can index a lot more than just documents
-(images, videos, e-mails, IM sessions, programs, etc.), and the
-authors of DocFetcher believe&nbsp;this is mostly a <span style="font-style: italic;">bad</span> thing, for the
-following reasons:<br>
+<h1>Comparison To Other Desktop Search Applications</h1>At least two
+things set DocFetcher apart from other desktop search applications,
+such as Google Desktop. First, it defaults to indexing only what you
+need, not to indexing the entire harddrive, and second, it indexes
+documents only - pictures, music, videos, etc. are omitted. Here's why
+we believe this is just fine the way it is:<br>
 <ul>
-<li>The real power of Google and other web search engines comes
+<li>The bigger the search scope, the more "noise" there will be in the search results. Accordingly, you will find that DocFetcher
+generally gives better search results than similar programs.</li>
+  <li>Less files to index = faster indexing and decreased CPU
+usage. (Don't
+you just hate it when there's always some program busily working in the
+background?)</li>
+  <li>The real power of Google and other web search engines comes
 from
 document indexing, because it gives a very good approximation of
 the <span style="font-style: italic;">content</span>
 of a document. Indexing images or videos however isn't all that useful,
 because the real&nbsp;content of an image or a video is not
-accessible via text extraction.</li><li>Why install yet another program to access&nbsp;images,
+accessible via text extraction.</li>
+
+
+<li>Why install yet another program to access&nbsp;images,
 music, videos, e-mails, etc., if your favorite picture browser, media player, e-mail
 client, and so on, has been optimized for many years to do <span style="font-style: italic;">just that</span>? Why would you use a half-baken, generic search interface then? So, no images, no music, no videos... - what's
 left?&nbsp;Documents. And that's what DocFetcher is good for. (By
 the
 way, <a href="http://www.launchy.net/">Launchy</a>
-is recommended for quickly launching start menu programs.)</li>
-<li>The bigger the search scope, the more "noise" there will be
-on the search results. Accordingly, you will find that DocFetcher
-generally gives better search results than similar programs, because,
-first, it only indexes documents, and second, it deliberately restricts
-itself to a few selected folders instead of indexing the entire
-harddrive.</li>
-<li>Less files to index = faster indexing and decreased CPU
-usage. (Don't
-you just hate it when there's always some program busily working in the
-background?)</li>
+is recommended for quickly launching start menu entries.)<br>
+</li>
 </ul>
 Other than that, if you don't need eye candy, but want a powerful
 Open Source tool that just does what it's supposed to do, <span style="font-style: italic;">without</span> violating your privacy and <span style="font-style: italic;">without</span> installing "extras", then this program is for you!
@@ -161,6 +164,6 @@ piwik_idsite = 1;
 piwik_url = pkBaseURL + "piwik.php";
 piwik_log(piwik_action_name, piwik_idsite, piwik_url);
 </script>
-<object><noscript><p><img src="http://apps.sourceforge.net/piwik/docfetcher/piwik.php?idsite=1" alt="piwik"/></p></noscript></object>
+<object><noscript><p><img src="http://apps.sourceforge.net/piwik/docfetcher/piwik.php?idsite=1" alt="piwik"></p></noscript></object>
 <!-- End Piwik Tag -->
 </body></html>

@@ -19,15 +19,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.IllegalCharsetNameException;
 
+import net.htmlparser.jericho.CharacterReference;
+import net.htmlparser.jericho.Element;
+import net.htmlparser.jericho.HTMLElementName;
+import net.htmlparser.jericho.Source;
+import net.htmlparser.jericho.StartTag;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.util.UtilFile;
-import au.id.jericho.lib.html.CharacterReference;
-import au.id.jericho.lib.html.Element;
-import au.id.jericho.lib.html.HTMLElementName;
-import au.id.jericho.lib.html.Source;
-import au.id.jericho.lib.html.StartTag;
 
 /**
  * @author Tran Nam Quang
@@ -73,7 +73,7 @@ public class HTMLParser extends Parser {
 		source.fullSequentialParse();
 
 		// Get tags
-		Element titleElement = source.findNextElement(0, HTMLElementName.TITLE);
+		Element titleElement = source.getNextElement(0, HTMLElementName.TITLE);
 		String[] metaData = new String[] {
 				titleElement == null ? null : CharacterReference.decodeCollapseWhiteSpace(titleElement.getContent()),
 						getMetaValue(source, "author"), //$NON-NLS-1$
@@ -82,7 +82,7 @@ public class HTMLParser extends Parser {
 		}; 
 
 		// Get contents and append tags
-		Element bodyElement = source.findNextElement(0, HTMLElementName.BODY);
+		Element bodyElement = source.getNextElement(0, HTMLElementName.BODY);
 		String contents = bodyElement == null ? "" : bodyElement.getContent().getTextExtractor().toString(); //$NON-NLS-1$
 		StringBuffer sb = new StringBuffer(contents);
 		for (String field : metaData)
@@ -146,7 +146,7 @@ public class HTMLParser extends Parser {
 	private String getMetaValue(Source source, String key) {
 		int pos = 0;
 		while(pos < source.length()) {
-			StartTag startTag = source.findNextStartTag(pos, "name", key, false); //$NON-NLS-1$
+			StartTag startTag = source.getNextStartTag(pos, "name", key, false); //$NON-NLS-1$
 			if (startTag == null) return null;
 			if (startTag.getName() == HTMLElementName.META)
 				return startTag.getAttributeValue("content"); //$NON-NLS-1$
