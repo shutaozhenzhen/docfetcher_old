@@ -576,14 +576,5 @@ public class UtilFile {
 		}
 		return output;
 	}
-	
-	/**
-	 * Returns whether the two given path strings are equal. They are considered
-	 * equal even if they contain different path separators
-	 * ("\" on Windows and "/" on Linux).
-	 */
-	public static boolean equalPaths(String path1, String path2) {
-		return path1.replace("\\", "/").equals(path2.replace("\\", "/")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	}
 
 }
