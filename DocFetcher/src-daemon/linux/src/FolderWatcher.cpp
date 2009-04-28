@@ -149,14 +149,25 @@ bool FolderWatcher::startWatch() {
 }
 
 /**
- * Initialization, called at the beginning
+ * Stop watching
  *
- * initializes the map of indexed folders and adds the watches
+ * clears the map of indexed folders and closes the watch
  *
  */
 bool FolderWatcher::stopWatch() {
+
+	folders_container_type::const_iterator itFolder;
+	for(itFolder = _indexed_folders.begin() ; itFolder != _indexed_folders.end() ; ++itFolder) {
+		if(!itFolder->second._modified) {
+			inotify_rm_watch(_fd, itFolder->first);
+		}
+	}
+
+	_indexed_folders.clear();
+
 	close(_fd);
 	_fd = -1;
+
 	return true;
 }
 
