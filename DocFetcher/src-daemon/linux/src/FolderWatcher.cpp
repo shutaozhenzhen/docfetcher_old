@@ -23,6 +23,8 @@
 
 #include <unistd.h>
 
+#include <dirent.h>
+
 #include <sys/stat.h>
 #include <stdlib.h>
 
@@ -118,6 +120,9 @@ bool FolderWatcher::startWatch() {
 	WatchedFolder aWatchedFolder;
 	aWatchedFolder._modified = false;
 
+	int watchId = 0;
+
+
  	while(std::getline(in,line)){
 		if(line.empty()){
 			continue;
@@ -131,14 +136,13 @@ bool FolderWatcher::startWatch() {
 
 			file_name = line;
 
-			int watchId = inotify_add_watch(_fd, file_name.c_str(), notifyFilter);
-
-			if(watchId == 0 ) {
+			if(!addWatchRecursive(true, watchId, file_name, notifyFilter)) {
 				log("error add_watch for dir=%s", line.c_str());
 			}else{
 				log("Watch installed for directory %s", line.c_str());
 				aWatchedFolder._path = line;
 				_indexed_folders.insert(std::make_pair(watchId, aWatchedFolder));
+				watchId++;
 			}
 
 		}
@@ -148,6 +152,69 @@ bool FolderWatcher::startWatch() {
 	return (_indexed_folders.size() > 0);
 }
 
+bool FolderWatcher::addWatchRecursive(const bool isRoot, const int watchId, const std::string &folder_name, const long notifyFilter) {
+
+	if(isRoot) {
+		int inotifyId = inotify_add_watch(_fd, folder_name.c_str(), notifyFilter);
+		if(inotifyId==-1) {
+			log("error inotify_add_watch for root=%s", folder_name.c_str());
+			return false;
+		}else{
+			_inotify2id.insert(std::make_pair(inotifyId, watchId));
+			log("watch added for root=%s", folder_name.c_str());
+		}
+	}
+
+    DIR * rep = opendir(folder_name.c_str());
+
+	std::string sub_folder_name;
+
+    if (rep != NULL)
+    {
+        struct dirent * ent;
+
+        while ((ent = readdir(rep)) != NULL)
+        {
+			sub_folder_name = ent->d_name;
+			if(sub_folder_name == "." || sub_folder_name == "..") {
+				continue;
+			}
+
+			sub_folder_name = folder_name + "/" + ent->d_name;
+
+			struct stat st;
+
+			if(stat(sub_folder_name.c_str(), &st) != 0) {
+				continue;
+			}
+
+			if(!S_ISDIR(st.st_mode)) {
+				continue;
+			}
+
+
+			int inotifyId = inotify_add_watch(_fd, sub_folder_name.c_str(), notifyFilter);
+
+			if(inotifyId==-1) {
+				log("error inotify_add_watch for sub_dir=%s", sub_folder_name.c_str());
+				continue;
+			}else{
+				_inotify2id.insert(std::make_pair(inotifyId, watchId));
+				log("watch added for sub_dir=%s", sub_folder_name.c_str());
+
+				addWatchRecursive(false, watchId, sub_folder_name, notifyFilter);
+			}
+
+        }
+
+        closedir(rep);
+     }
+
+     return true;
+
+}
+
+
 /**
  * Stop watching
  *
@@ -156,14 +223,8 @@ bool FolderWatcher::startWatch() {
  */
 bool FolderWatcher::stopWatch() {
 
-	folders_container_type::const_iterator itFolder;
-	for(itFolder = _indexed_folders.begin() ; itFolder != _indexed_folders.end() ; ++itFolder) {
-		if(!itFolder->second._modified) {
-			inotify_rm_watch(_fd, itFolder->first);
-		}
-	}
-
 	_indexed_folders.clear();
+	_inotify2id.clear();
 
 	close(_fd);
 	_fd = -1;
@@ -180,23 +241,30 @@ bool FolderWatcher::stopWatch() {
  * Removes the watch and updates the indexes file
  *
  */
-void FolderWatcher::callback(int watchID, int action) {
-	log("callback : watchID=%d,action=%d", watchID, action);
+void FolderWatcher::callback(int inotifyId, int action) {
+	log("callback : inotifyId=%d,action=%d", inotifyId, action);
 
-	if(_indexed_folders.find(watchID) == _indexed_folders.end()) {
+	if(_inotify2id.find(inotifyId) == _inotify2id.end()) {
 		log("id unknown ???");
 		return;
 	}
 
-	inotify_rm_watch(_fd, watchID);
+	const int watchId = _inotify2id[inotifyId];
 
-	if(_indexed_folders[watchID]._modified == true){
+	if(_indexed_folders[watchId]._modified == true){
 		log("already done...");
 		return;
 
 	}
 
-	_indexed_folders[watchID]._modified = true;
+	for(inotify2id_container_type::const_iterator it = _inotify2id.begin() ; it != _inotify2id.end() ; ++it) {
+		if(it->second == watchId) {
+			inotify_rm_watch(_fd, it->first);
+		}
+
+	}
+
+	_indexed_folders[watchId]._modified = true;
 
 	if(!updateIndexesFile()){
 		log("updateIndexesFile failed");
@@ -210,7 +278,6 @@ void FolderWatcher::callback(int watchID, int action) {
 /**
  * Writes the indexes file
  *
- * If all folders are modified, we exit the daemon
  *
  */
 bool FolderWatcher::updateIndexesFile() {

@@ -20,6 +20,7 @@ struct WatchedFolder {
 class FolderWatcher {
 public:
 	typedef std::map<int,WatchedFolder> folders_container_type;
+	typedef std::map<int,int> 			inotify2id_container_type;
 
 	FolderWatcher();
 	virtual ~FolderWatcher();
@@ -35,15 +36,19 @@ public:
 
 
 private:
+	bool updateIndexesFile();
+	bool addWatchRecursive(const bool, const int, const std::string &, const long);
+
+
+
 	void callback(int watchID, int action);
 
 	std::string _indexes_file_path;
 	const char CHAR_MODIFIED;
 
 
-	bool updateIndexesFile();
-
 	folders_container_type _indexed_folders;
+	inotify2id_container_type   _inotify2id;
 
 	int _fd;
 };
