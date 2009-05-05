@@ -51,7 +51,7 @@ public class ParserRegistry {
 		new PDFParser(),
 		new RTFParser(),
 		new SVGParser(),
-		//new WordPerfectParser()
+		//new WordPerfectParser() // Not supported on Windows, therefore disabled
 	};
 
 	// Additional reference to the text parser for faster access.

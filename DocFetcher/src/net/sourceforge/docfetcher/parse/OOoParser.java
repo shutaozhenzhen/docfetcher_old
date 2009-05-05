@@ -83,6 +83,8 @@ public abstract class OOoParser extends Parser {
 				contentInputStream.close();
 				contentSource.setLogger(null);
 				Element contentElement = contentSource.getNextElement(0, "office:body"); //$NON-NLS-1$
+				if (contentElement == null) // this content.xml file doesn't seem to contain text
+					continue;
 				String content = contentElement.getContent().getTextExtractor().toString();
 				sb.append(content).append(" "); //$NON-NLS-1$
 			}
