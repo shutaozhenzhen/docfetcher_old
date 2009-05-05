@@ -108,9 +108,6 @@ Section "DocFetcher"
     File resources\ChangeLog.txt
     File resources\Readme.txt
     
-    SetOutPath $APPDATA\DocFetcher
-    File resources\indexes.txt
-    
     SetOutPath $INSTDIR\licenses
 	File /r /x .svn resources\licenses\*.*
 	
