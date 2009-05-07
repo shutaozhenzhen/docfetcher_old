@@ -25,6 +25,7 @@ import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.model.HTMLPair;
 import net.sourceforge.docfetcher.model.Job;
 import net.sourceforge.docfetcher.model.ResultDocument;
 import net.sourceforge.docfetcher.model.RootScope;
@@ -148,22 +149,16 @@ public class DocFetcher extends ApplicationWindow {
 		docFetcher.open();
 		Display.getCurrent().dispose();
 		
-		// Launch daemon
-		try {
-			if (Const.IS_WINDOWS)
-				Runtime.getRuntime().exec("docfetcher-daemon-win.exe"); //$NON-NLS-1$
-			else if (Const.IS_LINUX) {
-				if (! Const.IS_PORTABLE)
-					Runtime.getRuntime().exec("/usr/share/docfetcher/docfetcher-daemon-linux"); //$NON-NLS-1$
-				// Don't launch daemon if DocFetcher is portable and runs from a CD-ROM (i.e. not writable)
-				else if (Const.PROGRAM_FOLDER.canWrite()) {
-					String daemonPath = Const.USER_DIR + "/docfetcher-daemon-linux"; //$NON-NLS-1$
-					new File(daemonPath).setExecutable(true, false);
-					Runtime.getRuntime().exec(daemonPath);
-				}
+		/*
+		 * Launch the daemon on the installed Linux version (because the debian
+		 * installer can't do it).
+		 */
+		if (Const.IS_LINUX && ! Const.IS_PORTABLE) {
+			try {
+				Runtime.getRuntime().exec("/usr/share/docfetcher/docfetcher-daemon-linux"); //$NON-NLS-1$
+			} catch (IOException e) {
+				// Ignore
 			}
-		} catch (IOException e) {
-			// nothing?
 		}
 	}
 	
@@ -524,7 +519,7 @@ public class DocFetcher extends ApplicationWindow {
 				// changed file
 				if(line.length() > 1 && line.charAt(0) == '#'){
 					String folder_changed = line.substring(1);
-					RootScope rs = scopeReg.getEntryFromDirectory(new File(folder_changed));
+					RootScope rs = scopeReg.getEntry(new File(folder_changed));
 
 					if(rs==null){
 						// directory unknown ???
@@ -556,11 +551,16 @@ public class DocFetcher extends ApplicationWindow {
 				newRootScopes.add(new RootScope(file));
 			
 			if (! newRootScopes.isEmpty()) {
-				// Check all created RootScopes after the indexing, uncheck everything else
+				// Check all given RootScopes/Scopes after indexing, uncheck everything else
 				indexingDialog.evtClosed.add(new Event.Listener<IndexingDialog> () {
 					public void update(IndexingDialog eventData) {
-						for (RootScope candidate : scopeReg.getEntriesList())
-							candidate.setCheckedDeep(newRootScopes.contains(candidate));
+						for (RootScope rootScope : scopeReg.getEntries())
+							rootScope.setCheckedDeep(false);
+						for (RootScope newRootScope : newRootScopes) {
+							Scope scope = scopeReg.getScopeDeep(newRootScope.getFile());
+							if (scope != null)
+								scope.setCheckedDeep(true);
+						}
 						scopeGroup.updateCheckStates();
 						indexingDialog.evtClosed.remove(this); // unregister listener
 					}
@@ -569,11 +569,34 @@ public class DocFetcher extends ApplicationWindow {
 				// Start indexing and open up the indexing dialog
 				boolean jobsAdded = false;
 				for (RootScope rs : newRootScopes) {
-					if (scopeReg.containsEntry(rs.getFile()))
-						continue;
-					rs.setDeleteOnExit(true);
-					indexingDialog.addJob(new Job(rs, true, true));
-					jobsAdded = true;
+					/*
+					 * Note: Through this pathway, the user can create
+					 * intersecting RootScopes: For example, the user can create
+					 * a permanent index "C:\Docs\Stuff" and then create a
+					 * temporary index for "C:\Docs". This case is not
+					 * intercepted in the following for-if construct because
+					 * allowing it seems to be more convenient for the user.
+					 * 
+					 * Note 2: The user can also search in HTML folders, even if
+					 * there were already indexed.
+					 */
+					boolean allow = true;
+					for (RootScope oldScope : scopeReg.getEntries()) {
+						if (oldScope.equals(rs)) {
+							allow = false;
+							break;
+						}
+						if (oldScope.contains(rs)) {
+							HTMLPair htmlPair = scopeReg.getHTMLPair(rs.getFile());
+							allow = htmlPair != null;
+							break;
+						}
+					}
+					if (allow) {
+						rs.setDeleteOnExit(true);
+						indexingDialog.addUncheckedJob(new Job(rs, true, true));
+						jobsAdded = true;
+					}
 				}
 				if (jobsAdded) { // Only open indexing dialog if at least one new folder was indexed
 					new Thread() {
@@ -591,6 +614,8 @@ public class DocFetcher extends ApplicationWindow {
 						}
 					}.start();
 				}
+				else // Call the evtClosed handler anyway
+					indexingDialog.evtClosed.fireUpdate(indexingDialog);
 			}
 			else
 				setStatus(Msg.invalid_start_params.value());

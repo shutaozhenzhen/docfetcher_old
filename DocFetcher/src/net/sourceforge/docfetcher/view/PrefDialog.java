@@ -341,7 +341,7 @@ public class PrefDialog {
 			if (entry.getKey() == exclFilterBox)
 				newValue = UtilList.toString(
 						" $ ", //$NON-NLS-1$
-						UtilGUI.parseExclusionString(exclFilterBox.getText())
+						UtilList.parseExclusionString(exclFilterBox.getText())
 				);
 			else
 				newValue = entry.getKey().getText();

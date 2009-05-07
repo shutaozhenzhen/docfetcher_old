@@ -2,6 +2,11 @@
 
 cd /usr/share/docfetcher
 
+DDFILE=docfetcher-daemon-linux.desktop
+if [ ! -f ~/.config/autostart/$DDFILE ]; then
+	cp ./$DDFILE ~/.config/autostart
+fi
+
 CLASSPATH=
 for FILE in `ls ./lib/*.jar`
 do

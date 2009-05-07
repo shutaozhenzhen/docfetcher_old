@@ -112,7 +112,7 @@ class Modifiable implements Serializable {
 	
 	Modifiable (RootScope root, File file) {
 		this.root = root;
-		this.file = UtilFile.getRelativeFile(Const.PROGRAM_FOLDER, file);
+		this.file = UtilFile.getRelativeFile(Const.USER_DIR_FILE, file);
 		if (file.isDirectory()) {
 			children = new ArrayList<Modifiable> ();
 			for (File subFile : file.listFiles())

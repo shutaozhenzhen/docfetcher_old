@@ -43,7 +43,7 @@ public class Indexable implements Serializable, Comparable<Indexable> {
 	 * @param file The file represented by this object
 	 */
 	public Indexable(Scope parent, File file) {
-		this.file = UtilFile.getRelativeFile(Const.PROGRAM_FOLDER, file);
+		this.file = UtilFile.getRelativeFile(Const.USER_DIR_FILE, file);
 		this.parent = parent;
 		if (file == null)
 			throw new IllegalArgumentException("The file must not be null."); //$NON-NLS-1$
@@ -74,7 +74,7 @@ public class Indexable implements Serializable, Comparable<Indexable> {
 	 * @param The file represented by this object
 	 */
 	public void setFile(File file) {
-		this.file = UtilFile.getRelativeFile(Const.PROGRAM_FOLDER, file);
+		this.file = UtilFile.getRelativeFile(Const.USER_DIR_FILE, file);
 	}
 
 	public int compareTo(Indexable other) {

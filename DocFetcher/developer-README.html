@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DocFetcher Developer Readme</title>
 
 <meta content="Tran Nam Quang" name="author">
@@ -8,8 +9,7 @@
 <meta name="CREATED" content="20071010;12210300">
 <meta name="CHANGEDBY" content="Tran Quang">
 <meta name="CHANGED" content="20071010;21544900">
-<link rel="stylesheet" href="DocFetcher_Manual_files/style.css" type="text/css"></head>
-<body style="max-width: 640px; margin-left: auto; margin-right: auto; font-family: Helvetica; font-style: normal; font-variant: normal; font-weight: normal; font-size: 95%; line-height: normal; font-size-adjust: none; font-stretch: normal;">
+<link rel="stylesheet" href="DocFetcher_Manual_files/style.css" type="text/css"></head><body style="max-width: 640px; margin-left: auto; margin-right: auto; font-family: Helvetica; font-style: normal; font-variant: normal; font-weight: normal; font-size: 95%; line-height: normal; font-size-adjust: none; font-stretch: normal;">
 <div id="main" style="margin-bottom: 30px;">
 <h1><span style="font-family: monospace;"></span>
 Building DocFetcher<br></h1><ul><li>Note:
@@ -28,11 +28,16 @@ build script requires an additional Ant task that isn't shipped with
 the DocFetcher source, the AspectJ Tools. Download it from <a href="http://www.eclipse.org/aspectj/downloads.php">here</a>
 and put the "aspectjtools.jar" file in it on the root directory of
 the newly created DocFetcher project. Now you should be able to run the
-Ant build script.</li><li>To build the Windows installer, boot into Windows, install <a href="http://nsis.sourceforge.net/">NSIS</a>
-and
-execute build-win-installer.nsi. Important: The NSIS script must be run
+Ant build script.</li><li>To build the Windows installer, boot into Windows, then:</li>
+  <ul>
+    <li>Install <a href="http://nsis.sourceforge.net/">NSIS</a>.</li>
+    <li>Install the NSIS plugin "Processes" by copying the Processes.dll file from <span style="font-family: monospace;">[DocFetcher folder]\dev</span> to the <span style="font-family: monospace;">C:\Program Files\NSIS\Plugins</span> folder.<br>
+    </li>
+    <li>Execute build-win-installer.nsi. Important: The NSIS script must be run
 <span style="font-style: italic;">after</span> running the Ant script, because the source code cannot be
-compiled with NSIS alone.</li><li>The output of both build scripts will go to the build folder (which will be created if it doesn't exist).</li><li>To
+compiled with NSIS alone.</li>
+  </ul>
+<li>The output of both build scripts will go to the build folder (which will be created if it doesn't exist).</li><li>To
 increment the version number of DocFetcher, update the line "!define
 VERSION ???" at the beginning of the NSIS script and the line
 "&lt;property name="version" value="???"/&gt;" at the beginning of the

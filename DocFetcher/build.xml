@@ -77,7 +77,7 @@
 			<filelist dir="build" files="${jar.name}"/>
 		</copy>
 		<copy todir="build/tmp/usr/share/docfetcher">
-			<fileset dir="resources/deb" includes="**/*.sh"/>
+			<fileset dir="resources/deb" includes="**/*.sh, **/docfetcher-daemon-linux.desktop"/>
 			<fileset dir="resources" includes="**/*.schemas"/>
 			<fileset dir="resources/daemon" includes="docfetcher-daemon-linux"/>
 		</copy>
@@ -148,9 +148,6 @@
 		</copy>
 		<copy todir="${programdir}/licenses">
 			<fileset dir="${versiondir}/licenses"/>
-		</copy>
-		<copy todir="${programdir}/indexes">
-			<fileset dir="resources" includes=".indexes.txt"/>
 		</copy>
 		<zip destfile="build/docfetcher_${version}_portable.zip" basedir="build/tmp"/>
 		<delete dir="build/tmp"/>

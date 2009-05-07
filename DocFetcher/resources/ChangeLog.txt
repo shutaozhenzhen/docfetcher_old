@@ -1,14 +1,42 @@
 @DATE@ - DocFetcher @VERSION@
 ---------------------------------------------
 Features:
-  * Portable version: When the indexed documents are inside the program folder, the latter can be moved around freely without breaking file references.
+  * Portable version: When the indexed documents are inside the program folder, the latter can be moved around freely without breaking file references. Also works on CD-ROMs.
   * Global hotkey: Pressing a certain key combination moves DocFetcher to the front.
+  * DocFetcher can be launched by rightclicking on a folder.
+  * DocFetcher daemon watches indexed folders for changes when DocFetcher isn't running.
+  * NSIS installer internationalized.
+  * First steps to translate DocFetcher.
+  * Highlight color in the preview panel can be changed.
+  * Option on preferences dialog to leave the indexing tabs open even after successful indexing.
+  * Support for SVG files.
+  * Support for MS Office 2007.
+
+Bugfixes:
+  * Very large files weren't fully indexed. Lucene skipped the rest of the file after ~10,000 terms.
+  * Deleting items on the result panel caused it to jump back to the first page.
+  * "Open in external browser" button didn't send DocFetcher to the system tray.
+  * Warning message when the user tries to close the program while an indexing process is still running in the background.
+  * OpenOffice text extraction completed.
+  * Bugfix for bug report #2778204: PreviewPanel threw an IllegalArgumentException when clicking the next/previous occurrence buttons.
 
 Changes:
   * Manual and other documentation files updated.
   * DocFetcher won't complain if it has no write permission for its files.
   * Searches can also be started with the Enter key of the Keypad.
-  * When clicking on the buttons of the indexing configuration dialog to list file extensions, some suggestions are omitted (e.g. ".classpath"). 
+  * Various GUI modifications: New buttons for changing the GUI layout (flat arrow buttons), "Minimize to system tray" button reintroduced from release 0.9.0, positions of some buttons altered.
+  * GUI optimized for dark desktop themes.
+  * When clicking on the buttons of the indexing configuration dialog to list file extensions, some suggestions are omitted (e.g. ".classpath").
+  * Various library updates.
+  * Stacktrace window displays more information; stacktrace is also written to a file.
+  * Improved look of system tray icon on Linux.
+  * Java 1.6.0 or higher required.
+  * New context menu items in the search scope panel: "Check All" and "Uncheck All".
+  * Search Scope context menu entry "Remove orphaned indexes".
+  * Much faster installation of debian package.
+  * Debian package accepts OpenJDK 6 as JRE.
+  * Windows 98 not supported anymore; references to it have been updated.
+  * Folder in Search Scope is expanded or collapsed if it has subfolders and the user doubleclicks on it.
 
 
 2008-10-28 - DocFetcher 0.9.5.1

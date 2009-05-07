@@ -37,7 +37,9 @@ import net.sourceforge.docfetcher.util.UtilList;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
@@ -199,6 +201,16 @@ public class ScopeGroup extends GroupWrapper {
 				updateVisibleCheckStates(new Object[] {event.getElement()});
 			}
 			
+		});
+		
+		// Doubleclick on item in viewer results in expand/collapse of its children
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			public void doubleClick(DoubleClickEvent event) {
+				Object[] objects = ((StructuredSelection) viewer.getSelection()).toArray();
+				if (objects.length != 1) return;
+				viewer.setExpandedState(objects[0], ! viewer.getExpandedState(objects[0]));
+				updateVisibleCheckStates(new Scope[0]);
+			}
 		});
 	}
 	
@@ -605,8 +617,18 @@ public class ScopeGroup extends GroupWrapper {
 			setText(Msg.list_docs.value());
 		}
 		public void run() {
+			// Get selected scopes
 			final Scope[] scopes = getExistingSelection();
 			if (scopes.length == 0) return;
+			
+			// Check all selected scopes
+			Event.hold();
+			for (Scope scope : scopes)
+				scope.setCheckedDeep(true);
+			Event.flush();
+			updateVisibleCheckStates(new Scope[0]);
+			
+			// Display documents in result panel
 			new Thread() {
 				public void run() {
 					final ResultDocument[] docs = RootScope.listDocuments(scopes);

@@ -13,6 +13,8 @@ package net.sourceforge.docfetcher.model;
 
 import java.io.File;
 
+import net.sourceforge.docfetcher.util.UtilFile;
+
 /**
  * A <code>net.sourceforge.docfetcher.model.Document</code> with an additional
  * score field.
@@ -42,7 +44,7 @@ public class ResultDocument extends Document implements Comparable<ResultDocumen
 	public ResultDocument(org.apache.lucene.document.Document doc, float score) {
 		luceneDoc = doc;
 		this.score = score;
-		file = new File(doc.get(path));
+		file = new File(UtilFile.normPathSep(doc.get(path)));
 		title = doc.get(Document.title);
 	}
 	

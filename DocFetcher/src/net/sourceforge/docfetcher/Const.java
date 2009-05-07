@@ -35,21 +35,6 @@ public class Const {
 	}
 	
 	/**
-	 * System property: os.name
-	 */
-	private static final String OS_NAME = System.getProperty("os.name"); //$NON-NLS-1$
-	
-	/**
-	 * Whether the system is a Windows machine.
-	 */
-	public static final boolean IS_WINDOWS = OS_NAME.toUpperCase().contains("WINDOWS"); //$NON-NLS-1$
-	
-	/**
-	 * Whether the system is a Linux machine.
-	 */
-	public static final boolean IS_LINUX = OS_NAME.toUpperCase().contains("LINUX"); //$NON-NLS-1$
-	
-	/**
 	 * Minimum width of buttons.
 	 */
 	public static final int MIN_BT_WIDTH = 75;
@@ -63,19 +48,6 @@ public class Const {
 	 * Default margin for Group widgets.
 	 */
 	public static final int GROUP_MARGIN = 5;
-	
-	/**
-	 * The current working directory.
-	 */
-	public static final String USER_DIR = System.getProperty("user.dir"); //$NON-NLS-1$
-	
-	/**
-	 * Each time DocFetcher starts, a new file is used to write the stacktrace
-	 * to. The files are differentiated by this date string in their filenames.
-	 * The date string has minute resolution, so multiple stacktraces occurring
-	 * within the same minute will be written to the same file.
-	 */
-	public static final String ERROR_FILENAME = "stacktrace_" + new SimpleDateFormat("yyyyMMdd-HHmm").format(new Date()) + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	/**
 	 * File separator character.
@@ -93,9 +65,42 @@ public class Const {
 	public static final String LS = System.getProperty("line.separator"); //$NON-NLS-1$
 	
 	/**
+	 * System property: os.name
+	 */
+	private static final String OS_NAME = System.getProperty("os.name"); //$NON-NLS-1$
+	
+	/**
+	 * Whether the system is a Windows machine.
+	 */
+	public static final boolean IS_WINDOWS = OS_NAME.toUpperCase().contains("WINDOWS"); //$NON-NLS-1$
+	
+	/**
+	 * Whether the system is a Linux machine.
+	 */
+	public static final boolean IS_LINUX = OS_NAME.toUpperCase().contains("LINUX"); //$NON-NLS-1$
+	
+	/**
 	 * Whether this instance of DocFetcher was installed on the system or not.
 	 */
 	public static final Boolean IS_PORTABLE;
+	
+	/**
+	 * The current working directory.
+	 */
+	public static final String USER_DIR = System.getProperty("user.dir"); //$NON-NLS-1$
+	
+	/**
+	 * A file representing the current working directory.
+	 */
+	public static final File USER_DIR_FILE = new File(USER_DIR).getAbsoluteFile();
+	
+	/**
+	 * Each time DocFetcher starts, a new file is used to write the stacktrace
+	 * to. The files are differentiated by this date string in their filenames.
+	 * The date string has minute resolution, so multiple stacktraces occurring
+	 * within the same minute will be written to the same file.
+	 */
+	public static final String ERROR_FILENAME = "stacktrace_" + new SimpleDateFormat("yyyyMMdd-HHmm").format(new Date()) + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	/**
 	 * The file where the preferences are stored.
@@ -124,11 +129,6 @@ public class Const {
 	 * running.
 	 */
 	public static FileOutputStream DAEMON_LOCK;
-
-	/**
-	 * The current working directory.
-	 */
-	public static final File PROGRAM_FOLDER = new File("").getAbsoluteFile(); //$NON-NLS-1$
 	
 	/**
 	 * Path to where the manual is stored.

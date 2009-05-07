@@ -180,11 +180,17 @@ Section "DocFetcher"
 	
 	; Register context menu entry
 	ExecWait '"$INSTDIR\DocFetcher.exe" --register-contextmenu'
+	
+	; Launch daemon
+	Exec '"$INSTDIR\docfetcher-daemon-win.exe"'
 SectionEnd
 
 Section "un.Uninstall"
 	; Unregister context menu entry
 	ExecWait '"$INSTDIR\DocFetcher.exe" --unregister-contextmenu'
+	
+	; Kill daemon
+	Processes::KillProcess "docfetcher-daemon-win"
 	
 	; Remove program folder
 	Delete $INSTDIR\DocFetcher.exe

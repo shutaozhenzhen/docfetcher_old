@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * List operation related utility methods.
+ * List and string operation related utility methods.
  * 
  * @author Tran Nam Quang
  */
@@ -250,7 +250,58 @@ public class UtilList {
 	}
 	
 	/**
-	 * Returns if the given target string starts with one of the given prefixes.
+	 * Converts the given raw regex string into an array of valid regular
+	 * expressions. The raw regex string is expected to consist of one or more
+	 * regular expressions separated by whitespace and/or a '$' character.
+	 */
+	public static String[] parseExclusionString(String str) {
+		int first = 0;
+		int last = str.length() - 1;
+		for (int i = 0; i < str.length(); i++) {
+			if (Character.isWhitespace(str.charAt(i)) || str.charAt(i) == '$')
+				first += 1;
+			else break;
+		}
+		for (int i = last; i >= 0; i--) {
+			if (Character.isWhitespace(str.charAt(i)) || str.charAt(i) == '$')
+				last -= 1;
+			else break;
+		}
+		if (first == str.length() || last == -1)
+			return new String[0];
+		return str.substring(first, last + 1).split("\\s*\\$+\\s*"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Shortens the given string if its length exceeds a fixed limit.
+	 */
+	public static String truncate(String str) {
+		if (str.length() > 32)
+			return str.substring(0, 32) + "..."; //$NON-NLS-1$
+		return str;
+	}
+
+	/**
+	 * Converts the given period of time in milliseconds into something more
+	 * human-friendly (e.g. "1 h 24 min 3 s").
+	 */
+	public static String simpleDuration(long millis) {
+		int secs = (int) (millis / 1000);
+		int hrs = secs / 3600;
+		secs -= hrs * 3600;
+		int mins = secs / 60;
+		secs -= mins * 60;
+		String ret = ""; //$NON-NLS-1$
+		if (hrs != 0) ret += hrs + " h"; //$NON-NLS-1$
+		if (mins != 0) ret += (hrs == 0 ? "" : " ") + mins + " min"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (secs != 0) ret += (hrs == 0 && mins == 0 ? "" : " ") + secs + " s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (ret.equals("")) //$NON-NLS-1$
+			return "0 s"; //$NON-NLS-1$
+		return ret;
+	}
+
+	/**
+	 * Returns whether the given target string starts with one of the given prefixes.
 	 */
 	public static boolean startsWith(String target, String... prefixes) {
 		for (String prefix : prefixes)

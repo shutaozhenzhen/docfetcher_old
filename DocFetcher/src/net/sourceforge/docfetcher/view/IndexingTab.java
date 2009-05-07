@@ -185,7 +185,7 @@ public class IndexingTab extends Composite {
 		 */
 		ModifyListener regexChecker = new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				String[] exclFilters = UtilGUI.parseExclusionString(exclusionBox.getText());
+				String[] exclFilters = UtilList.parseExclusionString(exclusionBox.getText());
 				for (String filter : exclFilters) {
 					try {
 						Pattern.compile(filter);
@@ -296,7 +296,7 @@ public class IndexingTab extends Composite {
 		}
 		
 		// Check if specified exclusions pattern is valid
-		String[] exclFilters = UtilGUI.parseExclusionString(exclusionBox.getText());
+		String[] exclFilters = UtilList.parseExclusionString(exclusionBox.getText());
 		for (String filter : exclFilters) {
 			try {
 				Pattern.compile(filter);

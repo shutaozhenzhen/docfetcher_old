@@ -34,7 +34,7 @@ public privileged aspect DiskWritingSuppressor {
 	private boolean writable = true;
 	
 	after(): set(Boolean Const.IS_PORTABLE) {
-		if (Const.IS_PORTABLE && ! Const.PROGRAM_FOLDER.canWrite())
+		if (Const.IS_PORTABLE && ! Const.USER_DIR_FILE.canWrite())
 			writable = false;
 	}
 	

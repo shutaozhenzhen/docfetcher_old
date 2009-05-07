@@ -228,9 +228,9 @@ public class ScopeRegistry implements Serializable {
 	}
 
 	/**
-	 * Returns the rootScope for a given directory
+	 * Returns the <tt>RootScope</tt> for a given directory
 	 */
-	public RootScope getEntryFromDirectory(File directory) {
+	public RootScope getEntry(File directory) {
 		for (RootScope rootScope : rootScopes) {
 			if (rootScope.file.equals(directory))
 				return rootScope;
@@ -257,6 +257,33 @@ public class ScopeRegistry implements Serializable {
 				return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Returns a <tt>Scope</tt> object for the given directory. The directory
+	 * can be anywhere in the tree of the registered <tt>Scope</tt>s. Null is
+	 * returned if the directory is not registered.
+	 */
+	public Scope getScopeDeep(File directory) {
+		for (RootScope rootScope : rootScopes) {
+			Scope scope = rootScope.getScopeDeep(directory);
+			if (scope != null)
+				return scope;
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns an HTMLPair object somewhere under the registered entries for the
+	 * given HTML directory, or null if none is found (recursive).
+	 */
+	public HTMLPair getHTMLPair(File directory) {
+		for (RootScope rootScope : rootScopes) {
+			HTMLPair htmlPair = rootScope.getHTMLPair(directory);
+			if (htmlPair != null)
+				return htmlPair;
+		}
+		return null;
 	}
 
 	/**
@@ -367,7 +394,7 @@ public class ScopeRegistry implements Serializable {
 						else
 							remove(currentScope);
 					}
-					else if (addToReg && ! intersectsEntry(currentScope) && ! interrupted) {
+					else if (addToReg && ! interrupted) {
 						rootScopes.add(currentScope);
 						evtRegistryRootChanged.fireUpdate(ScopeRegistry.this);
 					}

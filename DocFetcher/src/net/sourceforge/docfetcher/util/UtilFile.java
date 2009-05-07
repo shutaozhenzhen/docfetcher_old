@@ -388,19 +388,6 @@ public class UtilFile {
 		}
 		return sum;
 	}
-	
-	/**
-	 * Tries to return the file separator used in the given path (either Linux
-	 * or Windows). If the given path contains to file separator, a Windows file
-	 * separator is returned.
-	 */
-	public static String getFS(String path) {
-		if (path.contains("/")) //$NON-NLS-1$
-			return "/"; //$NON-NLS-1$
-		else if (path.contains("\\")) //$NON-NLS-1$
-			return "\\"; //$NON-NLS-1$
-		return Const.FS;
-	}
 
 	/**
 	 * Returns true if the folder given by the absolute path in <tt>dirPath</tt>
@@ -408,9 +395,10 @@ public class UtilFile {
 	 * absolute path <tt>dirOrFilePath</tt>.
 	 */
 	public static boolean contains(String dirPath, String dirOrFilePath) {
-		String fs = getFS(dirPath);
-		String[] parts1 = UtilList.split(dirPath, fs, true);
-		String[] parts2 = UtilList.split(dirOrFilePath, fs, true);
+		dirPath = dirPath.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		dirOrFilePath = dirOrFilePath.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		String[] parts1 = UtilList.split(dirPath, "/", true); //$NON-NLS-1$
+		String[] parts2 = UtilList.split(dirOrFilePath, "/", true); //$NON-NLS-1$
 		if (parts1.length >= parts2.length)
 			return false;
 		for (int i = 0; i < parts1.length; i++)
@@ -433,9 +421,10 @@ public class UtilFile {
 	 * <tt>dirOrFilePath</tt>.
 	 */
 	public static boolean containsDirect(String dirPath, String dirOrFilePath) {
-		String fs = getFS(dirPath);
-		String[] parts1 = UtilList.split(dirPath, fs, true);
-		String[] parts2 = UtilList.split(dirOrFilePath, fs, true);
+		dirPath = dirPath.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		dirOrFilePath = dirOrFilePath.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		String[] parts1 = UtilList.split(dirPath, "/", true); //$NON-NLS-1$
+		String[] parts2 = UtilList.split(dirOrFilePath, "/", true); //$NON-NLS-1$
 		if (parts1.length + 1 != parts2.length)
 			return false;
 		for (int i = 0; i < parts1.length; i++)
@@ -481,8 +470,8 @@ public class UtilFile {
 		String relPath = fileOrDirPath.substring(parentPath.length());
 		/*
 		 * Remove preceding file separator; both Linux and Windows file
-		 * separators can occur here if we're running the Linux-Windows hybrid
-		 * version of DocFetcher.
+		 * separators can occur here if we're running the portable version of
+		 * DocFetcher.
 		 */
 		if (UtilList.startsWith(relPath, Const.FS, "/", "\\")) //$NON-NLS-1$ //$NON-NLS-2$
 			return relPath.substring(1);
@@ -495,9 +484,22 @@ public class UtilFile {
 	 * @see #getRelativePath(String, String)
 	 */
 	public static String getRelativePath(File file) {
-		return getRelativePath(Const.PROGRAM_FOLDER.getAbsolutePath(), file.getAbsolutePath());
+		return getRelativePath(Const.USER_DIR_FILE.getAbsolutePath(), file.getAbsolutePath());
 	}
 
+	/**
+	 * Tries to return the file separator used in the given path (either Linux
+	 * or Windows). If the given path contains to file separator, a Windows file
+	 * separator is returned.
+	 */
+	private static String getFS(String path) {
+		if (path.contains("/")) //$NON-NLS-1$
+			return "/"; //$NON-NLS-1$
+		else if (path.contains("\\")) //$NON-NLS-1$
+			return "\\"; //$NON-NLS-1$
+		return Const.FS;
+	}
+	
 	/**
 	 * Returns the concatenation of two filepath strings.
 	 */
@@ -575,6 +577,16 @@ public class UtilFile {
 				output.add(existingDirs.get(i));
 		}
 		return output;
+	}
+	
+	/**
+	 * Normalizes the given path string so that only the path separator of the
+	 * current environment (Windows vs. Linux) is used.
+	 */
+	public static String normPathSep(String path) {
+		if (Const.IS_WINDOWS)
+			return path.replace("/", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
+		return path.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

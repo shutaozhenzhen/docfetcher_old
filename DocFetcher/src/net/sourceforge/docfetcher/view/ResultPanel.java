@@ -704,7 +704,7 @@ public class ResultPanel extends Composite {
 	}
 	
 	/**
-	 * Filters out a file if it's parent directory isn't checked in the
+	 * Filters out a file if its parent directory isn't checked in the
 	 * search scope viewer.
 	 */
 	static class ScopeFilter implements ResultFilter {

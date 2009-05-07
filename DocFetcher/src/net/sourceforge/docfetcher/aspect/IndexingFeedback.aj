@@ -20,7 +20,7 @@ import net.sourceforge.docfetcher.model.FileWrapper;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.parse.HTMLParser;
 import net.sourceforge.docfetcher.parse.ParseException;
-import net.sourceforge.docfetcher.util.UtilGUI;
+import net.sourceforge.docfetcher.util.UtilList;
 import net.sourceforge.docfetcher.view.IndexingDialog;
 
 /**
@@ -112,7 +112,7 @@ public aspect IndexingFeedback {
 			indexingDialog.appendInfo(Msg.finished_with_errors.value());
 		
 		// Set mesage: total elapsed time
-		indexingDialog.appendInfo(Msg.total_elapsed_time.format(UtilGUI.simpleDuration(rootScope.getParseTime())));
+		indexingDialog.appendInfo(Msg.total_elapsed_time.format(UtilList.simpleDuration(rootScope.getParseTime())));
 
 		// File counters
 		if (! Thread.currentThread().isInterrupted()) // Don't increase counter if indexing process was terminated by user

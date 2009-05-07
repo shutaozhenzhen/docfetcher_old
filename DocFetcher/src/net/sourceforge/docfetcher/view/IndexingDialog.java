@@ -178,29 +178,31 @@ public class IndexingDialog {
 	/**
 	 * Adds the given job the indexing queue. Does nothing if the given job
 	 * intersects with registered entries or entries in the indexing queue.
+	 * Returns whether the job has been added successfully or not.
 	 * <p>
 	 * Note: This does not make the indexing dialog visible. An additional call
 	 * to IndexingDialog.open() is needed for that.
 	 */
-	public void addJob(Job newJob) {
+	public boolean addJob(Job newJob) {
 		ScopeRegistry scopeReg = ScopeRegistry.getInstance();
 		if (newJob.isAddToRegistry()) {
 			String msg = scopeReg.checkIntersection(newJob.getScope());
 			if (msg != null)
-				return;
+				return false;
 		}
 		// For update requests only check for queue intersections
 		// Allow duplicate in queue if the existing queue item is being processed
 		else if (scopeReg.intersectsInactiveQueue(newJob.getScope()))
-			return;
+			return false;
 		addUncheckedJob(newJob);
+		return true;
 	}
 
 	/**
 	 * Adds the given job the indexing queue. Does not check whether the given
 	 * job intersects with registered entries or entries in the indexing queue.
 	 */
-	private void addUncheckedJob(final Job newJob) {
+	public void addUncheckedJob(final Job newJob) {
 		File file = newJob.getScope().getFile();
 		String tabTitle = file.getName();
 		if (tabTitle.equals("")) //$NON-NLS-1$
@@ -210,7 +212,7 @@ public class IndexingDialog {
 		
 		// Create tab item
 		final CTabItem tabItem = new CTabItem(tabFolder, SWT.NONE);
-		tabItem.setText(UtilGUI.truncate(tabTitle));
+		tabItem.setText(UtilList.truncate(tabTitle));
 		if (newJob.isReadyForIndexing())
 			tabItem.setImage(Icon.WALK_TREE.getImage());
 		else

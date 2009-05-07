@@ -14,6 +14,8 @@ prg=$dir/$(basename -- "$prg") || exit
 
 cd $dir
 
+chmod a+x ./docfetcher-daemon-linux
+
 CLASSPATH=
 for FILE in `ls ./lib/*.jar`
 do

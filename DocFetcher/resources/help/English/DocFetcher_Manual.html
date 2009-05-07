@@ -1,5 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html><head>
+
+
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DocFetcher Manual</title>
 
 <meta content="Tran Nam Quang" name="author">
@@ -8,8 +10,7 @@
 <meta name="CREATED" content="20071010;12210300">
 <meta name="CHANGEDBY" content="Tran Quang">
 <meta name="CHANGED" content="20071010;21544900">
-<link rel="stylesheet" href="DocFetcher_Manual_files/style.css" type="text/css"></head>
-<body>
+<link rel="stylesheet" href="DocFetcher_Manual_files/style.css" type="text/css"></head><body>
 <div id="main">
 <div style="float: right; color: gray;">DocFetcher
 1.0</div>
@@ -75,15 +76,19 @@ after opening a file. DocFetcher will also hide in the System Tray
 if you click on the minimize button of the program window. To bring it
 back, either click on the System Tray icon or press the "global hotkey"
 (Ctrl + F8 by default).</p>
-<p><span class="p-label">Update your
-indexes</span>:
-If you add, remove or modify documents in your document repository, it
-will get out of sync with the indexes. If DocFetcher is running by the
-time you modify your repository, it can update the indexes
-automatically. If the application was not running, you have to select
-"Update Index" from the Search Scope context menu the next time you run
-it in
-order to get the most up-to-date search results.</p><p><span style="font-weight: bold;">Don't index entire drives</span>:
+<p><span class="p-label">Index updates</span>: If documents in the
+document repository are added, removed or modified, the corresponding
+indexes have to be updated. This is done automatically in two ways: (1)
+If DocFetcher is running, it detects the changes and updates the
+indexes immediately. (2) If DocFetcher isn't running, the changes are
+detected by a small daemon program that runs in the background; then
+the affected indexes are updated the next time DocFetcher starts.<br><span style="text-decoration: underline;">
+Note</span>: If you are
+using the portable version of DocFetcher and want the
+daemon to be run automatically on startup, you have to manually add the
+daemon executable to the list of startup programs. (There are actually two daemons, one for Windows and one for Linux.)<br>
+</p>
+<p><span style="font-weight: bold;">Don't index entire drives</span>:
 In contrast to other desktop search applications (e.g. Google Desktop),
 DocFetcher was not designed for&nbsp;indexing entire harddrives (e.g.
 "C:\"), and may explode if you attempt to do so. DocFetcher expects
@@ -129,13 +134,8 @@ extensions</span>: You can specify which files should be indexed
 as
 plain text. This feature may be useful for programmers who want to
 index
-source code files.&nbsp;HTML file extensions can be customized also.</p>
-<p><span class="p-label">Automatic index
-updating on file
-system events</span>:
-While DocFetcher is running, it can listen to file system events in the
-indexed directories and update the appropriate indexes if necessary.</p>
-<p><span class="p-label">Indexing multiple
+source code files.&nbsp;HTML file extensions can be customized also.<br>
+</p><p><span class="p-label">Indexing multiple
 folders at once</span>:
 There is an "Add folder to queue"
 button on the top right of the indexing configuration window that

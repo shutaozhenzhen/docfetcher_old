@@ -155,6 +155,20 @@ public class Scope extends Indexable {
 	public boolean contains(File file) {
 		return UtilFile.contains(this.file.getAbsolutePath(), file.getAbsolutePath());
 	}
+	
+	/**
+	 * Returns a Scope object for the given directory if it is identical to the
+	 * receiver or a child of the receiver (recursive). Otherwise returns null.
+	 */
+	public Scope getScopeDeep(File directory) {
+		if (file.equals(directory))
+			return this;
+		for (Scope child : subScopes) {
+			Scope candidate = child.getScopeDeep(directory);
+			if (candidate != null) return candidate;
+		}
+		return null;
+	}
 
 	/**
 	 * Returns whether the given non-HTML file has a representation directly
@@ -176,6 +190,22 @@ public class Scope extends Indexable {
 			if (htmlPair.equals(candidate))
 				return true;
 		return false;
+	}
+	
+	/**
+	 * Returns an HTMLPair object under this Scope for the given HTML directory,
+	 * or null if none is found (recursive).
+	 */
+	public HTMLPair getHTMLPair(File directory) {
+		if (directory == null) return null;
+		for (HTMLPair htmlPair : subHTMLPairs)
+			if (directory.equals(htmlPair.getHtmlFolder()))
+				return htmlPair;
+		for (Scope subScope : subScopes) {
+			HTMLPair htmlPair = subScope.getHTMLPair(directory);
+			if (htmlPair != null) return htmlPair;
+		}
+		return null;
 	}
 
 	/**

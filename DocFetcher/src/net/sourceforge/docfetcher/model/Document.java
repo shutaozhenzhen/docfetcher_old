@@ -137,7 +137,7 @@ public class Document {
 	public Document setFile(File file) {
 		if (file == null)
 			throw new IllegalArgumentException("The document file must not be null."); //$NON-NLS-1$
-		this.file = UtilFile.getRelativeFile(Const.PROGRAM_FOLDER, file);
+		this.file = UtilFile.getRelativeFile(Const.USER_DIR_FILE, file);
 		luceneDoc.removeFields(lastModified);
 		luceneDoc.removeFields(path);
 		luceneDoc.add(new Field(lastModified, String.valueOf(file.lastModified()), Store.YES, Index.NO));
