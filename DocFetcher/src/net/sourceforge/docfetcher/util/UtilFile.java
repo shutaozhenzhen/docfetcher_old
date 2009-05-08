@@ -388,6 +388,22 @@ public class UtilFile {
 		}
 		return sum;
 	}
+	
+	/**
+	 * Returns whether the two given path strings are identical. Two paths are
+	 * considered identical even if they contain different path separators.
+	 * Also, it doesn't matter whether they end with an extra path separator or
+	 * not.
+	 */
+	public static boolean equalPaths(String path1, String path2) {
+		path1 = path1.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		path2 = path2.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (path1.endsWith("/")) //$NON-NLS-1$
+			path1 = path1.substring(0, path1.length() - 1);
+		if (path2.endsWith("/")) //$NON-NLS-1$
+			path2 = path2.substring(0, path2.length() - 1);
+		return path1.equals(path2);
+	}
 
 	/**
 	 * Returns true if the folder given by the absolute path in <tt>dirPath</tt>

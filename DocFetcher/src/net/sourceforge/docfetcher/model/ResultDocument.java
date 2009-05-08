@@ -44,7 +44,14 @@ public class ResultDocument extends Document implements Comparable<ResultDocumen
 	public ResultDocument(org.apache.lucene.document.Document doc, float score) {
 		luceneDoc = doc;
 		this.score = score;
+		
+		/*
+		 * The call to UtilFile.normPathSep(..) is needed here because the
+		 * stored path could have been generated in a different environment
+		 * (Windows/Linux).
+		 */
 		file = new File(UtilFile.normPathSep(doc.get(path)));
+		
 		title = doc.get(Document.title);
 	}
 	

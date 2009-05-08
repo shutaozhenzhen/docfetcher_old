@@ -6,7 +6,8 @@ Features:
   * DocFetcher can be launched by rightclicking on a folder.
   * DocFetcher daemon watches indexed folders for changes when DocFetcher isn't running.
   * NSIS installer internationalized.
-  * First steps to translate DocFetcher.
+  * Portuguese translation.
+  * Farsi/Persian translation (GUI only).
   * Highlight color in the preview panel can be changed.
   * Option on preferences dialog to leave the indexing tabs open even after successful indexing.
   * Support for SVG files.

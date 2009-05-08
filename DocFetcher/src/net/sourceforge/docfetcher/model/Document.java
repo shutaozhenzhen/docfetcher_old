@@ -265,4 +265,8 @@ public class Document {
 		return false;
 	}
 	
+	public String toString() {
+		return file.toString();
+	}
+	
 }

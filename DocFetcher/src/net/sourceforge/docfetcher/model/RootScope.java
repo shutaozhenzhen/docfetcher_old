@@ -153,14 +153,15 @@ public class RootScope extends Scope {
 				for (int i = 0; i < numDocs; i++) {
 					if (Thread.currentThread().isInterrupted()) break;
 					String pathCandidate = reader.document(i).get(Document.path);
-					pathCandidate = new File(pathCandidate).getAbsolutePath(); // Possible conversion from Linux to Windows paths or vice versa
+					pathCandidate = new File(pathCandidate).getAbsolutePath();
 					File removeFile = null;
-					for (File f : removeFromIndex)
-						if (f.getAbsolutePath().equals(pathCandidate)) {
+					for (File f : removeFromIndex) {
+						if (UtilFile.equalPaths(f.getAbsolutePath(), pathCandidate)) {
 							reader.deleteDocument(i);
 							removeFile = f;
 							break;
 						}
+					}
 					if (removeFile != null)
 						removeFromIndex.remove(removeFile);
 				}
