@@ -14,6 +14,7 @@
 
 #include "windows.h"
 #include "TCHAR.h"
+#include "string.h"
 
 #include <process.h>
 #include <psapi.h>
@@ -72,16 +73,17 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	// JNotify_win32 traces
 	dbg = true;
 
-	if(!isUniqueInstance()) {
-		log("another instance is running...");
-		return 1;
-	}
-
 	// find indexes.txt file
 	if(!_folderWatcher.findIndexesFile()) {
 		log("Cannot get indexes file.");
 		return 1;
 	}
+
+	if(!isUniqueInstance()) {
+		log("another instance is running...");
+		return 1;
+	}
+
 
 	_win32FSHook = new Win32FSHook();
 	_win32FSHook->init(NULL);
@@ -138,13 +140,13 @@ void watchLoop(void *){
 
 /**
  * Check if this is the only instance
- * It is done by creating a mutex with the daemon exe's full path
+ * It is done by creating a mutex with the daemon lockfile full path
  * to distinguish various installations of Docfetcher
  *
  */
 bool isUniqueInstance(){
 	TCHAR mutex_name [MAX_PATH] = {0};
-	::GetModuleFileName(NULL, mutex_name, MAX_PATH);
+	strcpy (mutex_name, _folderWatcher.getLockFile().c_str());
 
 	// replace "\" by "_"
 	for(TCHAR* ch = mutex_name; *ch != _T('\0'); ++ch)
