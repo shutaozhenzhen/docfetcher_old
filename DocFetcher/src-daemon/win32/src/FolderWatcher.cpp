@@ -207,9 +207,10 @@ bool FolderWatcher::findIndexesFile() {
 
 	// Portable version -> the directory ./indexes exists
 	TCHAR current_path [MAX_PATH] = {0};
-	::GetCurrentDirectory(MAX_PATH, current_path);
+	::GetModuleFileName(NULL, current_path, MAX_PATH);
 
 	std::string indexes_directory = current_path;
+	indexes_directory.erase(indexes_directory.rfind('\\'));
 	indexes_directory += "\\indexes";
 
 	HANDLE hFind;
@@ -218,8 +219,8 @@ bool FolderWatcher::findIndexesFile() {
 	if(hFind != INVALID_HANDLE_VALUE) {
 		// Portable version
 		::FindClose(hFind);
-		_indexes_file_path = current_path;
-		_indexes_file_path += "\\indexes\\.indexes.txt";
+		_indexes_file_path = indexes_directory;
+		_indexes_file_path += "\\.indexes.txt";
 		log("Portable version : working with file %s", _indexes_file_path.c_str());
 		return true;
 	}else{
