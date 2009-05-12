@@ -25,7 +25,6 @@
 				<file file="resources/Readme.txt"/>
 				<file file="resources/deb/control/control"/>
 				<file file="resources/deb/docfetcher.desktop"/>
-				<file file="resources/help/DocFetcher_Manual.html"/>
 			</resources>
 			<filterset>
 				<filter token="DATE" value="${DSTAMP}"/>
