@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>DocFetcher Handbuch - Bekannte Fehler und Beschränkungen</title>
+
+<meta content="Hermann-Josef Beckers" name="author">
+<link rel="stylesheet" href="style.css" type="text/css"></head><body>
+<div class="header"><a href="../DocFetcher_Manual.html#Additional_Information">Zurück zur Hauptseite<br>
+</a></div>
+<div id="main">
+<h1 id="title">Bekannte Programmfehler und -beschränkungen</h1>
+<h2>Unter Windows</h2><ul><li>
+DocFetcher kann abstürzen, wenn zwei oder mehr Indexe gleichzeitg
+entfernt werden oder wenn das Programm beendet wird, während die Option
+"Indizierte Ordner überwachen" aktiviert war. Es kann auch abstürzen,
+wenn diese Option über das Einstellungen-Fenster deaktiviert wird.
+Grund ist ein Fehler in einer der benutzten Programmbibliotheken
+(JNotify). Derzeit gibt es keine bekannte Lösung außer der Abschaltung
+der Ordner-Überwachung.</li></ul>
+<h2>Unter Linux</h2><ul>
+<li>Es wird empfohlen, die offizielle Java-Laufzeitumgebung von Sun
+anstelle der anderen, teilweise nicht vollständigen
+Java-Implementierungen zu verwenden, sowohl hinsichtlich der
+Kompabilität als auch aus Performanzgründen.</li><li>Kopieren von
+Dateien aus der Ergebnisanzeige könnte nicht funktionieren. Umgehung:
+Öffnen Sie den Ordner der Datei (über das Kontextmenu der
+Ergebnisanzeige) und kopieren Sie die Dateien von dort.</li><li>Der
+Versuch, Ordner mit symbolischen Links zu indizieren, kann das Programm
+in eine Endlosschleife versetzen, wenn die Ordner-Überwachung aktiv
+ist. Dies ist ebenfalls ein Fehler in JNotify und es hilft nur die
+Abschaltung der Ordner-Überwachung.</li><li>Das Verschieben von Dateien
+aus überwachten Ordnern veranlasst keine Index-Aktualisierung. Der
+Index muß manuell aktualisiert werden. Bei Löschung funktioniert die
+automatische Aktualisierung allerdings. </li>
+</ul>
+<h2>Benutzeroberfläche</h2><ul><li>
+Das Hervorheben in der Vorschauanzeige ist noch nicht vollständig
+implementiert. Insbesondere gilt: Wenn Sie eine AND-Suche durchführen
+wie z. B. "Hund Katze" (einschließlich der Anführungszeichen), werden
+sowohl "Hund" als auch "Katze" in der Vorschauanzeige hervorgehoben.
+</li></ul><h2>Indizierungs-bezogen<br>
+</h2>
+<ul>
+<li>Um herauszufinden, was tatsächlich aus einem bestimmten Dokument
+ausgelesen wird, können Sie die eingebaute "Parser-Testbox" durch
+Drücken von F11 benutzen.</li><li>Vielleicht sehen Sie den Fehler "Nicht genug Speicher in der Java VM", wenn die zu indizierende Datei zu groß ist. Siehe <a href="Indexing_Huge_Documents.html">hier</a> zu weiteren Informationen.</li><li>Alle Passwort-geschützten Dokumente werden beim Indizieren übersprungen.
+</li><li>Manchmal wird eine PDF-Datei übersprungen, obwohl der Inhalt
+in einem anderen PDF-Anzeigeprogramm ohne Eingabe eines Passworts
+sichtbar ist. Der wahrscheinliche Grund ist, dass diese Datei die
+Anzeige erlaubt, <span style="font-style: italic;">aber</span> mit Passwort gegen das
+Kopieren von Teilen und/oder Ändern des Inhalts geschützt ist.
+DocFetcher extrahiert aber Text aus diesen Dateien. Dies kann als eine
+Art "Kopieren" interpretiert werden; daher können Sie die Datei lesen,
+DocFetcher aber nicht. Diese Dateien können sehr leicht an dem
+unleserlichen Zeugs in ihren Metadaten (z. B. Titelfeld) erkannt werden.</li>
+<li>Einige Bereiche von Microsoft Word-Dateien werden nicht extrahiert
+und sind daher nicht durchsuchbar, wie z. B. Text in Formeln und
+Charts.
+.</li>
+<li>DocFetcher kann nicht auf CHM-Dateien zugreifen, die mit dem
+Standard-Windows-CHM-Betrachter betrachtet werden (dies wurde nicht für
+andere CHM-Anzeigeprogramme getestet). </li>
+<li>Einige Dateien werden absolut nicht indiziert, obwohl sie als
+gültige Dokumente erscheinen. Dies ist der Fall mit einigen Powerpoint-
+und PDF-Dateien, die anscheinend Text enthalten, aber tatsächlich nur
+aus (eingescannten) Bildern bestehen. Sie können die oben erwähnte
+"Parser Textbox" verwenden, um diese Dateien zu identifizieren.</li><li>
+SVG-Textextrahierung funktioniert nicht, wenn der Text als Pfad anstatt einer wirklichen Textzeichenkette gespeichert ist.</li>
+<li>Ein Wort, das zwei oder mehr Zeilen umfasst (also durch Zeilenumbrüche getrennt ist), ist nicht durchsuchbar.</li>
+</ul>
+<br>
+<ul>
+</ul>
+</div>
+<div class="footer"><a href="../DocFetcher_Manual.html#Additional_Information">Zurück zur Hauptseite</a></div>
+</body></html>
