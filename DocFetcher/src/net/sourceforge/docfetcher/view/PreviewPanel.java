@@ -396,7 +396,7 @@ public class PreviewPanel extends Composite {
 					return; // Another preview request had been started while we were parsing
 				
 				/*
-				 * Create the message that will displayed if the character limit
+				 * Create the message that will be displayed if the character limit
 				 * is reached. It is appended to the file contents later; if it
 				 * was appended here, some words in it might get highlighted.
 				 */
