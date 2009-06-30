@@ -15,8 +15,8 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilFile;
 
 /**

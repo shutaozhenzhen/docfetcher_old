@@ -129,6 +129,10 @@ public class PrefDialog {
 				Msg.pref_highlight.value(),
 				Pref.Bool.HighlightSearchTerms
 		);
+		createCheckButton(container,
+				Msg.pref_clear_search_history_on_exit.value(),
+				Pref.Bool.ClearSearchHistoryOnExit
+		);
 		
 		/*
 		 * Controls for the highlighting color

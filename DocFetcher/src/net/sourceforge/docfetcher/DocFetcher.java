@@ -34,6 +34,7 @@ import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.model.ScopeRegistry.SearchException;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.view.FilesizeGroup;
@@ -660,6 +661,10 @@ public class DocFetcher extends ApplicationWindow {
 		Pref.Bool.FirstLaunch.setValue(false);		Pref.Bool.ShellMaximized.setValue(getShell().getMaximized());		
 		// Store sash weights
 		Pref.IntArray.SashHorizontalWeights.setValue(sashHorizontal.getWeights());		Pref.IntArray.SashLeftWeights.setValue(sashLeft.getWeights());		mainPanel.saveWeights();
+		
+		// Clear search history if the user wants it that way
+		if (Pref.Bool.ClearSearchHistoryOnExit.getValue())
+			Pref.StrArray.SearchHistory.setValue();
 		
 		// Save preferences and registries
 		try {

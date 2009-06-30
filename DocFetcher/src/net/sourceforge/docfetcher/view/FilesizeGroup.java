@@ -11,10 +11,10 @@
 
 package net.sourceforge.docfetcher.view;
 
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Filesize;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
+import net.sourceforge.docfetcher.util.Event;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;

@@ -93,7 +93,7 @@ public class ExceptionHandler {
 		errorDialog.append(str);
 		try {
 			if (fileWriter == null) {
-				File file = new File(Const.ERROR_FILENAME);
+				File file = new File(Const.ERROR_FILEPATH);
 				boolean fileExists = file.exists();
 				fileWriter = new FileWriter(file, true);
 				

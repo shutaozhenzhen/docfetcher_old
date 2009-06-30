@@ -23,7 +23,6 @@ import java.util.TreeSet;
 
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -35,6 +34,7 @@ import net.sourceforge.docfetcher.model.ResultDocument;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.model.Scope;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
@@ -221,43 +221,36 @@ public class ResultPanel extends Composite {
 		// Create context menu
 		Menu menu = new Menu(parent.getShell(), SWT.POP_UP);
 		table.setMenu(menu);
+		
 		final MenuItem openItem = new MenuItem(menu, SWT.PUSH);
-		final MenuItem openParentItem = new MenuItem(menu, SWT.PUSH);
-		new MenuItem(menu, SWT.SEPARATOR);
-		final MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
-		final MenuItem deleteItem = new MenuItem(menu, SWT.PUSH);
-		menu.setDefaultItem(openItem);
 		openItem.setText(Msg.open.value());
 		openItem.setEnabled(false);
-		openParentItem.setText(Msg.open_parent.value());
-		openParentItem.setEnabled(false);
-		copyItem.setText(Msg.copy.value() + "\t" + Key.Copy.toString()); //$NON-NLS-1$
-		copyItem.setEnabled(false);
-		deleteItem.setText(Msg.delete_file.value() + "\t" + Key.Delete.toString()); //$NON-NLS-1$
-		deleteItem.setEnabled(false);
-		
-		// Context menu actions
+		menu.setDefaultItem(openItem);
 		openItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				launchSelection();
 			}
 		});
+		
+		final MenuItem openParentItem = new MenuItem(menu, SWT.PUSH);
+		openParentItem.setEnabled(false);
+		openParentItem.setText(Msg.open_parent.value());
+		new MenuItem(menu, SWT.SEPARATOR);
 		openParentItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				launchSelectionParents();
 			}
 		});
+		
+		final MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
+		copyItem.setText(Msg.copy.value() + "\t" + Key.Copy.toString()); //$NON-NLS-1$
+		copyItem.setEnabled(false);
 		copyItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				copySelectionToClipboard();
 			}
 		});
-		deleteItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				deleteSelection();
-			}
-		});
-		
+
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent arg0) {
 				// Disable context menu items if selection is empty
@@ -265,12 +258,28 @@ public class ResultPanel extends Composite {
 				openItem.setEnabled(hasSelection);
 				openParentItem.setEnabled(hasSelection);
 				copyItem.setEnabled(hasSelection);
-				deleteItem.setEnabled(hasSelection);
 				
 				// Update result panel and status line
 				evtSelectionChanged.fireUpdate(ResultPanel.this);
 			}
 		});
+		
+		if (Pref.Bool.AllowRepositoryModification.getValue()) {
+			final MenuItem deleteItem = new MenuItem(menu, SWT.PUSH);
+			deleteItem.setText(Msg.delete_file.value() + "\t" + Key.Delete.toString()); //$NON-NLS-1$
+			deleteItem.setEnabled(false);
+			deleteItem.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					deleteSelection();
+				}
+			});
+			viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+				public void selectionChanged(SelectionChangedEvent arg0) {
+					deleteItem.setEnabled(! viewer.getSelection().isEmpty());
+					evtSelectionChanged.fireUpdate(ResultPanel.this);
+				}
+			});
+		}
 		
 		viewer.getTable().addKeyListener(new ResultPanelNavigator());
 		viewer.getTable().addKeyListener(new SortSelector());
@@ -773,9 +782,9 @@ public class ResultPanel extends Composite {
 			File f2 = r2.getFile();
 			switch (property) {
 			case TITLE:
-				return r1.getTitle().compareToIgnoreCase(r2.getTitle()) * inverted;
+				return UtilList.compareToIgnoreCaseWithNumbers(r1.getTitle(), r2.getTitle()) * inverted;
 			case NAME:
-				return f1.getName().compareToIgnoreCase(f2.getName()) * inverted;
+				return UtilList.compareToIgnoreCaseWithNumbers(f1.getName(), f2.getName()) * inverted;
 			case SCORE:
 				return r1.compareTo(r2) * inverted; // Descending order
 			case SIZE:
@@ -790,7 +799,7 @@ public class ResultPanel extends Composite {
 			case PATH:
 				String path1 = f1.getAbsolutePath();
 				String path2 = f2.getAbsolutePath();
-				return path1.compareToIgnoreCase(path2) * inverted;
+				return UtilList.compareToIgnoreCaseWithNumbers(path1, path2) * inverted;
 			case LAST_MODIFIED:
 				long lmod1 = f1.lastModified();
 				long lmod2 = f2.lastModified();

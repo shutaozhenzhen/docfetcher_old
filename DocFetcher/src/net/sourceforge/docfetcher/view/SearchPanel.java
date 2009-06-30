@@ -12,10 +12,11 @@
 package net.sourceforge.docfetcher.view;
 
 import net.sourceforge.docfetcher.DocFetcher;
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.MemoryList;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
@@ -55,6 +56,8 @@ public class SearchPanel extends Composite {
 	private ResultPanel resultPanel;
 	private ToolItem helpBt;
 	
+	private MemoryList<String> searchHistory;
+	
 	public SearchPanel(Composite parent) {
 		super(parent, SWT.NONE);
 		searchBar = UtilGUI.createCompositeWithBorder(this, true);
@@ -68,6 +71,12 @@ public class SearchPanel extends Composite {
 					evtSearchRequest.fireUpdate(searchBox.getText());
 			}
 		});
+		
+		// Load search history
+		searchHistory = new MemoryList<String> (Pref.Int.SearchHistorySize.getValue());
+		String[] stringSearchHistory = Pref.StrArray.SearchHistory.getValue();
+		searchHistory.addAll(UtilList.toList(stringSearchHistory));
+		searchBox.setItems(stringSearchHistory);
 		
 		final Composite toolBarContainer = new Composite(searchBar, SWT.NONE);
 		toolBarContainer.setLayout(new FormLayout());
@@ -182,28 +191,10 @@ public class SearchPanel extends Composite {
 	 * the search box.
 	 */
 	public void addToSearchHistory(String term) {
-		String[] oldHistory = searchBox.getItems();
-		
-		// Get length of new search history
-		int newHistoryLength = oldHistory.length;
-		if (! UtilList.containsEquality(oldHistory, term))
-			newHistoryLength += 1;
-		newHistoryLength = Math.min(newHistoryLength, Pref.Int.SearchHistorySize.getValue());
-		if (newHistoryLength <= 0) // search history size was set to a value <= 0
-			return;
-		String[] newHistory = new String[newHistoryLength];
-
-		// Fill new search history
-		newHistory[0] = term;
-		int j = 1;
-		for (int i = 0; i < oldHistory.length && j < newHistory.length; i++) {
-			if (! oldHistory[i].equals(term)) {
-				newHistory[j] = oldHistory[i];
-				j += 1;
-			}
-		}
-		
-		searchBox.setItems(newHistory);
+		searchHistory.add(term);
+		String[] stringSearchHistory = searchHistory.toArray(new String[searchHistory.size()]);
+		Pref.StrArray.SearchHistory.setValue(stringSearchHistory);
+		searchBox.setItems(stringSearchHistory);
 		searchBox.setText(term);
 	}
 	

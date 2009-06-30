@@ -15,10 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.Const;
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.parse.Parser;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilList;
 
 import org.eclipse.jface.action.Action;

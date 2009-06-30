@@ -23,9 +23,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.docfetcher.Const;
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
 import org.apache.lucene.index.Term;

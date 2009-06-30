@@ -15,9 +15,9 @@ package net.sourceforge.docfetcher.view;
 import jxgrabkey.HotkeyConflictException;
 import jxgrabkey.JXGrabKey;
 import net.sourceforge.docfetcher.Const;
-import net.sourceforge.docfetcher.Event;
-import net.sourceforge.docfetcher.Event.Listener;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.Event.Listener;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;

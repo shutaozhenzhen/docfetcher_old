@@ -20,7 +20,6 @@ import java.util.Set;
 
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
@@ -30,6 +29,7 @@ import net.sourceforge.docfetcher.model.ResultDocument;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.model.Scope;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
@@ -104,10 +104,12 @@ public class ScopeGroup extends GroupWrapper {
 		viewerMenu.addSeparator();
 		viewerMenu.addNonEmptyAction(new OpenDirectoryAction(), Key.Enter);
 		viewerMenu.addNonEmptyAction(new ListDocumentsAction(), null);
-		viewerMenu.addSingleElementAction(new CreateSubfolderAction(), Key.ShiftInsert);
-		viewerMenu.addSingleElementAction(new RenameFolderAction(), Key.Rename);
-		viewerMenu.addNonEmptyAction(new DeleteFolderAction(), Key.ShiftDelete);
-		viewerMenu.addSingleElementAction(new PasteIntoFolderAction(), Key.Paste);
+		if (Pref.Bool.AllowRepositoryModification.getValue()) {
+			viewerMenu.addSingleElementAction(new CreateSubfolderAction(), Key.ShiftInsert);
+			viewerMenu.addSingleElementAction(new RenameFolderAction(), Key.Rename);
+			viewerMenu.addNonEmptyAction(new DeleteFolderAction(), Key.ShiftDelete);
+			viewerMenu.addSingleElementAction(new PasteIntoFolderAction(), Key.Paste);
+		}
 		viewerMenu.addSeparator();
 		viewerMenu.addRootAction(new ToggleDeleteOnExitAction(), null);
 		viewerMenu.setManagedActionsEnabled(false);

@@ -44,7 +44,7 @@ public class ErrorDialog {
 		
 		// Widgets
 		Link label = new Link(shell, SWT.NONE);
-		label.setText(Msg.report_bug.format(Const.USER_DIR + Const.FS + Const.ERROR_FILENAME));
+		label.setText(Msg.report_bug.format(Const.ERROR_FILEPATH));
 		label.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				Program.launch(e.text);

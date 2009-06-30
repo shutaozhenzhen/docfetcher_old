@@ -309,5 +309,76 @@ public class UtilList {
 				return true;
 		return false;
 	}
+	
+	/**
+	 * Compares the two given strings. Works like
+	 * String.compareToIgnoreCase(String), except when the strings contain
+	 * number sequences. In that case, the numbers as a whole are compared, not
+	 * digit by digit.
+	 * <p>
+	 * Example: If the two strings "file12" and "file2" are given,
+	 * String.compareToIgnoreCase(String) returns -1, since 1 < 2, but this
+	 * method returns 1, since 12 > 2.
+	 * 
+	 * @see java.lang.String#compareToIgnoreCase(String)
+	 */
+	public static int compareToIgnoreCaseWithNumbers(String s1, String s2) {
+		if (s1.equals("") || s2.equals("")) //$NON-NLS-1$ //$NON-NLS-2$
+			return s1.compareToIgnoreCase(s2);
+		int i1 = 0;
+		int i2 = 0;
+		while (i1 < s1.length() && i2 < s2.length()) {
+			String c1 = s1.substring(i1, i1 + 1);
+			String c2 = s2.substring(i2, i2 + 1);
+			if ("0123456789".indexOf(c1) != -1 && "0123456789".indexOf(c2) != -1) { //$NON-NLS-1$ //$NON-NLS-2$
+				int j1 = getNumberEnd(s1, i1);
+				int j2 = getNumberEnd(s2, i2);
+				String num1 = s1.substring(i1, j1);
+				String num2 = s2.substring(i2, j2);
+				int diff = num1.length() - num2.length();
+				if (diff < 0)
+					num1 = addLeadingZeros(num1, -diff);
+				else if (diff > 0)
+					num2 = addLeadingZeros(num2, diff);
+				int comp = num1.compareToIgnoreCase(num2);
+				if (comp != 0)
+					return comp;
+				i1 = j1;
+				i2 = j2;
+			}
+			else {
+				int comp = c1.compareToIgnoreCase(c2);
+				if (comp != 0)
+					return comp;
+				i1++;
+				i2++;
+			}
+		}
+		return 0;
+	}
+	
+	/**
+	 * Tries to find the end of a number sequence in the given String starting
+	 * at the index <tt>start</tt>. If succesful, the end index + 1 is returned,
+	 * otherwise start + 1.
+	 */
+	private static int getNumberEnd(String s, int start) {
+		int i = start;
+		for (; i < s.length(); i++)
+			if (! Character.isDigit(s.charAt(i)))
+				break;
+		return i;
+	}
+	
+	/**
+	 * Prepends <tt>nZeros</tt> zeros to the given string and returns the
+	 * resulting string.
+	 */
+	private static String addLeadingZeros(String s, int nZeros) {
+		char[] zeros = new char[nZeros];
+		for (int i = 0; i < zeros.length; i++)
+			zeros[i] = '0';
+		return String.valueOf(zeros) + s;
+	}
 
 }

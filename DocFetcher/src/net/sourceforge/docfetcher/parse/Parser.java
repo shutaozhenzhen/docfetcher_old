@@ -13,9 +13,9 @@ package net.sourceforge.docfetcher.parse;
 
 import java.io.File;
 
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.Document;
+import net.sourceforge.docfetcher.util.Event;
 
 /**
  * A class that parses files and has a check state. 

@@ -11,7 +11,7 @@
 
 package net.sourceforge.docfetcher.model;
 
-import net.sourceforge.docfetcher.Event;
+import net.sourceforge.docfetcher.util.Event;
 
 /**
  * An indexing task item used for queueing indexing tasks.

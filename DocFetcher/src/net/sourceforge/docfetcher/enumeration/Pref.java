@@ -28,9 +28,9 @@ import org.eclipse.swt.SWT;
 
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
@@ -60,6 +60,8 @@ public class Pref {
 		HighlightSearchTerms (true),
 		HotkeyEnabled (true),
 		CloseIndexingTabs (true),
+		AllowRepositoryModification (true),
+		ClearSearchHistoryOnExit (true),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();
@@ -193,6 +195,7 @@ public class Pref {
 	public static enum StrArray {
 		HTMLExtensions ("html", "htm", "shtml", "shtm", "php", "asp", "jsp"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 		TextExtensions ("txt", "nfo"), //$NON-NLS-1$ //$NON-NLS-2$
+		SearchHistory (),
 		;
 
 		public final Event<String[]> evtChanged = new Event<String[]> ();
@@ -328,7 +331,11 @@ public class Pref {
 		writer.write("#" + new Date().toString() + Const.LS); //$NON-NLS-1$
 		String lastKey = props.lastKey();
 		for (Entry<String, String> entry : props.entrySet()) {
-			writer.write(entry.getKey() + "=" + entry.getValue()); //$NON-NLS-1$
+			/*
+			 * Fix of bug #2811753: Backslashes must be escaped.
+			 */
+			String value = entry.getValue().replace("\\", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
+			writer.write(entry.getKey() + "=" + value); //$NON-NLS-1$
 			if (lastKey != entry.getKey())
 				writer.write(Const.LS);
 		}

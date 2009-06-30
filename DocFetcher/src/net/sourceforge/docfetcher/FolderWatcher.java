@@ -29,6 +29,7 @@ import net.sourceforge.docfetcher.model.Job;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilList;
 import net.sourceforge.docfetcher.view.IndexingDialog;
 

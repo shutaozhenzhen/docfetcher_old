@@ -11,8 +11,8 @@
 
 package net.sourceforge.docfetcher.view;
 
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.util.Event;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;

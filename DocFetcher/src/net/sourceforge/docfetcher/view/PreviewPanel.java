@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.docfetcher.Const;
-import net.sourceforge.docfetcher.Event;
 import net.sourceforge.docfetcher.enumeration.Font;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -29,6 +28,7 @@ import net.sourceforge.docfetcher.parse.ParseException;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.parse.TextParser;
+import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
@@ -277,8 +277,9 @@ public class PreviewPanel extends Composite {
 			showViewer(textViewerContainer);
 			textViewer.setText(""); //$NON-NLS-1$
 			termsInUse = false;
-			browserProvider.getBrowser(previewPanel, browserToolBar, ParserRegistry.getHTMLParser())
-			.setText("<html><head></head><body></body></html>"); //$NON-NLS-1$
+			BrowserPanel browser = browserProvider.getBrowser(previewPanel, browserToolBar, ParserRegistry.getHTMLParser());
+			if (browser != null) // Is null on KDE desktops
+				browser.setText("<html><head></head><body></body></html>"); //$NON-NLS-1$
 		}
 	}
 	

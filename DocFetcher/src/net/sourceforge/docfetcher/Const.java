@@ -100,7 +100,7 @@ public class Const {
 	 * The date string has minute resolution, so multiple stacktraces occurring
 	 * within the same minute will be written to the same file.
 	 */
-	public static final String ERROR_FILENAME = "stacktrace_" + new SimpleDateFormat("yyyyMMdd-HHmm").format(new Date()) + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public static final String ERROR_FILEPATH;
 	
 	/**
 	 * The file where the preferences are stored.
@@ -151,6 +151,7 @@ public class Const {
 			MANUAL_PARENT_PATH = getManualParentPath(USER_DIR);
 			INDEX_DAEMON_FILE = new File("indexes" + FS + ".indexes.txt"); //$NON-NLS-1$ //$NON-NLS-2$
 			IS_PORTABLE = true;
+			ERROR_FILEPATH = USER_DIR + FS + "stacktrace_" + new SimpleDateFormat("yyyyMMdd-HHmm").format(new Date()) + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		// Installed version
 		else {
@@ -165,6 +166,7 @@ public class Const {
 			INDEX_DAEMON_FILE = new File(appDataPath + FS + ".indexes.txt"); //$NON-NLS-1$
 			new File(appDataPath).mkdirs();
 			IS_PORTABLE = false;
+			ERROR_FILEPATH = appDataPath + FS + "stacktrace_" + new SimpleDateFormat("yyyyMMdd-HHmm").format(new Date()) + ".txt"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 		// the lock file 
