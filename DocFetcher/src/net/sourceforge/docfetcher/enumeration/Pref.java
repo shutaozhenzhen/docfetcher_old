@@ -101,6 +101,7 @@ public class Pref {
 		PrefPageHeight (450),
 		MaxResultsPerPage (50),
 		MaxResultsTotal (10000),
+		MaxLinesInProgressPanel (10000),
 		OpenLimit (10),
 		PreviewFontHeight (10),
 		PreviewFontHeightMono (10),

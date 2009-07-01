@@ -216,13 +216,33 @@ public class ProgressPanel extends Composite {
 			});
 			return;
 		}
-		if (! progressBox.getText().equals("")) //$NON-NLS-1$
+		if (progressBox.isDisposed())
+			return;
+		if (progressBox.getCharCount() != 0)
 			progressBox.append(Const.LS);
-		int endPos = progressBox.getCharCount();
+		int endPos = progressBox.getCharCount(); // this may return a different value than the previous call
 		progressBox.append(msg);
 		progressBox.setSelection(endPos); // Avoids horizontal scrolling when the message string is too long
 		progressBox.setTopIndex(Integer.MAX_VALUE);
+		
+		// Limit number of lines in order to avoid OutOfMemoryExceptions
+		if (progressBox.getLineCount() > Pref.Int.MaxLinesInProgressPanel.getValue()) {
+			String text = progressBox.getText();
+			int breakCount = 0;
+			int i = 0;
+			while (breakCount < 100) {
+				i = text.indexOf("\n", i + 1); //$NON-NLS-1$
+				breakCount++;
+			}
+			text = text.substring(i + 1);
+			progressBox.setText("...\n"); //$NON-NLS-1$
+			progressBox.append(text);
+			progressBox.setSelection(text.lastIndexOf("\n") + 4); //$NON-NLS-1$
+			progressBox.setTopIndex(Integer.MAX_VALUE);
+		}
 	}
+	
+	
 	
 	/**
 	 * Adds the given error to the list of the displayed errors.
