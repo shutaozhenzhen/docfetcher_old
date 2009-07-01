@@ -134,6 +134,11 @@ public class FolderWatcher {
 			if (targetFile.isFile() &&
 					! ParserRegistry.canParseIn(modifiedScope, targetFile)) return;
 			
+			// Ignore so-called temporary owner files created by MS Word
+			// See bug #2804172
+			if (targetFile.getName().matches("~\\$.*\\.docx?")) //$NON-NLS-1$
+				return;
+			
 			// Check if file was REALLY modified (JNotify tends to fire even when files have only been accessed)
 			if (! modifiedScope.getFile().equals(targetFile)) {
 				FileWrapper fileWrapper = modifiedScope.getFileWrapperDeep(targetFile);
