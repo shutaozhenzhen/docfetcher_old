@@ -111,10 +111,18 @@ public class UtilGUI {
 			});
 			return;
 		}
-		MessageBox msgBox = new MessageBox(getActiveShell(), SWT.ICON_ERROR | SWT.OK | SWT.PRIMARY_MODAL);
-		msgBox.setText(text == null ? Msg.system_error.value() : text);
-		msgBox.setMessage(message);
-		msgBox.open();
+		Shell activeShell = getActiveShell();
+		if (activeShell != null) {  
+			MessageBox msgBox = new MessageBox(activeShell, SWT.ICON_ERROR | SWT.OK | SWT.PRIMARY_MODAL);
+			msgBox.setText(text == null ? Msg.system_error.value() : text);
+			msgBox.setMessage(message);
+			msgBox.open();
+		}
+		/*
+		 * Somehow, activeShell can be null at this point. See bug #2792186.
+		 */
+		else
+			showErrorMsgOnStart(message);
 	}
 	
 	/**
