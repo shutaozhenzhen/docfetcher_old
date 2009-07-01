@@ -168,7 +168,9 @@ public class UtilFile {
 	 */
 	public static void delete(File target, boolean includeTopLevel) {
 		if (target.isDirectory() && ! isSymLink(target)) {
-			for (File file : target.listFiles())
+			File[] files = target.listFiles();
+			if (files == null) return;
+			for (File file : files)
 				delete(file, true);
 		}
 		if (includeTopLevel)
@@ -322,9 +324,13 @@ public class UtilFile {
 	 * Recursively collects all file extensions under the given directory and
 	 * puts them into the given Set. Files with an extension, but no basename
 	 * (e.g. ".classpath") are omitted.
+	 * <p>
+	 * Does nothing if the given directory cannot be accessed.
 	 */
 	private static void listExtensions(Set<String> exts, File rootDir) {
-		for (File file : rootDir.listFiles()) {
+		File[] files = rootDir.listFiles();
+		if (files == null) return; // See bug #2791378
+		for (File file : files) {
 			if (Thread.currentThread().isInterrupted()) return;
 			if (file.isFile()) {
 				String ext = UtilFile.getExtension(file);
@@ -362,6 +368,7 @@ public class UtilFile {
 	 * will be recursively searched in.
 	 */
 	public static long getSizeInKB(File... files) {
+		if (files == null) return 0;
 		long sum = 0;
 		for (File file : files) {
 			if (file.isFile()) {
