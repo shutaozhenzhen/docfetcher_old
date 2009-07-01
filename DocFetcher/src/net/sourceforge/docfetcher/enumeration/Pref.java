@@ -13,18 +13,18 @@ package net.sourceforge.docfetcher.enumeration;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Vector;
 import java.util.Map.Entry;
-
-import org.eclipse.swt.SWT;
 
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
@@ -33,6 +33,8 @@ import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
+
+import org.eclipse.swt.SWT;
 
 /**
  * Represents generic program preferences and allows type safe access to them
@@ -253,10 +255,11 @@ public class Pref {
 		try {
 			if (! propFile.exists())
 				propFile.createNewFile();
-			FileInputStream inStream = new FileInputStream(propFile);
+			FileInputStream in = new FileInputStream(propFile);
+			InputStreamReader in1 = new InputStreamReader(in, "utf-8"); //$NON-NLS-1$
 			Properties prop = new Properties();
-			prop.load(inStream);
-			inStream.close();
+			prop.load(in1);
+			in1.close();
 			for (Bool bool : Pref.Bool.values())
 				bool.value = Boolean.parseBoolean(
 						prop.getProperty(
@@ -309,7 +312,7 @@ public class Pref {
 	 * Saves the preferences to the preferences file.
 	 */
 	public static void save() throws IOException {
-		SortedMap<String, String> props = new TreeMap<String, String> ();
+		SortedProperties props = new SortedProperties();
 		for (Bool bool : Pref.Bool.values())
 			props.put(bool.name(), Boolean.toString(bool.value));
 		for (Int intpref : Pref.Int.values())
@@ -325,21 +328,34 @@ public class Pref {
 					checkPrefix + checkEntry.getKey().getSimpleName(),
 					checkEntry.getValue().toString()
 			);
-		FileWriter writer = new FileWriter(Const.USER_PROPERTIES_FILE, false);
-		writer.write("#" + DocFetcher.appName + " preferences" + Const.LS); //$NON-NLS-1$ //$NON-NLS-2$
-		writer.write("#" + "Only modify this if you know what you're doing" + Const.LS); //$NON-NLS-1$ //$NON-NLS-2$
-		writer.write("#" + new Date().toString() + Const.LS); //$NON-NLS-1$
-		String lastKey = props.lastKey();
-		for (Entry<String, String> entry : props.entrySet()) {
-			/*
-			 * Fix of bug #2811753: Backslashes must be escaped.
-			 */
-			String value = entry.getValue().replace("\\", "\\\\"); //$NON-NLS-1$ //$NON-NLS-2$
-			writer.write(entry.getKey() + "=" + value); //$NON-NLS-1$
-			if (lastKey != entry.getKey())
-				writer.write(Const.LS);
+		
+		StringBuffer comment = new StringBuffer();
+		comment.append(DocFetcher.appName + " preferences" + Const.LS); //$NON-NLS-1$
+		comment.append("Only modify this if you know what you're doing"); //$NON-NLS-1$
+		
+		FileOutputStream out = new FileOutputStream(Const.USER_PROPERTIES_FILE, false);
+		OutputStreamWriter out1 = new OutputStreamWriter(out, "utf-8"); //$NON-NLS-1$
+		props.store(out1, comment.toString());
+		out1.close();
+	}
+	
+	/**
+	 * Like the java.util.Properties class, but the entries are sorted.
+	 * 
+	 * @author qforce
+	 */
+	private static class SortedProperties extends Properties {
+		private static final long serialVersionUID = 1L;
+		@SuppressWarnings("unchecked")
+		public synchronized Enumeration keys() {
+			Enumeration keysEnum = super.keys();
+			Vector keyList = new Vector();
+			while(keysEnum.hasMoreElements()){
+				keyList.add(keysEnum.nextElement());
+			}
+			Collections.sort(keyList);
+			return keyList.elements();
 		}
-		writer.close();
 	}
 
 }
