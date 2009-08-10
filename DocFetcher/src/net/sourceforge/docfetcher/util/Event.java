@@ -13,7 +13,7 @@ package net.sourceforge.docfetcher.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,96 +24,159 @@ import org.eclipse.swt.widgets.Display;
  * pattern: Instead of adding methods like addListener, removeListener, etc. to
  * each class one wants to listen to, this class can simply be added as a field.
  * <p>
- * Moreover, the entire event system can be temporarily disabled using the
- * static hold() and flush() methods, which is useful for avoiding mass
- * notification when a lot of changes are made to an observed object.
+ * Moreover, the entire event system can be put into a 'caching mode' using the
+ * static {@link #hold()} and {@link #flush()} methods, which is useful for
+ * avoiding mass notification when a lot of changes are made to an observed
+ * object. In caching mode, the event system may discard duplicate events,
+ * depending on the return value that is choosen for
+ * {@link Listener#getEventDataPolicy()}.
  * <p>
  * The additional type parameter T of this class specifies the type of the event
- * data object that is transmitted on notifications.
+ * data object that is transmitted on notifications. If none is needed, the
+ * observed object may return itself.
  * 
  * @author Tran Nam Quang
  */
 public class Event<T> {
 	
-	public interface Listener<T> {
-		public void update(T eventData);
+	/**
+	 * This constant indicates that when the event system leaves the caching
+	 * mode, the listener should only be notified of the last cached event.
+	 */
+	public static final int SINGLE = 0;
+	
+	/**
+	 * This constant indicates that when the event system leaves the caching
+	 * mode, the listener should not receive multiple copies of the same cached
+	 * event data object.
+	 */
+	public static final int UNIQUE = 1;
+	
+	/**
+	 * This constant indicates that when the event system leaves the caching
+	 * mode, the listener should receive every cached event data object, even if
+	 * there are duplicates.
+	 */
+	public static final int DUPLICATE = 2;
+	
+	public static abstract class Listener<T> {
+		private List<T> cachedEventData = new ArrayList<T> ();
+		
+		public abstract void update(T eventData);
+		
+		/**
+		 * Subclassers may override this method to return one of the constants
+		 * defined in {@link Event}, that is, {@link Event#SINGLE}, Event.UNIQUE or
+		 * Event.DUPLICATE
+		 */
+		protected int getEventDataPolicy() {
+			return SINGLE; // Default value, can be overridden
+		}
+		
+		private void updateFromCache() {
+			int nEventData = cachedEventData.size();
+			switch (getEventDataPolicy()) {
+			case SINGLE:
+				if (nEventData > 0)
+					update(cachedEventData.get(nEventData - 1)); // last entry
+				break;
+			case UNIQUE:
+				List<T> uniqueData = new ArrayList<T> (nEventData);
+				for (int i = 0; i < nEventData; i++) {
+					if (i < nEventData - 1) {
+						T eventData = cachedEventData.get(i);
+						List<T> nextEntries = cachedEventData.subList(i + 1, nEventData);
+						if (! nextEntries.contains(eventData))
+							uniqueData.add(eventData);
+					}
+				}
+				for (T eventData : uniqueData)
+					update(eventData);
+				break;
+			case DUPLICATE:
+				for (T eventData : cachedEventData)
+					update(eventData);
+				break;
+			}
+			cachedEventData.clear();
+		}
 	}
 	
 	private boolean enabled = true;
-	private Set<Listener<T>> observers = new HashSet<Listener<T>> ();
-	private List<T> eventCache = new ArrayList<T> ();
+	private Set<Listener<T>> listeners = new LinkedHashSet<Listener<T>> ();
 	
-	public void add(Listener<T> observer) {
-		observers.add(observer);
+	public void add(Listener<T> listener) {
+		listeners.add(listener);
 	}
 	
-	public void addAll(Collection<Listener<T>> observers) {
-		this.observers.addAll(observers);
+	public void addAll(Collection<Listener<T>> listeners) {
+		this.listeners.addAll(listeners);
 	}
 	
 	
-	public void remove(Listener<T> observer) {
-		observers.remove(observer);
+	public void remove(Listener<T> listener) {
+		listeners.remove(listener);
 	}
 	
-	public void removeAllObservers() {
-		observers.clear();
+	public void removeAllListeners() {
+		listeners.clear();
 	}
 	
-	public Set<Listener<T>> getObservers() {
-		return observers;
+	public Set<Listener<T>> getListeners() {
+		return listeners;
 	}
 	
+	/**
+	 * Sents an event to the registered listeners. The event will be cached if
+	 * the event system currently operates in caching mode. This method should
+	 * only be called by the observed object.
+	 */
 	public void fireUpdate(final T eventData) {
-		if (! (enabled && globalEnabled)) return;
-		if (hold == 0) {
-			if (Display.getCurrent() != null || Display.getDefault() == null) {
-				for (Listener<T> observer : new HashSet<Listener<T>> (observers))
-					observer.update(eventData);
-			}
-			else {
-				Display.getDefault().syncExec(new Runnable() {
-					public void run() {
-						for (Listener<T> observer : new HashSet<Listener<T>> (observers))
-							observer.update(eventData);
-					}
-				});
-			}
+		if (! enabled) return;
+		if (Display.getCurrent() != null || Display.getDefault() == null) {
+			doFireUpdate(eventData);
 		}
 		else {
-			eventCache.add(eventData);
-			needsFlushing.add(this);
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					doFireUpdate(eventData);
+				}
+			});
 		}
 	}
 	
-	private void flushCache() {
-		if (enabled && globalEnabled)
-			for (T eventData : new ArrayList<T> (eventCache))
-				for (Listener<T> observer : new HashSet<Listener<T>> (observers))
-					observer.update(eventData);
-		eventCache.clear();
+	private void doFireUpdate(T eventData) {
+		if (hold == 0) {
+			for (Listener<T> listener : new ArrayList<Listener<T>> (listeners))
+				listener.update(eventData);
+		}
+		else {
+			for (Listener<T> listener : new ArrayList<Listener<T>> (listeners)) {
+				cachedListeners.add(listener);
+				listener.cachedEventData.add(eventData);
+			}
+		}
 	}
 	
 	public boolean isEnabled() {
 		return enabled;
 	}
-	
-	/**
-	 * Enables or disables this event.
-	 */
+
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	
+
 	private static int hold = 0;
-	private static boolean globalEnabled = true;
-	private static Set<Event<?>> needsFlushing = new HashSet<Event<?>> ();
+	private static Set<Listener<?>> cachedListeners = new LinkedHashSet<Listener<?>> ();
 	
 	/**
 	 * Temporarily puts the entire event system into a 'caching mode', meaning
 	 * that subsequent notification requests caused by changes on the observed
 	 * objects will be delayed until <tt>flush</tt> is called. Each
 	 * <tt>hold</tt> must be followed by a <tt>flush</tt> some time later.
+	 * <p>
+	 * In caching mode, the event system may discard duplicate events, depending
+	 * on the return value of {@link Listener#getEventDataPolicy()}.
 	 * <p>
 	 * Calls to <tt>hold</tt> and <tt>flush</tt> can be nested, so you could,
 	 * for example, call <tt>hold</tt> three times, and then <tt>flush</tt>
@@ -130,29 +193,18 @@ public class Event<T> {
 		hold = Math.max(0, hold - 1);
 		if (hold > 0) return;
 		if (Display.getCurrent() != null || Display.getDefault() == null) {
-			for (Event<?> event : new HashSet<Event<?>> (needsFlushing))
-				event.flushCache();
+			for (Listener<?> listener : cachedListeners)
+				listener.updateFromCache();
 		}
 		else {
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
-					for (Event<?> event : new HashSet<Event<?>> (needsFlushing))
-						event.flushCache();
+					for (Listener<?> listener : cachedListeners)
+						listener.updateFromCache();
 				}
 			});
 		}
-		needsFlushing.clear();
-	}
-	
-	public static boolean isGlobalEnabled() {
-		return globalEnabled;
-	}
-	
-	/**
-	 * Enables or disables the entire event system.
-	 */
-	public static void setGlobalEnabled(boolean enabled) {
-		globalEnabled = enabled;
+		cachedListeners.clear();
 	}
 
 }

@@ -18,6 +18,7 @@ import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
+import net.sourceforge.docfetcher.util.Timer;
 import net.sourceforge.docfetcher.view.IndexingDialog;
 
 /**
@@ -27,7 +28,7 @@ import net.sourceforge.docfetcher.view.IndexingDialog;
  */
 public aspect CodeConventions {
 	
-	declare warning: call(* PrintStream.print*(..)):
+	declare warning: call(* PrintStream.print*(..)) && !within(Timer):
 		"Don't forget to remove System.out.print*() calls after usage."; //$NON-NLS-1$
 	
 	declare warning: set(* ExceptionHandler.forceDisabled):

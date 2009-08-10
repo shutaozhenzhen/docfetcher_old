@@ -328,7 +328,7 @@ public class DocFetcher extends ApplicationWindow {
 		/*
 		 * Update the result panel on changes to the values in the filesize group.
 		 */
-		class FilesizeResultFilter implements ResultPanel.ResultFilter, Event.Listener<long[]> {
+		class FilesizeResultFilter extends Event.Listener<long[]> implements ResultPanel.ResultFilter {
 			private long minBytes = 0;
 			private long maxBytes = -1;
 			public boolean select(ResultDocument doc) {
