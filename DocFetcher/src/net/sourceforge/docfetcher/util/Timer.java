@@ -16,20 +16,28 @@ package net.sourceforge.docfetcher.util;
  */
 public class Timer {
 	
+	private static long firstPrintTime = -1;
 	private static long lastPrintTime = -1;
 	
 	private Timer() {}
 	
 	public static void reset() {
+		firstPrintTime = -1;
 		lastPrintTime = -1;
 	}
 	
 	public static void print(String msg) {
+		long now = System.currentTimeMillis();
 		if (lastPrintTime == -1)
-			System.out.println("0:\t" + msg); //$NON-NLS-1$
-		else
-			System.out.println((System.currentTimeMillis() - lastPrintTime) + ":\t" + msg); //$NON-NLS-1$
-		lastPrintTime = System.currentTimeMillis();
+			System.out.println("ABS\tREL\t" + msg); //$NON-NLS-1$
+		else {
+			long diff0 = now - firstPrintTime;
+			long diff1 = now - lastPrintTime;
+			System.out.println(diff0 + "\t" + diff1 + "\t" + msg); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		lastPrintTime = now;
+		if (firstPrintTime == -1)
+			firstPrintTime = now;
 	}
 
 }

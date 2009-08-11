@@ -52,6 +52,6 @@ public aspect CodeConventions {
 	&& !withincode(* UtilFile.listAll(..))
 	&& !withincode(* UtilFile.listFiles(..))
 	&& !withincode(* UtilFile.listFolders(..)):
-		"Don't use the JDK File.list* methods! Use the list method from the UtilFile class instead!"; //$NON-NLS-1$
+		"Use the UtilFile.list*(..) methods instead, since they don't return null, thus avoiding NullPointerExceptions."; //$NON-NLS-1$
 
 }

@@ -166,42 +166,11 @@ public class DocFetcher extends ApplicationWindow {
 	private DocFetcher() {
 		super(null);
 		addStatusLine();
-		
-		// Load preferences and scope registry
 		Pref.load();
 		appName = Pref.Str.AppName.getValue();
 		if (appName.trim().equals("")) //$NON-NLS-1$
 			appName = "DocFetcher"; //$NON-NLS-1$
 		Display.setAppName(DocFetcher.appName);
-		scopeReg = ScopeRegistry.getInstance();
-		
-		// Remove scope registry entries whose index folders don't exist anymore
-		RootScope[] rootScopes = scopeReg.getEntries();
-		for (RootScope rootScope : rootScopes)
-			if (! rootScope.getIndexDir().exists())
-				scopeReg.remove(rootScope);
-		
-		/*
-		 * Wipe out unregistered index folders (possibly from older
-		 * installations or program crashes).
-		 */
-		File[] indexDirs = UtilFile.listFolders(Const.INDEX_PARENT_FILE);
-		for (File indexDir : indexDirs)
-			if (! scopeReg.containsIndexDir(indexDir) && indexDir.getName().matches(".*_[0-9]+")) //$NON-NLS-1$
-				UtilFile.delete(indexDir, true);
-		
-		// Hook onto scope registry and set app name according to number of jobs
-		scopeReg.getEvtQueueChanged().add(new Event.Listener<ScopeRegistry> () {
-			public void update(ScopeRegistry scopeReg) {
-				Shell shell = getShell();
-				if (shell == null) return;
-				int count = scopeReg.getSubmittedJobs().length;
-				String prefix = Msg.jobs.format(count) + " - "; //$NON-NLS-1$
-				shell.setText((count == 0 ? "" : prefix) + DocFetcher.appName); //$NON-NLS-1$
-			}
-		});
-	
-		folderWatcher = new FolderWatcher(); // must be done after loading the Prefs
 	}
 	
 	public static DocFetcher getInstance() {
@@ -285,8 +254,6 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// Load settings
 		filterPanel.setVisible(Pref.Bool.ShowFilterPanel.getValue());
-		parserGroup.setParsers(ParserRegistry.getParsers());
-		scopeGroup.setScopes(true, scopeReg.getEntries());
 		
 		/*
 		 * Enabling the sash weight handler must be delayed using a Thread;
@@ -635,6 +602,12 @@ public class DocFetcher extends ApplicationWindow {
 			else
 				setStatus(Msg.invalid_start_params.value());
 		}
+		
+		new Thread() {
+			public void run() {
+				initializeApplication();
+			}
+		}.start();
 
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
@@ -645,6 +618,45 @@ public class DocFetcher extends ApplicationWindow {
 		exceptionHandler.setEnabled(true);
 		
 		return topContainer;
+	}
+	
+	private void initializeApplication() {
+		scopeReg = ScopeRegistry.getInstance();
+		
+		// Remove scope registry entries whose index folders don't exist anymore
+		RootScope[] rootScopes = scopeReg.getEntries();
+		for (RootScope rootScope : rootScopes)
+			if (! rootScope.getIndexDir().exists())
+				scopeReg.remove(rootScope);
+		
+		/*
+		 * Wipe out unregistered index folders (possibly from older
+		 * installations or program crashes).
+		 */
+		File[] indexDirs = UtilFile.listFolders(Const.INDEX_PARENT_FILE);
+		for (File indexDir : indexDirs)
+			if (! scopeReg.containsIndexDir(indexDir) && indexDir.getName().matches(".*_[0-9]+")) //$NON-NLS-1$
+				UtilFile.delete(indexDir, true);
+		
+		// Hook onto scope registry and set app name according to number of jobs
+		scopeReg.getEvtQueueChanged().add(new Event.Listener<ScopeRegistry> () {
+			public void update(ScopeRegistry scopeReg) {
+				Shell shell = getShell();
+				if (shell == null) return;
+				int count = scopeReg.getSubmittedJobs().length;
+				String prefix = Msg.jobs.format(count) + " - "; //$NON-NLS-1$
+				shell.setText((count == 0 ? "" : prefix) + DocFetcher.appName); //$NON-NLS-1$
+			}
+		});
+		
+		folderWatcher = new FolderWatcher(); // must be done after loading the Prefs
+		
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				parserGroup.setParsers(ParserRegistry.getParsers());
+				scopeGroup.setScopes(true, scopeReg.getEntries());
+			}
+		});
 	}
 	
 	/**
