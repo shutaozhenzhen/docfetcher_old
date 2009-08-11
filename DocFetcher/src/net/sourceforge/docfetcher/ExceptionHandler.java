@@ -107,7 +107,8 @@ public class ExceptionHandler {
 			// Add some useful system info to the stacktrace
 			String[] programVersion = getProgramVersion();
 			errorDialog.append("program.version=" + programVersion[0] + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			errorDialog.append("build.date=" + programVersion[1] + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			errorDialog.append("program.portable=" + Const.IS_PORTABLE + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			errorDialog.append("program.build=" + programVersion[1] + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			String[] keys = new String[] {
 					"java.runtime.name", //$NON-NLS-1$
 					"java.runtime.version", //$NON-NLS-1$
