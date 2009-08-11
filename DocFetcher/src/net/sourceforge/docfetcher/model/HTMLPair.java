@@ -115,7 +115,7 @@ class Modifiable implements Serializable {
 		this.file = UtilFile.getRelativeFile(Const.USER_DIR_FILE, file);
 		if (file.isDirectory()) {
 			children = new ArrayList<Modifiable> ();
-			for (File subFile : file.listFiles())
+			for (File subFile : UtilFile.listAll(file))
 				if (subFile.isDirectory() ||
 						ParserRegistry.canParseIn(root, subFile))
 					children.add(new Modifiable(root, subFile));
@@ -139,7 +139,7 @@ class Modifiable implements Serializable {
 			if (child.isModified())
 				return true;
 		// Directory: Modified if new files have been inserted
-		File[] newFiles = file.listFiles(new FileFilter() {
+		File[] newFiles = UtilFile.listAll(file, new FileFilter() {
 			public boolean accept(File candidate) {
 				return candidate.isDirectory() ||
 				ParserRegistry.canParseIn(root, candidate);

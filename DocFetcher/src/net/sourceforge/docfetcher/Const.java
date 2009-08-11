@@ -199,7 +199,7 @@ public class Const {
 	 */
 	private static String getManualParentPath(String helpFolderParent) {
 		File helpFolder = new File(UtilFile.join(helpFolderParent, "help")); //$NON-NLS-1$
-		File[] manualFolders = UtilFile.getSubDirs(helpFolder);
+		File[] manualFolders = UtilFile.listFolders(helpFolder);
 		
 		// The target folder names to search for
 		String[] targets = new String[] {

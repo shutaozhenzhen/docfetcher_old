@@ -98,26 +98,42 @@ public class UtilFile {
 			paths[i] = files[i].getAbsolutePath();
 		return paths;
 	}
-
+	
 	/**
-	 * Returns all subdirectories of the given directory (only first level).
+	 * Returns all files and folders in the given directory (only first level).
 	 * Returns an empty array if access to the directory was denied.
 	 * <p>
 	 * <b>Note</b>: This does not exclude symbolic links!
 	 */
-	public static File[] getSubDirs(File dir) {
-		File[] files = dir.listFiles(dirsOnlyFilter);
+	public static File[] listAll(File dir) {
+		File[] files = dir.listFiles();
 		return files == null ? new File[] {} : files;
 	}
-
+	
+	public static File[] listAll(File dir, FileFilter filter) {
+		File[] files = dir.listFiles(filter);
+		return files == null ? new File[] {} : files;
+	}
+	
 	/**
 	 * Returns all files in the given directory (only first level). Returns an
 	 * empty array if access to the directory was denied.
 	 * <p>
 	 * <b>Note</b>: This does not exclude symbolic links!
 	 */
-	public static File[] getSubFiles(File dir) {
+	public static File[] listFiles(File dir) {
 		File[] files = dir.listFiles(filesOnlyFilter);
+		return files == null ? new File[] {} : files;
+	}
+	
+	/**
+	 * Returns all folders of the given folder (only first level). Returns an
+	 * empty array if access to the directory was denied.
+	 * <p>
+	 * <b>Note</b>: This does not exclude symbolic links!
+	 */
+	public static File[] listFolders(File dir) {
+		File[] files = dir.listFiles(dirsOnlyFilter);
 		return files == null ? new File[] {} : files;
 	}
 
@@ -168,8 +184,7 @@ public class UtilFile {
 	 */
 	public static void delete(File target, boolean includeTopLevel) {
 		if (target.isDirectory() && ! isSymLink(target)) {
-			File[] files = target.listFiles();
-			if (files == null) return;
+			File[] files = listAll(target);
 			for (File file : files)
 				delete(file, true);
 		}
@@ -196,7 +211,7 @@ public class UtilFile {
 			if (file.isDirectory()) {
 				String baseName = UtilFile.getHTMLDirBasename(file);
 				if (baseName == null) continue;
-				File[] candidates = file.getParentFile().listFiles(new FileFilter() {
+				File[] candidates = listAll(file.getParentFile(), new FileFilter() {
 					public boolean accept(File candidate) {
 						return candidate.isFile() && ParserRegistry.isHTMLFile(candidate);
 					}
@@ -210,7 +225,7 @@ public class UtilFile {
 			}
 			else if (file.isFile() && ParserRegistry.isHTMLFile(file)) {
 				String baseName = UtilFile.getNameNoExt(file);
-				File[] candidates = file.getParentFile().listFiles(new FileFilter() {
+				File[] candidates = listAll(file.getParentFile(), new FileFilter() {
 					public boolean accept(File candidate) {
 						if (! candidate.isDirectory()) return false;
 						String baseName = UtilFile.getHTMLDirBasename(candidate);
@@ -271,8 +286,7 @@ public class UtilFile {
 		}
 		else if (srcFile.isDirectory()) {
 			destFile.mkdirs();
-			File[] srcFiles = srcFile.listFiles();
-			if (srcFiles == null) return;
+			File[] srcFiles = listAll(srcFile);
 			for (File subSrcFile : srcFiles)
 				copy(subSrcFile, destFile);
 		}
@@ -328,8 +342,7 @@ public class UtilFile {
 	 * Does nothing if the given directory cannot be accessed.
 	 */
 	private static void listExtensions(Set<String> exts, File rootDir) {
-		File[] files = rootDir.listFiles();
-		if (files == null) return; // See bug #2791378
+		File[] files = listAll(rootDir);
 		for (File file : files) {
 			if (Thread.currentThread().isInterrupted()) return;
 			if (file.isFile()) {
@@ -377,7 +390,7 @@ public class UtilFile {
 				sum += length / 1024 + extra;
 			}
 			else if (file.isDirectory() && ! isSymLink(file)) {
-				sum += getSizeInKB(file.listFiles());
+				sum += getSizeInKB(listAll(file));
 			}
 		}
 		return sum;
@@ -559,7 +572,7 @@ public class UtilFile {
 	public static String suggestNewSubfolderName(File parentFolder) {
 		if (! parentFolder.isDirectory())
 			throw new IllegalArgumentException();
-		File[] subDirs = getSubDirs(parentFolder);
+		File[] subDirs = listFolders(parentFolder);
 		String[] subDirNames = new String[subDirs.length];
 		for (int i = 0; i < subDirs.length; i++)
 			subDirNames[i] = subDirs[i].getName();

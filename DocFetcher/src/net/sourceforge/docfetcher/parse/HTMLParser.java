@@ -100,8 +100,7 @@ public class HTMLParser extends Parser {
 	 * their contents to the given StringBuffer.
 	 */
 	private void merge(StringBuffer sb, File directory) {
-		File[] files = directory.listFiles();
-		if (files == null) return;
+		File[] files = UtilFile.listAll(directory);
 		for (File file : files) {
 			if (file.isFile()) {
 				// Parse file and append its contents to given StringBuffer

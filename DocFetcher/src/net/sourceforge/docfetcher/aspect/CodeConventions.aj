@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.dev;
 
+import java.io.File;
 import java.io.PrintStream;
 
 import net.sourceforge.docfetcher.ExceptionHandler;
@@ -19,6 +20,7 @@ import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.Timer;
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.view.IndexingDialog;
 
 /**
@@ -45,5 +47,11 @@ public aspect CodeConventions {
 	
 	declare warning: execution(boolean get*(..)) && !within(Pref.Bool):
 		"Boolean getter methods should start with 'is'."; //$NON-NLS-1$
+	
+	declare warning: (call(* File.list(..)) || call(* File.listFiles(..)))
+	&& !withincode(* UtilFile.listAll(..))
+	&& !withincode(* UtilFile.listFiles(..))
+	&& !withincode(* UtilFile.listFolders(..)):
+		"Don't use the JDK File.list* methods! Use the list method from the UtilFile class instead!"; //$NON-NLS-1$
 
 }

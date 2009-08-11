@@ -532,8 +532,8 @@ public class ResultPanel extends Composite {
 		for (File file : filesToDelete) {
 			File parent = file.getParentFile();
 			UtilFile.delete(file, true);
-			String[] neighbors = parent.list();
-			if (neighbors != null && neighbors.length == 0)
+			File[] neighbors = UtilFile.listAll(parent);
+			if (neighbors.length == 0)
 				emptyParents.add(parent);
 		} 
 		

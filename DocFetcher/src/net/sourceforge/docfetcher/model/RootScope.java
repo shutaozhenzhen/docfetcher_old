@@ -294,8 +294,8 @@ public class RootScope extends Scope {
 				! (scope.isHTMLFileRegistered(candidate));
 			}
 		};
-		File[] newHTMLFolders = scope.file.listFiles(newHTMLFolderFilter);
-		File[] newHTMLFiles = scope.file.listFiles(newHTMLFileFilter);
+		File[] newHTMLFolders = UtilFile.listAll(scope.file, newHTMLFolderFilter);
+		File[] newHTMLFiles = UtilFile.listAll(scope.file, newHTMLFileFilter);
 		if (newHTMLFolders != null)
 			for (File newHTMLFolder : newHTMLFolders)
 				newHTMLDirBasenames.add(UtilFile.getHTMLDirBasename(newHTMLFolder));
@@ -405,8 +405,8 @@ public class RootScope extends Scope {
 			List<File> files,
 			List<File> directories,
 			List<HTMLPair> htmlPairs) {
-		File[] entries = parent.file.listFiles();
-		if (entries == null) return;
+		File[] entries = UtilFile.listAll(parent.file);
+		if (entries.length == 0) return;
 
 		// Preprocessing: Separation of files without HTML pair detection,
 		// excluding symbolic links
@@ -465,8 +465,8 @@ public class RootScope extends Scope {
 			List<File> files,
 			List<File> directories,
 			List<HTMLPair> htmlPairs) {
-		File[] entries = parent.file.listFiles();
-		if (entries == null) return;
+		File[] entries = UtilFile.listAll(parent.file);
+		if (entries.length == 0) return;
 
 		for (File entry : entries) {
 			if (UtilFile.isSymLink(entry)) continue;

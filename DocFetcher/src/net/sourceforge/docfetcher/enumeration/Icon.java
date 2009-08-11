@@ -15,6 +15,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.util.UtilFile;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -64,7 +65,7 @@ public enum Icon {
 	
 	// Put all icons from the icon folder into the ImageRegistry
 	static {
-		File[] iconFiles = new File(Const.ICON_DIRNAME).listFiles();
+		File[] iconFiles = UtilFile.listAll(new File(Const.ICON_DIRNAME));
 		for (int i = 0; i < iconFiles.length; i++) {
 			String name = iconFiles[i].getName();
 			ImageDescriptor descriptor = null;

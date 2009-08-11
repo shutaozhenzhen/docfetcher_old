@@ -185,7 +185,7 @@ public class DocFetcher extends ApplicationWindow {
 		 * Wipe out unregistered index folders (possibly from older
 		 * installations or program crashes).
 		 */
-		File[] indexDirs = UtilFile.getSubDirs(Const.INDEX_PARENT_FILE);
+		File[] indexDirs = UtilFile.listFolders(Const.INDEX_PARENT_FILE);
 		for (File indexDir : indexDirs)
 			if (! scopeReg.containsIndexDir(indexDir) && indexDir.getName().matches(".*_[0-9]+")) //$NON-NLS-1$
 				UtilFile.delete(indexDir, true);
