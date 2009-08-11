@@ -44,9 +44,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
@@ -58,6 +62,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -155,26 +160,49 @@ public class ScopeGroup extends GroupWrapper {
 			public void dispose() {}
 		});
 		
-		viewer.setLabelProvider(new org.eclipse.jface.viewers.LabelProvider() {
-			public String getText(Object element) {
-				Indexable scope = (Indexable) element;
+		class MyStyledCellLabelProvider extends StyledCellLabelProvider {
+			private Styler styler;
+			public MyStyledCellLabelProvider() {
+				styler = new Styler() {
+					public void applyStyles(TextStyle textStyle) {
+						textStyle.foreground = UtilGUI.getColor(SWT.COLOR_DARK_GRAY);
+					}
+				};
+			}
+			public void update(ViewerCell cell) {
+				Indexable scope = (Indexable) cell.getElement();
 				File file = scope.getFile();
 				String label = file.getName();
 				if (label.equals("")) // applies to root directories, i.e. "C:\\" //$NON-NLS-1$
 					label = file.getAbsolutePath();
-				else if(scope instanceof RootScope)
-					label += " --- " + file.getAbsolutePath(); //$NON-NLS-1$
 				
 				// "temp" prefix for RootScopes that will be deleted on exit
 				if (scope instanceof RootScope)
 					if (((RootScope) scope).isDeleteOnExit())
 						label = "[X]  " + label; //$NON-NLS-1$
 				
-				return label;
+				StyledString styledString = new StyledString(label, null);
+				if (scope instanceof RootScope) {
+					String path = file.getAbsolutePath();
+					styledString.append(" --- " + path, styler); //$NON-NLS-1$
+				}
+				cell.setText(styledString.toString());
+				cell.setStyleRanges(styledString.getStyleRanges());
+			}
+			protected void measure(org.eclipse.swt.widgets.Event event,
+					Object element) {
+				super.measure(event, element);
+			}
+		}
+		viewer.setLabelProvider(new MyStyledCellLabelProvider());
+		
+		viewer.setSorter(new ViewerSorter() {
+			public int compare(Viewer viewer, Object e1, Object e2) {
+				String name1 = ((Scope) e1).getFile().getName();
+				String name2 = ((Scope) e2).getFile().getName();
+				return name1.compareToIgnoreCase(name2);
 			}
 		});
-		
-		viewer.setSorter(new ViewerSorter());
 		
 		/*
 		 * Because the check states of the viewer items are maintained manually,
