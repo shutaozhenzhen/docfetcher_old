@@ -23,6 +23,8 @@ import net.sourceforge.docfetcher.util.Timer;
 import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.view.IndexingDialog;
 
+import org.eclipse.swt.program.Program;
+
 /**
  * Some constraints on the code.
  * 
@@ -53,5 +55,8 @@ public aspect CodeConventions {
 	&& !withincode(* UtilFile.listFiles(..))
 	&& !withincode(* UtilFile.listFolders(..)):
 		"Use the UtilFile.list*(..) methods instead, since they don't return null, thus avoiding NullPointerExceptions."; //$NON-NLS-1$
+	
+	declare warning: call(* Program.launch(..)) && !withincode(* UtilFile.launch(..)):
+		"Use the UtilFile.launch(..) method instead, it will also work on KDE."; //$NON-NLS-1$
 
 }

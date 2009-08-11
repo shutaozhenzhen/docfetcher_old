@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.enumeration.Pref.Bool;
 import net.sourceforge.docfetcher.enumeration.Pref.Int;
 import net.sourceforge.docfetcher.enumeration.Pref.Str;
 import net.sourceforge.docfetcher.enumeration.Pref.StrArray;
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
@@ -44,7 +45,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
@@ -243,7 +243,7 @@ public class PrefDialog {
 		});
 		helpButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Program.launch(Const.HELP_FILE_PREF);
+				UtilFile.launch(Const.HELP_FILE_PREF);
 			}
 		});
 		

@@ -19,6 +19,7 @@ import net.sourceforge.docfetcher.enumeration.Key;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
@@ -38,7 +39,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
@@ -107,7 +107,7 @@ public class ProgressPanel extends Composite {
 		errorTable.addMouseListener(new MouseAdapter() {
 			public void mouseDoubleClick(MouseEvent e) {
 				TableItem item = errorTable.getItem(new Point(e.x, e.y));
-				Program.launch(item.getText(1));
+				UtilFile.launch(item.getText(1));
 			}
 		});
 		
@@ -270,7 +270,7 @@ public class ProgressPanel extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				TableItem[] items = errorTable.getSelection();
 				for (TableItem item : items)
-					Program.launch(item.getText(1));
+					UtilFile.launch(item.getText(1));
 			}
 		});
 	}
@@ -280,7 +280,7 @@ public class ProgressPanel extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				TableItem[] items = errorTable.getSelection();
 				for (TableItem item : items)
-					Program.launch(new File(item.getText(1)).getParent());
+					UtilFile.launch(new File(item.getText(1)).getParent());
 			}
 		});
 	}

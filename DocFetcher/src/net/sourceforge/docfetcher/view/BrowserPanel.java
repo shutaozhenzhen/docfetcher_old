@@ -18,6 +18,7 @@ import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
 import org.eclipse.swt.SWT;
@@ -32,7 +33,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -133,7 +133,7 @@ public class BrowserPanel extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				String url = browser.getUrl();
 				if (url.equals("")) return; //$NON-NLS-1$
-				Program.launch(url);
+				UtilFile.launch(url);
 				if (Pref.Bool.HideOnOpen.getValue())
 					DocFetcher.getInstance().toSystemTray();
 			}

@@ -23,6 +23,7 @@ import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.Job;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.parse.ParseException;
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
@@ -38,7 +39,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -168,7 +168,7 @@ public class IndexingTab extends Composite {
 		// Launch help file when help button is pressed
 		helpButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				Program.launch(Const.HELP_FILE_INDEXING);
+				UtilFile.launch(Const.HELP_FILE_INDEXING);
 			}
 		});
 		

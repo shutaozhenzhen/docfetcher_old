@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.swt.program.Program;
+
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
@@ -623,6 +625,26 @@ public class UtilFile {
 		if (Const.IS_WINDOWS)
 			return path.replace("/", "\\"); //$NON-NLS-1$ //$NON-NLS-2$
 		return path.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	/**
+	 * Launches the given filename or filepath, returning whether the file was
+	 * successfully launched. This method first tries to launch the file via
+	 * {@link Program#launch(String)}. If that fails and we're on Linux, the
+	 * method tries to call xdg-open. This is what usually happens on KDE-based
+	 * Linuxes, which are not supported by SWT.
+	 */
+	public static boolean launch(String fileName) {
+		if (Program.launch(fileName))
+			return true;
+		if (! Const.IS_LINUX)
+			return false;
+		try {
+			Process p = Runtime.getRuntime().exec(new String[] {"xdg-open", fileName}); //$NON-NLS-1$
+			return p.waitFor() == 0;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 }

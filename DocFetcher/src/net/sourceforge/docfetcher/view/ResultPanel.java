@@ -438,7 +438,7 @@ public class ResultPanel extends Composite {
 		Iterator<?> it = sel.iterator();
 		while(it.hasNext()) {
 			ResultDocument doc = (ResultDocument) it.next();
-			Program.launch(doc.getFile().getAbsolutePath());
+			UtilFile.launch(doc.getFile().getAbsolutePath());
 		}
 		if (Pref.Bool.HideOnOpen.getValue())
 			DocFetcher.getInstance().toSystemTray();
@@ -464,7 +464,7 @@ public class ResultPanel extends Composite {
 			return;
 		}
 		for (String dir : dirsToOpen)
-			Program.launch(dir);
+			UtilFile.launch(dir);
 		if (Pref.Bool.HideOnOpen.getValue())
 			DocFetcher.getInstance().toSystemTray();
 	}
@@ -571,7 +571,7 @@ public class ResultPanel extends Composite {
 				public void mouseDoubleClick(MouseEvent e) {
 					String[] selItems = list.getSelection();
 					if (selItems.length == 0) return;
-					Program.launch(selItems[0]);
+					UtilFile.launch(selItems[0]);
 				}
 			});
 			FormDataFactory fdf = FormDataFactory.getInstance();
@@ -861,7 +861,7 @@ public class ResultPanel extends Composite {
 			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 			ResultDocument result = (ResultDocument) sel.getFirstElement();
 			File file = result.getFile();
-			boolean launched = Program.launch(file.getAbsolutePath());
+			boolean launched = UtilFile.launch(file.getAbsolutePath());
 			if (launched) {
 				if (Pref.Bool.HideOnOpen.getValue())
 					DocFetcher.getInstance().toSystemTray();

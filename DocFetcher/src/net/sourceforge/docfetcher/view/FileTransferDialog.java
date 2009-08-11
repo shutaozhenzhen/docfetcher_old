@@ -29,7 +29,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
@@ -71,7 +70,7 @@ public class FileTransferDialog {
 		progressPanel.addErrorMenuItem(Msg.open_target_folder.value(), false, new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if (newParent != null)
-					Program.launch(newParent.getAbsolutePath());
+					UtilFile.launch(newParent.getAbsolutePath());
 			}
 		});
 		progressPanel.addErrorMenuItemSeparator();

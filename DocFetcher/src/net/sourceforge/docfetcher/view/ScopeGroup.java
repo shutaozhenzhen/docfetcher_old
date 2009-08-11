@@ -58,7 +58,6 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -606,7 +605,7 @@ public class ScopeGroup extends GroupWrapper {
 				return;
 			}
 			for (Scope scope : scopes)
-				Program.launch(scope.getFile().getAbsolutePath());
+				UtilFile.launch(scope.getFile().getAbsolutePath());
 		}
 	}
 	

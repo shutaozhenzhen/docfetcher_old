@@ -29,6 +29,7 @@ import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.parse.TextParser;
 import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
@@ -50,7 +51,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -532,7 +532,7 @@ public class PreviewPanel extends Composite {
 		parser = ParserRegistry.getHTMLParser();
 		final BrowserPanel browser = browserProvider.getBrowser(previewPanel, browserToolBar, parser);
 		if (browser == null) {
-			Program.launch(Const.HELP_FILE);
+			UtilFile.launch(Const.HELP_FILE);
 			return false;
 		}
 		file = new File(Const.HELP_FILE);
