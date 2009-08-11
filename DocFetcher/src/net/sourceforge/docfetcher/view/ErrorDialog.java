@@ -33,12 +33,12 @@ public class ErrorDialog {
 	
 	private Text text;
 
-	public ErrorDialog() {
+	public ErrorDialog(String shellTitle) {
 		// Shell
 		int shellStyle = SWT.SYSTEM_MODAL | SWT.DIALOG_TRIM | SWT.MIN | SWT.MAX | SWT.RESIZE;
 		Shell shell = new Shell(Display.getDefault(), shellStyle);
 		shell.setImage(Icon.WARNING_BIG.getImage());
-		shell.setText(Msg.system_error.value());
+		shell.setText(shellTitle != null ? shellTitle : Msg.system_error.value());
 		shell.setSize(400, 400);
 		UtilGUI.centerShell(null, shell);
 		

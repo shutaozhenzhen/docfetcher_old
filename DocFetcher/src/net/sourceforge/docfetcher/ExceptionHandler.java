@@ -16,7 +16,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.view.ErrorDialog;
 
 import org.eclipse.swt.widgets.Display;
@@ -88,8 +91,35 @@ public class ExceptionHandler {
 	 * error dialog.
 	 */
 	private void appendError(String str) {
-		if (errorDialog == null)
-			errorDialog = new ErrorDialog();
+		if (errorDialog == null) {
+			/*
+			 * Try to give the error dialog box an informative title, because
+			 * that's what most bug reporters will choose for the bug report
+			 * summary line.
+			 */
+			Pattern errorPattern = Pattern.compile(".*?\\.([^.]*?)\\:.*"); //$NON-NLS-1$
+			Matcher matcher = errorPattern.matcher(str);
+			String shellTitle = null;
+			if (matcher.matches())
+				shellTitle = matcher.group(1);
+			errorDialog = new ErrorDialog(shellTitle);
+			
+			// Add some useful system info to the stacktrace
+			String[] programVersion = getProgramVersion();
+			errorDialog.append("program.version=" + programVersion[0] + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			errorDialog.append("build.date=" + programVersion[1] + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			String[] keys = new String[] {
+					"java.runtime.name", //$NON-NLS-1$
+					"java.runtime.version", //$NON-NLS-1$
+					"java.version", //$NON-NLS-1$
+					"os.arch", //$NON-NLS-1$
+					"os.name", //$NON-NLS-1$
+					"os.version", //$NON-NLS-1$
+					"user.language" //$NON-NLS-1$
+			};
+			for (String key : keys)
+				errorDialog.append(key + "=" + System.getProperty(key) + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		errorDialog.append(str);
 		try {
 			if (fileWriter == null) {
@@ -113,6 +143,20 @@ public class ExceptionHandler {
 		} catch (IOException e) {
 			// This might happen when the DocFetcher is run from a CD-ROM
 		}
+	}
+	
+	/**
+	 * Extracts the program version and build date from the filename of the
+	 * DocFetcher JAR file. Returns "unknown, unknown" if the extraction failed.
+	 */
+	private String[] getProgramVersion() {
+		Pattern pattern = Pattern.compile("net.sourceforge.docfetcher_(.*?)_(.*?).jar"); //$NON-NLS-1$
+		for (File libFile : UtilFile.listFiles(new File("lib"))) { //$NON-NLS-1$
+			Matcher matcher = pattern.matcher(libFile.getName());
+			if (matcher.matches())
+				return new String[] {matcher.group(1), matcher.group(2)};
+		}
+		return new String[] {"unknown", "unknown"}; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
