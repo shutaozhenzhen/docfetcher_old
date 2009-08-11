@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.contentobjects.jnotify.JNotify;
-import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.FileWrapper;
@@ -286,26 +285,23 @@ public class FolderWatcher {
 		if (watchIdMap.containsKey(rootScope)) return;
 		File file = rootScope.getFile();
 		if (! file.exists()) return;
+		
+		DocFetcher docFetcher = DocFetcher.getInstance();
+		if (docFetcher == null) return; // this is null on startup
+		docFetcher.setExceptionHandlerEnabled(false);
+		
 		try {
-			DocFetcher docFetcher = DocFetcher.getInstance();
-			if (docFetcher == null) return; // this is null on startup
-			
-			/*
-			 * FIXME JNotify 0.91 can somehow throw JNotifyExceptions that
-			 * bypass this try-catch-clause. WTF?
-			 */
-			docFetcher.setExceptionHandlerEnabled(false);
 			int id = JNotify.addWatch(
 					file.getAbsolutePath(),
 					JNotify.FILE_ANY, true,
 					fsListener
 			);
-			docFetcher.setExceptionHandlerEnabled(true);
-			
 			watchIdMap.put(rootScope, id);
-		} catch (JNotifyException e) {
+		} catch (Exception e) { // JNotify can throw Runtime Exceptions
 			// Ignore
 		}
+		
+		docFetcher.setExceptionHandlerEnabled(true);
 	}
 	
 	/**
@@ -317,19 +313,14 @@ public class FolderWatcher {
 			watchIdMap.remove(rootScope);
 			return;
 		}
+		DocFetcher.getInstance().setExceptionHandlerEnabled(false);
 		try {
-			/*
-			 * FIXME JNotify 0.91 can somehow throw JNotifyExceptions that
-			 * bypass this try-catch-clause. WTF?
-			 */
-			DocFetcher.getInstance().setExceptionHandlerEnabled(false);
 			JNotify.removeWatch(watchIdMap.get(rootScope));
-			DocFetcher.getInstance().setExceptionHandlerEnabled(true);
-			
 			watchIdMap.remove(rootScope);
-		} catch (JNotifyException e) {
+		} catch (Exception e) { // JNotify can throw Runtime Exceptions
 			// Ignore
 		}
+		DocFetcher.getInstance().setExceptionHandlerEnabled(true);
 	}
 
 }

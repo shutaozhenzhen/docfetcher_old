@@ -14,10 +14,13 @@ package net.sourceforge.docfetcher.view;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,6 +37,8 @@ import net.sourceforge.docfetcher.model.ResultDocument;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.model.Scope;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
+import net.sourceforge.docfetcher.parse.Parser;
+import net.sourceforge.docfetcher.parse.ParserRegistry;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
@@ -341,18 +346,9 @@ public class ResultPanel extends Composite {
 	 */
 	private void setResultPages(ResultDocument[] input) {
 		// Apply filters
-		List<ResultDocument> filteredInput = new ArrayList<ResultDocument> (input.length);
-		for (ResultDocument candidate : input) {
-			boolean select = true;
-			for (ResultFilter filter : filters) {
-				if (! filter.select(candidate)) {
-					select = false;
-					break;
-				}
-			}
-			if (select)
-				filteredInput.add(candidate);
-		}
+		List<ResultDocument> filteredInput = Arrays.asList(input);
+		for (ResultFilter filter : filters)
+			filteredInput = filter.select(filteredInput);
 		visibleResultCount = filteredInput.size();
 		if (visibleResultCount == 0) {
 			resultPages = new ResultDocument[1][0];
@@ -697,7 +693,12 @@ public class ResultPanel extends Composite {
 	 * @author Tran Nam Quang
 	 */
 	public static interface ResultFilter {
-		public boolean select(ResultDocument doc);
+		
+		/**
+		 * Takes the given collection of ResultDocuments and returns a new,
+		 * filtered list of ResultDocuments.
+		 */
+		public List<ResultDocument> select(Collection<ResultDocument> docs);
 	}
 	
 	/**
@@ -706,8 +707,19 @@ public class ResultPanel extends Composite {
 	 */
 	static class ParserFilter implements ResultFilter {
 		
-		public boolean select(ResultDocument doc) {
-			return doc.getParsedBy().isChecked();
+		public List<ResultDocument> select(Collection<ResultDocument> docs) {
+			Map<String, Boolean> checkStates = new HashMap<String, Boolean> ();
+			for (Parser parser : ParserRegistry.getParsers())
+				checkStates.put(parser.getClass().getSimpleName(), parser.isChecked());
+			
+			List<ResultDocument> selected = new ArrayList<ResultDocument> (docs.size());
+			for (ResultDocument doc : docs) {
+				Boolean checkState = checkStates.get(doc.getParserName());
+				if (checkState != null && checkState)
+					selected.add(doc);
+			}
+			
+			return selected;
 		}
 		
 	}
@@ -718,34 +730,35 @@ public class ResultPanel extends Composite {
 	 */
 	static class ScopeFilter implements ResultFilter {
 		
-		public boolean select(ResultDocument doc) {
-			File target = doc.getFile();
-			Scope location = null;
+		public List<ResultDocument> select(Collection<ResultDocument> docs) {
+			/*
+			 * Bug #2807587: In v1.0 and earlier DocFetcher walked down the
+			 * Scope hierarchy for each ResultDocument to determine whether it
+			 * should be included in the visible results, causing DocFetcher to
+			 * freeze for minutes if there were too many indexes and/or result
+			 * items. Using this HashMap, the processing time has been reduced
+			 * to milliseconds.
+			 */
+			Map<String, Boolean> checkStates = new HashMap<String, Boolean> ();
 			for (RootScope rootScope : ScopeRegistry.getInstance().getEntries()) {
-				if (rootScope.contains(target)) {
-					location = locate(rootScope, target);
-					break;
-				}
+				insertCheckState(checkStates, rootScope);
 			}
-			if (location == null) // Scope might have been removed by the user
-				return false;
-			return location.isChecked();
+			
+			List<ResultDocument> selected = new ArrayList<ResultDocument> (docs.size());
+			for (ResultDocument doc : docs) {
+				String path = doc.getFile().getParentFile().getAbsolutePath();
+				Boolean checkState = checkStates.get(path);
+				if (checkState != null && checkState)
+					selected.add(doc);
+			}
+			
+			return selected;
 		}
 		
-		/**
-		 * Returns the Scope under the given Scope which contains the given file.
-		 */
-		private Scope locate(Scope location, File target) {
-			Scope subLocation = null;
-			for (Scope candidate : location.getChildren()) {
-				if (candidate.contains(target)) {
-					subLocation = candidate;
-					break;
-				}
-			}
-			if (subLocation == null)
-				return location;
-			return locate(subLocation, target);
+		private void insertCheckState(Map<String, Boolean> checkStates, Scope scope) {
+			checkStates.put(scope.getFile().getAbsolutePath(), scope.isChecked());
+			for (Scope child : scope.getChildren())
+				insertCheckState(checkStates, child);
 		}
 		
 	}

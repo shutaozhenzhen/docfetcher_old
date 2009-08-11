@@ -242,12 +242,22 @@ public class Document {
 	 * Returns the parser that produced this document object. It will not return
 	 * null.
 	 */
-	public Parser getParsedBy() {
+	public Parser getParser() {
 		String parserName = luceneDoc.get(parsedBy);
 		for (Parser candidate : ParserRegistry.getParsers())
 			if (candidate.getClass().getSimpleName().equals(parserName))
 				return candidate;
 		throw new IllegalStateException();
+	}
+	
+	/**
+	 * Returns the name of the parser that produced this document object. This
+	 * method is faster than {@link #getParser()}, because instead of performing
+	 * a search, only a stored string is returned. This method will not return
+	 * null.
+	 */
+	public String getParserName() {
+		return luceneDoc.get(parsedBy);
 	}
 	
 	/**

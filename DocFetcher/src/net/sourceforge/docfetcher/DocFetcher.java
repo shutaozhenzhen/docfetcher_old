@@ -331,11 +331,25 @@ public class DocFetcher extends ApplicationWindow {
 		class FilesizeResultFilter extends Event.Listener<long[]> implements ResultPanel.ResultFilter {
 			private long minBytes = 0;
 			private long maxBytes = -1;
-			public boolean select(ResultDocument doc) {
-				long targetSize = doc.getFile().length();
-				boolean minPassed = minBytes <= targetSize;
-				boolean maxPassed = maxBytes == -1 ? true : targetSize <= maxBytes;
-				return minPassed && maxPassed;
+			public List<ResultDocument> select(Collection<ResultDocument> docs) {
+				/*
+				 * If no filesize filters are set, we can simply return the
+				 * input. This is especially important if the number of result
+				 * documents is huge, because bypassing the rest of this filter
+				 * can save a lot of processing time.
+				 */
+				if (minBytes == 0 && maxBytes == -1)
+					return new ArrayList<ResultDocument> (docs);
+				
+				List<ResultDocument> selected = new ArrayList<ResultDocument>(docs.size());
+				for (ResultDocument doc : docs) {
+					long targetSize = doc.getFile().length();
+					boolean minPassed = minBytes <= targetSize;
+					boolean maxPassed = maxBytes == -1 ? true : targetSize <= maxBytes;
+					if (minPassed && maxPassed)
+						selected.add(doc);
+				}
+				return selected;
 			}
 			public void update(long[] eventData) {
 				minBytes = eventData[0];
@@ -413,7 +427,7 @@ public class DocFetcher extends ApplicationWindow {
 			public void update(ResultPanel resultPanel) {
 				ResultDocument doc = (ResultDocument) resultPanel.getSelection().getFirstElement();
 				if (doc == null) return;
-				previewPanel.setFile(doc.getFile(), doc.getParsedBy());
+				previewPanel.setFile(doc.getFile(), doc.getParser());
 				showResultStatus();
 			}
 		});

@@ -31,6 +31,9 @@ public aspect CodeConventions {
 	declare warning: call(* PrintStream.print*(..)) && !within(Timer):
 		"Don't forget to remove System.out.print*() calls after usage."; //$NON-NLS-1$
 	
+	declare warning: call(* Timer.print*(..)):
+		"Don't forget to remove Timer.print*() calls after usage."; //$NON-NLS-1$
+	
 	declare warning: set(* ExceptionHandler.forceDisabled):
 		"Don't forget to re-enable the exception handler after usage."; //$NON-NLS-1$
 	
