@@ -318,16 +318,6 @@ public class ScopeGroup extends GroupWrapper {
 	}
 	
 	/**
-	 * Sets the RootScopes to be displayed in this widget, which all have the
-	 * check state given by <tt>checkState</tt>. 
-	 */
-	public void setScopes(boolean checkState, RootScope... scopes) {
-		viewer.setInput(scopes);
-		for (Scope scope : scopes)
-			viewer.setSubtreeChecked(scope, checkState);
-	}
-	
-	/**
 	 * Updates the check states of the visible viewer elements and the elements
 	 * corresponding to the Scopes given in and under <tt>includedScopes</tt>
 	 * according to the check states in the model. All other elements are left

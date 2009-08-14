@@ -654,7 +654,7 @@ public class DocFetcher extends ApplicationWindow {
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
 				parserGroup.setParsers(ParserRegistry.getParsers());
-				scopeGroup.setScopes(true, scopeReg.getEntries());
+				scopeGroup.setScopes(scopeReg.getEntries());
 			}
 		});
 	}
