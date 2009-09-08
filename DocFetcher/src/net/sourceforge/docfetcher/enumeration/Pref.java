@@ -343,7 +343,7 @@ public class Pref {
 	/**
 	 * Like the java.util.Properties class, but the entries are sorted.
 	 * 
-	 * @author qforce
+	 * @author Tran Nam Quang
 	 */
 	private static class SortedProperties extends Properties {
 		private static final long serialVersionUID = 1L;

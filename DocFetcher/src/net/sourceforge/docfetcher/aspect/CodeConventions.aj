@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.dev;
 import java.io.File;
 import java.io.PrintStream;
 
+import net.sourceforge.docfetcher.CommandLineHandler;
 import net.sourceforge.docfetcher.ExceptionHandler;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
@@ -32,7 +33,9 @@ import org.eclipse.swt.program.Program;
  */
 public aspect CodeConventions {
 	
-	declare warning: call(* PrintStream.print*(..)) && !within(Timer):
+	declare warning: call(* PrintStream.print*(..))
+	&& !within(Timer)
+	&& !within(CommandLineHandler):
 		"Don't forget to remove System.out.print*() calls after usage."; //$NON-NLS-1$
 	
 	declare warning: call(* Timer.print*(..)):

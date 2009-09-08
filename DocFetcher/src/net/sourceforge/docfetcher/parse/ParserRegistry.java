@@ -79,6 +79,13 @@ public class ParserRegistry {
 	public static HTMLParser getHTMLParser() {
 		return htmlParser;
 	}
+	
+	/**
+	 * Returns the Text parser
+	 */
+	public static TextParser getTextParser() {
+		return textParser;
+	}
 
 	/**
 	 * Returns a parser that can handle the given file, or null if none

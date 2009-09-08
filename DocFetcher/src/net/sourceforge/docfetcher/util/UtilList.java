@@ -380,5 +380,16 @@ public class UtilList {
 			zeros[i] = '0';
 		return String.valueOf(zeros) + s;
 	}
+	
+	/**
+	 * Concatenates two arrays. The resulting array must be provided by the user
+	 * and is expected to have a length equal to the sum of lengths of the two
+	 * input arrays.
+	 */
+	public static <T> T[] concatenate(T[] part1, T[] part2, T[] result) {
+		System.arraycopy(part1, 0, result, 0, part1.length);
+		System.arraycopy(part2, 0, result, part1.length, part2.length);
+		return result;
+	}
 
 }

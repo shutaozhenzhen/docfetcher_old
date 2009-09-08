@@ -14,6 +14,7 @@ package net.sourceforge.docfetcher.aspect;
 import java.io.FileWriter;
 
 import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.CommandLineHandler;
 import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.ExceptionHandler;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -58,7 +59,8 @@ public privileged aspect DiskWritingSuppressor {
 	declare warning: call(FileWriter+.new(..))
 	&& !withincode(* Pref.save())
 	&& !withincode(* ScopeRegistry.save(..))
-	&& !withincode(* ExceptionHandler.appendError(..)):
+	&& !withincode(* ExceptionHandler.appendError(..))
+	&& !within(CommandLineHandler):
 		"Don't write to disk without updating net.sourceforge.docfetcher.aspect.DiskWritingSuppressor."; //$NON-NLS-1$
 
 }

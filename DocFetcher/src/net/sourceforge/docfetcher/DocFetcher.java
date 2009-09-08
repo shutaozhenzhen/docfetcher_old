@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Key;
@@ -76,11 +78,6 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.swt.widgets.Widget;
 
-import ca.beq.util.win32.registry.RegistryException;
-import ca.beq.util.win32.registry.RegistryKey;
-import ca.beq.util.win32.registry.RegistryValue;
-import ca.beq.util.win32.registry.RootKey;
-
 /**
  * The main application window.
  * 
@@ -94,6 +91,7 @@ public class DocFetcher extends ApplicationWindow {
 	private HotkeyHandler hotkeyHandler;
 	private ExceptionHandler exceptionHandler;
 	public static String appName;
+	
 	private Composite filterPanel;
 	private SashForm sashHorizontal;
 	private SashForm sashLeft;
@@ -112,37 +110,9 @@ public class DocFetcher extends ApplicationWindow {
 	private ScopeGroup scopeGroup;
 
 	public static void main(String[] args) {
-		/*
-		 * Register or unregister context menu entry on Windows. We would like
-		 * to print to the command prompt here, but for unknown reasons no
-		 * messages are displayed with System.out.println. Therefore all
-		 * System.out.println calls have been disabled.
-		 */
-		if (Const.IS_WINDOWS && args.length == 1 && args[0].startsWith("-")) { //$NON-NLS-1$
-			String param = args[0].toLowerCase();
-			File exe = new File("DocFetcher.exe"); //$NON-NLS-1$
-			String exePath = exe.getAbsolutePath();
-			if (exe.exists()) {
-				String regkey = "Directory\\shell\\" + Msg.search_with_docfetcher.value(); //$NON-NLS-1$
-				if (param.equals("--register-contextmenu")) { //$NON-NLS-1$
-					RegistryKey key = new RegistryKey(RootKey.HKEY_CLASSES_ROOT, regkey + "\\command"); //$NON-NLS-1$
-					key.create();
-					key.setValue(new RegistryValue("\"" + exePath + "\" \"%1\"")); //$NON-NLS-1$ //$NON-NLS-2$
-//					System.out.println("Registered: " + exePath);
-				}
-				else if (param.equals("--unregister-contextmenu")) { //$NON-NLS-1$
-					try {
-						new RegistryKey(RootKey.HKEY_CLASSES_ROOT, regkey).delete();
-					} catch (RegistryException e) {
-//						System.out.println("Registry entry not found.");
-					}
-//					System.out.println("Unregistered: " + exePath);
-				}
-			}
-//			else
-//				System.out.println("File not found: " + exePath);
+		Pref.load(); // Preferences must be loaded before invoking the command line handler
+		if (! CommandLineHandler.handle(args))
 			return;
-		}
 		
 		startParams = args;
 		docFetcher = new DocFetcher();
@@ -166,7 +136,6 @@ public class DocFetcher extends ApplicationWindow {
 	private DocFetcher() {
 		super(null);
 		addStatusLine();
-		Pref.load();
 		appName = Pref.Str.AppName.getValue();
 		if (appName.trim().equals("")) //$NON-NLS-1$
 			appName = "DocFetcher"; //$NON-NLS-1$
@@ -225,7 +194,6 @@ public class DocFetcher extends ApplicationWindow {
 				Icon.DOCFETCHER32.getImage(),
 				Icon.DOCFETCHER48.getImage(),
 		});
-		
 		super.configureShell(shell);
 	}
 	
@@ -254,22 +222,6 @@ public class DocFetcher extends ApplicationWindow {
 		
 		// Load settings
 		filterPanel.setVisible(Pref.Bool.ShowFilterPanel.getValue());
-		
-		/*
-		 * Enabling the sash weight handler must be delayed using a Thread;
-		 * otherwise we would get a nasty layout bug that would shrink the width
-		 * of the filter panel after each subsequent program launch, provided
-		 * the program is terminated in maximized state.
-		 */
-		new Thread() {
-			public void run() {
-				Display.getDefault().syncExec(new Runnable() {
-					public void run() {
-						new SashWeightHandler(getShell(), sashHorizontal);
-					}
-				});
-			}
-		}.start();
 		
 		// Create indexing box
 		indexingDialog = new IndexingDialog(getShell());
@@ -525,84 +477,6 @@ public class DocFetcher extends ApplicationWindow {
 			}
 		}
 		
-		// Create temporary indexes from start parameters
-		if (startParams != null && startParams.length != 0) {
-			// Create RootScope objects from start parameters
-			final List<RootScope> newRootScopes = new ArrayList<RootScope> ();
-			for (File file : UtilFile.getDissociatedDirectories(startParams))
-				newRootScopes.add(new RootScope(file));
-			
-			if (! newRootScopes.isEmpty()) {
-				// Check all given RootScopes/Scopes after indexing, uncheck everything else
-				indexingDialog.evtClosed.add(new Event.Listener<IndexingDialog> () {
-					public void update(IndexingDialog eventData) {
-						for (RootScope rootScope : scopeReg.getEntries())
-							rootScope.setCheckedDeep(false);
-						for (RootScope newRootScope : newRootScopes) {
-							Scope scope = scopeReg.getScopeDeep(newRootScope.getFile());
-							if (scope != null)
-								scope.setCheckedDeep(true);
-						}
-						scopeGroup.updateCheckStates();
-						indexingDialog.evtClosed.remove(this); // unregister listener
-					}
-				});
-
-				// Start indexing and open up the indexing dialog
-				boolean jobsAdded = false;
-				for (RootScope rs : newRootScopes) {
-					/*
-					 * Note: Through this pathway, the user can create
-					 * intersecting RootScopes: For example, the user can create
-					 * a permanent index "C:\Docs\Stuff" and then create a
-					 * temporary index for "C:\Docs". This case is not
-					 * intercepted in the following for-if construct because
-					 * allowing it seems to be more convenient for the user.
-					 * 
-					 * Note 2: The user can also search in HTML folders, even if
-					 * there were already indexed.
-					 */
-					boolean allow = true;
-					for (RootScope oldScope : scopeReg.getEntries()) {
-						if (oldScope.equals(rs)) {
-							allow = false;
-							break;
-						}
-						if (oldScope.contains(rs)) {
-							HTMLPair htmlPair = scopeReg.getHTMLPair(rs.getFile());
-							allow = htmlPair != null;
-							break;
-						}
-					}
-					if (allow) {
-						rs.setDeleteOnExit(true);
-						indexingDialog.addUncheckedJob(new Job(rs, true, true));
-						jobsAdded = true;
-					}
-				}
-				if (jobsAdded) { // Only open indexing dialog if at least one new folder was indexed
-					new Thread() {
-						public void run() {
-							Display.getDefault().asyncExec(new Runnable() {
-								public void run() {
-									/*
-									 * This wouldn't work outside the thread,
-									 * because at this point the main shell
-									 * hasn't been created yet.
-									 */
-									indexingDialog.open();
-								}
-							});
-						}
-					}.start();
-				}
-				else // Call the evtClosed handler anyway
-					indexingDialog.evtClosed.fireUpdate(indexingDialog);
-			}
-			else
-				setStatus(Msg.invalid_start_params.value());
-		}
-		
 		new Thread() {
 			public void run() {
 				initializeApplication();
@@ -655,8 +529,102 @@ public class DocFetcher extends ApplicationWindow {
 			public void run() {
 				parserGroup.setParsers(ParserRegistry.getParsers());
 				scopeGroup.setScopes(scopeReg.getEntries());
+				createTemporaryIndexes();
+				
+				/*
+				 * Enabling the sash weight handler must be delayed using a Thread;
+				 * otherwise we would get a nasty layout bug that would shrink the width
+				 * of the filter panel after each subsequent program launch, provided
+				 * the program is terminated in maximized state.
+				 */
+				new SashWeightHandler(getShell(), sashHorizontal);
 			}
 		});
+	}
+	
+	/**
+	 * Creates temporary indexes from start parameters.
+	 */
+	private void createTemporaryIndexes() {
+		if (startParams == null || startParams.length == 0) return;
+		
+		// Create RootScope objects from start parameters
+		final List<RootScope> newRootScopes = new ArrayList<RootScope> ();
+		for (File file : UtilFile.getDissociatedDirectories(startParams))
+			newRootScopes.add(new RootScope(file));
+
+		if (newRootScopes.isEmpty()) {
+			setStatus(Msg.invalid_start_params.value());
+			return;
+		}
+		
+		// Check all given RootScopes/Scopes after indexing, uncheck everything else
+		indexingDialog.evtClosed.add(new Event.Listener<IndexingDialog> () {
+			public void update(IndexingDialog eventData) {
+				for (RootScope rootScope : scopeReg.getEntries())
+					rootScope.setCheckedDeep(false);
+				for (RootScope newRootScope : newRootScopes) {
+					Scope scope = scopeReg.getScopeDeep(newRootScope.getFile());
+					if (scope != null)
+						scope.setCheckedDeep(true);
+				}
+				scopeGroup.updateCheckStates();
+				indexingDialog.evtClosed.remove(this); // unregister listener
+			}
+		});
+
+		// Start indexing and open up the indexing dialog
+		boolean jobsAdded = false;
+		for (RootScope rs : newRootScopes) {
+			/*
+			 * Note: Through this pathway, the user can create
+			 * intersecting RootScopes: For example, the user can create
+			 * a permanent index "C:\Docs\Stuff" and then create a
+			 * temporary index for "C:\Docs". This case is not
+			 * intercepted in the following for-if construct because
+			 * allowing it seems to be more convenient for the user.
+			 * 
+			 * Note 2: The user can also search in HTML folders, even if
+			 * there were already indexed.
+			 */
+			boolean allow = true;
+			for (RootScope oldScope : scopeReg.getEntries()) {
+				if (oldScope.equals(rs)) {
+					allow = false;
+					break;
+				}
+				if (oldScope.contains(rs)) {
+					HTMLPair htmlPair = scopeReg.getHTMLPair(rs.getFile());
+					allow = htmlPair != null;
+					break;
+				}
+			}
+			if (allow) {
+				rs.setDeleteOnExit(true);
+				indexingDialog.addUncheckedJob(new Job(rs, true, true));
+				jobsAdded = true;
+			}
+		}
+		
+		// Only open indexing dialog if at least one new folder was indexed
+		if (jobsAdded) {
+			new Thread() {
+				public void run() {
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							/*
+							 * This wouldn't work outside the thread,
+							 * because at this point the main shell
+							 * hasn't been created yet.
+							 */
+							indexingDialog.open();
+						}
+					});
+				}
+			}.start();
+		}
+		else // Call the evtClosed handler anyway
+			indexingDialog.evtClosed.fireUpdate(indexingDialog);
 	}
 	
 	/**
@@ -969,6 +937,20 @@ public class DocFetcher extends ApplicationWindow {
 	 */
 	public void setWatchEnabled(boolean enabled, RootScope... targets) {
 		folderWatcher.setWatchEnabled(enabled, targets);
+	}
+	
+	/**
+	 * Extracts the program version and build date from the filename of the
+	 * DocFetcher JAR file. Returns null if the extraction failed.
+	 */
+	public static String[] getProgramVersion() {
+		Pattern pattern = Pattern.compile("net.sourceforge.docfetcher_(.*?)_(.*?).jar"); //$NON-NLS-1$
+		for (File libFile : UtilFile.listFiles(new File("lib"))) { //$NON-NLS-1$
+			Matcher matcher = pattern.matcher(libFile.getName());
+			if (matcher.matches())
+				return new String[] {matcher.group(1), matcher.group(2)};
+		}
+		return null;
 	}
 	
 }

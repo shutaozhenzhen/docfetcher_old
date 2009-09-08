@@ -324,6 +324,35 @@ public class UtilFile {
 		String fileName = file.getName();
 		return fileName.substring(0, fileName.length() - extLength);
 	}
+	
+	/**
+	 * Returns the file extension of the given file, without the '.' character.
+	 * Returns an empty string if the file has no extension (meaning that it
+	 * doesn't contain the '.' character).
+	 * <p>
+	 * An exception is made for files ending with ".xxx.gz" (e.g.
+	 * "archive.tar.gz" and "abiword.abw.gz"): The double extension "xxx.gz" is
+	 * returned instead of "gz".
+	 */
+	public static String getExtension(String fileName) {
+		int index = fileName.lastIndexOf('.');
+		if (index == -1) return ""; //$NON-NLS-1$
+		String ext = fileName.substring(index + 1).toLowerCase();
+		if (! ext.equals("gz")) //$NON-NLS-1$
+			return ext;
+		int index2 = fileName.lastIndexOf('.', fileName.length() - 4);
+		if (index2 == -1) return ext;
+		return fileName.substring(index2 + 1).toLowerCase();
+	}
+
+	/**
+	 * Returns the filename of the given file without its file extension.
+	 */
+	public static String getNameNoExt(String fileName) {
+		int extLength = getExtension(fileName).length();
+		if (extLength != 0) extLength += 1;
+		return fileName.substring(0, fileName.length() - extLength);
+	}
 
 	/**
 	 * Recursively collects all file extensions under the given directory and
@@ -587,6 +616,30 @@ public class UtilFile {
 			i++;
 		}
 	}
+
+	/**
+	 * Tries to return a new file object with <tt>parentFolder</tt> as parent
+	 * and <tt>initialName</tt> as filename. If a file with this name already
+	 * exists in the parent folder, the method appends a number to the filename
+	 * so that the resulting file is one that doesn't exist yet.
+	 * <p>
+	 * Example: If the parent folder contains "test.txt", "test (1).txt" and
+	 * "test (3).txt", this method returns a file with the name "test (2).txt".
+	 */
+	public static File getNewFile(File parentFolder, String initialName) {
+		if (! parentFolder.isDirectory())
+			throw new IllegalArgumentException();
+		File file = new File(parentFolder, initialName);
+		if (! file.exists()) return file;
+		String basename = getNameNoExt(initialName);
+		String ext = getExtension(initialName);
+		int i = 1;
+		while (true) {
+			file = new File(parentFolder, basename + " (" + i + ")." + ext); //$NON-NLS-1$ //$NON-NLS-2$
+			if (! file.exists()) return file;
+			i++;
+		}
+	}
 	
 	/**
 	 * Expects a string array containing file or directory paths and returns
@@ -629,10 +682,11 @@ public class UtilFile {
 	
 	/**
 	 * Launches the given filename or filepath, returning whether the file was
-	 * successfully launched. This method first tries to launch the file via
-	 * {@link Program#launch(String)}. If that fails and we're on Linux, the
-	 * method tries to call xdg-open. This is what usually happens on KDE-based
-	 * Linuxes, which are not supported by SWT.
+	 * successfully launched. This method first tries to launch the file via the
+	 * SWT method {@link Program#launch(String)}. If that fails and the
+	 * application is running on Linux, this method tries to call xdg-open. This
+	 * is what usually happens on KDE-based Linuxes, which are not supported by
+	 * SWT.
 	 */
 	public static boolean launch(String fileName) {
 		if (Program.launch(fileName))

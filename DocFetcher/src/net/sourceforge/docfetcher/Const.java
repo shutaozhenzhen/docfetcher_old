@@ -181,7 +181,6 @@ public class Const {
 			 * This can occur if two instances are running, if someone is using
 			 * the file or if DocFetcher is run from a CD-ROM.
 			 */
-			e.printStackTrace();
 		}
 	}
 	

@@ -19,7 +19,6 @@ import java.io.PrintStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.view.ErrorDialog;
 
 import org.eclipse.swt.widgets.Display;
@@ -105,7 +104,9 @@ public class ExceptionHandler {
 			errorDialog = new ErrorDialog(shellTitle);
 			
 			// Add some useful system info to the stacktrace
-			String[] programVersion = getProgramVersion();
+			String[] programVersion = DocFetcher.getProgramVersion();
+			if (programVersion == null)
+				programVersion = new String[] {"Unknown", "Unknown"}; //$NON-NLS-1$ //$NON-NLS-2$
 			errorDialog.append("program.version=" + programVersion[0] + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			errorDialog.append("program.portable=" + Const.IS_PORTABLE + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			errorDialog.append("program.build=" + programVersion[1] + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -146,20 +147,6 @@ public class ExceptionHandler {
 		}
 	}
 	
-	/**
-	 * Extracts the program version and build date from the filename of the
-	 * DocFetcher JAR file. Returns "unknown, unknown" if the extraction failed.
-	 */
-	private String[] getProgramVersion() {
-		Pattern pattern = Pattern.compile("net.sourceforge.docfetcher_(.*?)_(.*?).jar"); //$NON-NLS-1$
-		for (File libFile : UtilFile.listFiles(new File("lib"))) { //$NON-NLS-1$
-			Matcher matcher = pattern.matcher(libFile.getName());
-			if (matcher.matches())
-				return new String[] {matcher.group(1), matcher.group(2)};
-		}
-		return new String[] {"unknown", "unknown"}; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
 	/**
 	 * A custom implementation of a printstream that writes to a textbox and a
 	 * text file.

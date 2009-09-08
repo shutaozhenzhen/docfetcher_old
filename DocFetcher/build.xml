@@ -10,7 +10,7 @@
 		</tstamp>
 		<property name="appname" value="DocFetcher"/>
 		<property name="package" value="net.sourceforge.docfetcher"/>
-		<property name="version" value="1.0.1"/>
+		<property name="version" value="1.1"/>
 		<property name="versiondir" value="build/temp_${version}"/>
 		<property name="deploy.name" value="${appname}-${version}"/>
 		<property name="jar.name" value="${package}_${version}_${build.time}.jar"/>
@@ -153,6 +153,35 @@
 		</copy>
 		<zip destfile="build/docfetcher_${version}_portable.zip" basedir="build/tmp"/>
 		<delete dir="build/tmp"/>
+	</target>
+	
+	<target name="deploy.test" depends="compile, fixcrlf.windows"
+		description="Build portable release for testing">
+		<copy todir="build/${deploy.name}/lib">
+			<fileset dir="lib" includes="**/*.jar, **/*.dll, **/*.so, **/*.so.*" excludes="**/*linux*.jar, **/*win32*.jar"/>
+			<filelist dir="build" files="${jar.name}"/>
+		</copy>
+		<copy todir="build/${deploy.name}/lib/windows">
+			<fileset dir="lib" includes="**/*win32*.jar"/>
+		</copy>
+		<copy todir="build/${deploy.name}/lib/linux">
+			<fileset dir="lib" includes="**/*linux*.jar"/>
+		</copy>
+		<copy todir="build/${deploy.name}">
+			<fileset dir="resources" includes="icons/*, lang/*, user.properties, *.schemas"/>
+			<fileset dir="${versiondir}" includes="**/*.txt"/>
+			<fileset dir="resources/daemon"/>
+		</copy>
+		<copy todir="build/${deploy.name}">
+			<fileset dir="resources/portable"/>
+			<fileset dir="resources/daemon"/>
+		</copy>
+		<copy todir="build/${deploy.name}/help">
+			<fileset dir="resources/help"/>
+		</copy>
+		<copy todir="build/${deploy.name}/licenses">
+			<fileset dir="${versiondir}/licenses"/>
+		</copy>
 	</target>
 	
 	<target name="deploy.source" depends="compile"

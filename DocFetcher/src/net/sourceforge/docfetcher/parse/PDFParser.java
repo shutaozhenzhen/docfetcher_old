@@ -33,6 +33,8 @@ public class PDFParser extends Parser {
 		PDDocument pdfDoc = null;
 		try {
 			pdfDoc = PDDocument.load(file);
+			if (pdfDoc.isEncrypted())
+				throw new ParseException(file, Msg.doc_pw_protected.value());
 			PDFTextStripper stripper = new PDFTextStripper();
 			StringWriter writer = new StringWriter();
 			stripper.writeText(pdfDoc, writer);
