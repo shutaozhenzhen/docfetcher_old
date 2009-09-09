@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.enumeration;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -263,18 +264,31 @@ public enum Msg {
 		return MessageFormat.format(value, obj);
 	}
 	
-	/**
-	 * The internal ResourceBundle to load the messages from.
-	 */
-	private static ResourceBundle bundle = ResourceBundle.getBundle(Const.RESOURCE_BUNDLE);
-	
 	/*
 	 * Loads the localized messages from disk.
 	 */
 	static {
 		try {
-			for (Msg msg : Msg.values()) {
-				msg.value = bundle.getString(msg.name());
+			String langEnglish = Locale.ENGLISH.getLanguage();
+			String langDefault = Locale.getDefault().getLanguage();
+			if (langDefault.equals(langEnglish)) {
+				ResourceBundle bundle = ResourceBundle.getBundle(Const.RESOURCE_BUNDLE);
+				for (Msg msg : Msg.values())
+					msg.value = bundle.getString(msg.name());
+			}
+			else {
+				/*
+				 * For non-English locales, use the English message for those
+				 * messages that haven't been translated yet, indicated by a
+				 * "$TODO$" value.
+				 */
+				ResourceBundle bundleDefault = ResourceBundle.getBundle(Const.RESOURCE_BUNDLE);
+				ResourceBundle bundleEnglish = ResourceBundle.getBundle(Const.RESOURCE_BUNDLE, Locale.ROOT);
+				for (Msg msg : Msg.values()) {
+					msg.value = bundleDefault.getString(msg.name());
+					if (msg.value.equals("$TODO$")) //$NON-NLS-1$
+						msg.value = bundleEnglish.getString(msg.name());
+				}
 			}
 		} catch (MissingResourceException e) {
 			e.printStackTrace();
