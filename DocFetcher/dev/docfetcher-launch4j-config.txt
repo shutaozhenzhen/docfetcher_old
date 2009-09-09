@@ -4,7 +4,7 @@ Basic
 ==============================
 Jar runtime path: lib\
 Don't wrap the jar, launch only: checked
-Icon: (Path to ico-file)
+Icon: (Path to ic-file)
 Change dir: .
 Stay alive after launching a GUI application: checked
 Java download URL: http://java.com
@@ -19,4 +19,5 @@ Classpath: lib\*.jar, lang\*.*
 JRE
 ==============================
 Min JRE version: 1.6.0
+Max heap size: 256 MB
 JVM options: -Djava.library.path="lib"
