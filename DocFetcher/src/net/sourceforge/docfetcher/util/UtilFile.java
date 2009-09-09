@@ -464,12 +464,12 @@ public class UtilFile {
 	public static boolean contains(String dirPath, String dirOrFilePath) {
 		dirPath = dirPath.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 		dirOrFilePath = dirOrFilePath.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
-		String[] parts1 = UtilList.split(dirPath, "/", true); //$NON-NLS-1$
-		String[] parts2 = UtilList.split(dirOrFilePath, "/", true); //$NON-NLS-1$
-		if (parts1.length >= parts2.length)
+		List<String> parts1 = UtilList.split(dirPath, "/"); //$NON-NLS-1$
+		List<String> parts2 = UtilList.split(dirOrFilePath, "/"); //$NON-NLS-1$
+		if (parts1.size() >= parts2.size())
 			return false;
-		for (int i = 0; i < parts1.length; i++)
-			if (! parts1[i].equals(parts2[i]))
+		for (int i = 0; i < parts1.size(); i++)
+			if (! parts1.get(i).equals(parts2.get(i)))
 				return false;
 		return true;
 	}
@@ -490,12 +490,12 @@ public class UtilFile {
 	public static boolean containsDirect(String dirPath, String dirOrFilePath) {
 		dirPath = dirPath.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
 		dirOrFilePath = dirOrFilePath.replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$
-		String[] parts1 = UtilList.split(dirPath, "/", true); //$NON-NLS-1$
-		String[] parts2 = UtilList.split(dirOrFilePath, "/", true); //$NON-NLS-1$
-		if (parts1.length + 1 != parts2.length)
+		List<String> parts1 = UtilList.split(dirPath, "/"); //$NON-NLS-1$
+		List<String> parts2 = UtilList.split(dirOrFilePath, "/"); //$NON-NLS-1$
+		if (parts1.size() + 1 != parts2.size())
 			return false;
-		for (int i = 0; i < parts1.length; i++)
-			if (! parts1[i].equals(parts2[i]))
+		for (int i = 0; i < parts1.size(); i++)
+			if (! parts1.get(i).equals(parts2.get(i)))
 				return false;
 		return true;
 	}

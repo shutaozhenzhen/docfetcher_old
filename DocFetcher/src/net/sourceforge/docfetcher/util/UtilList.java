@@ -209,13 +209,18 @@ public class UtilList {
 	}
 
 	/**
-	 * Splits the given string into an array of substrings using <tt>sep</tt>
-	 * as the separator sequence. This differs from the standard
-	 * String.split(String) in that no regular expressions are used. If the
-	 * <tt>noEmptyEnds</tt> parameter is true, empty strings at the start and
-	 * end of the returned string array will be omitted.
+	 * Splits the given string into an array of substrings using <tt>sep</tt> as
+	 * the separator sequence. This differs from the standard
+	 * String.split(String) method in the following:
+	 * <ul>
+	 * <li>The separator is a string, not a regular expression.</li>
+	 * <li>The returned object is a list, not an array.</li>
+	 * <li>The String.split(String) method omits empty parts at the end, but not
+	 * at the beginning. This method omits empty parts both at the beginning and
+	 * at the end.</li>
+	 * </ul>
 	 */
-	public static String[] split(String string, String sep, boolean noEmptyEnds) {
+	public static List<String> split(String string, String sep) {
 		List<String> parts = new ArrayList<String> ();
 		int startIndex = 0;
 		while (true) {
@@ -227,13 +232,12 @@ public class UtilList {
 			parts.add(string.substring(startIndex, index));
 			startIndex = index + 1;
 		}
-		if (noEmptyEnds) {
-			while (! parts.isEmpty() && parts.get(0).equals("")) //$NON-NLS-1$
-				parts.remove(0);
-			while (! parts.isEmpty() && parts.get(parts.size() - 1).equals("")) //$NON-NLS-1$
-				parts.remove(parts.size() - 1);
-		}
-		return parts.toArray(new String[parts.size()]);
+		// Remove empty ends
+		while (! parts.isEmpty() && parts.get(0).equals("")) //$NON-NLS-1$
+			parts.remove(0);
+		while (! parts.isEmpty() && parts.get(parts.size() - 1).equals("")) //$NON-NLS-1$
+			parts.remove(parts.size() - 1);
+		return parts;
 	}
 	
 	/**
