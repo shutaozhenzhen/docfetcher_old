@@ -126,6 +126,12 @@
 	
 	<target name="deploy.portable" depends="compile, fixcrlf.windows"
 		description="Build portable Windows/Linux hybrid release">
+		<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+			<classpath>
+				<pathelement location="./ant-contrib-1.0b3.jar"/>
+			</classpath>
+		</taskdef>
+		
 		<copy todir="${programdir}/lib">
 			<fileset dir="lib" includes="**/*.jar, **/*.dll, **/*.so, **/*.so.*" excludes="**/*linux*.jar, **/*win32*.jar"/>
 			<filelist dir="build" files="${jar.name}"/>
@@ -151,7 +157,24 @@
 		<copy todir="${programdir}/licenses">
 			<fileset dir="${versiondir}/licenses"/>
 		</copy>
-		<zip destfile="build/docfetcher_${version}_portable.zip" basedir="build/tmp"/>
+		
+		<!-- On Linux we're calling the zip command because the built-in zip task
+		can't make the shell script executable. -->
+		<chmod dir="build/tmp/${deploy.name}" perm="+x" includes="**/*.sh"/>
+		<if>
+			<os family="windows"/>
+			<then>
+				<zip destfile="build/docfetcher_${version}_portable.zip" basedir="build/tmp"/>
+				<echo level="warning">If the portable version is built on Windows, its Linux launch script will have no executable flag.</echo>
+			</then>
+			<else>
+				<exec executable="zip" dir="build/tmp">
+					<arg value="-r"/>
+					<arg value="../docfetcher_${version}_portable.zip"/>
+					<arg value="./${deploy.name}"/>
+				</exec>
+			</else>
+		</if>
 		<delete dir="build/tmp"/>
 	</target>
 	
@@ -182,6 +205,7 @@
 		<copy todir="build/${deploy.name}/licenses">
 			<fileset dir="${versiondir}/licenses"/>
 		</copy>
+		<chmod dir="build/${deploy.name}" perm="+x" includes="**/*.sh"/>
 	</target>
 	
 	<target name="deploy.source" depends="compile"
@@ -201,6 +225,6 @@
 	
 	<target name="deploy.all"
 		depends="deploy.linux, deploy.portable, deploy.source"
-		description="Build all, except for the Windows installer"/>
+		description="Build all, except for the Windows installer and the test release"/>
 	
 </project>
