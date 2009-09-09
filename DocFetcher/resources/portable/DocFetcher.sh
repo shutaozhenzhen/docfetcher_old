@@ -1,18 +1,8 @@
 #!/bin/sh
 
-prg=$0
-if [ ! -e "$prg" ]; then
-  case $prg in
-    (*/*) exit 1;;
-    (*) prg=$(command -v -- "$prg") || exit;;
-  esac
-fi
-dir=$(
-  cd -P -- "$(dirname -- "$prg")" && pwd -P
-) || exit
-prg=$dir/$(basename -- "$prg") || exit
-
-cd $dir
+script=$(readlink -f "$0")
+scriptdir=`dirname "$script"`
+cd "$scriptdir"
 
 chmod a+x ./docfetcher-daemon-linux
 
