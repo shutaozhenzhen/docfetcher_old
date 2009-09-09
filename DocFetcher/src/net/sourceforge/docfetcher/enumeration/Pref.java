@@ -17,10 +17,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
@@ -277,11 +279,13 @@ public class Pref {
 				);
 			for (Str str : Pref.Str.values())
 				str.value = prop.getProperty(str.name(), str.defaultValue);
-			for (StrArray strArray : Pref.StrArray.values())
-				strArray.value = prop.getProperty(
+			for (StrArray strArray : Pref.StrArray.values()) {
+				String rawValue = prop.getProperty(
 						strArray.name(),
-						UtilList.toString(", ", strArray.defaultValue) //$NON-NLS-1$
-				).split("[^\\p{Alnum}]+"); //$NON-NLS-1$
+						encodeStrings(strArray.defaultValue, ";") //$NON-NLS-1$
+				);
+				strArray.value = decodeStrings(rawValue, ';');
+			}
 			for (IntArray intArray : Pref.IntArray.values()) {
 				String rawValue = prop.getProperty(
 						intArray.name(),
@@ -321,7 +325,7 @@ public class Pref {
 		for (Str str : Pref.Str.values())
 			props.put(str.name(), str.value);
 		for (StrArray strArray : Pref.StrArray.values())
-			props.put(strArray.name(), UtilList.toString(", ", strArray.value)); //$NON-NLS-1$
+			props.put(strArray.name(), encodeStrings(strArray.value, ";")); //$NON-NLS-1$
 		for (IntArray intArray : Pref.IntArray.values())
 			props.put(intArray.name(), UtilList.toString(", ", intArray.value)); //$NON-NLS-1$
 		for (Entry<Class<? extends Object>, Boolean> checkEntry : checkedClasses.entrySet())
@@ -357,6 +361,52 @@ public class Pref {
 			Collections.sort(keyList);
 			return keyList.elements();
 		}
+	}
+
+	/**
+	 * Encodes the given string array into a single string, using the specified
+	 * separator. The resulting string is a concatenation of the elements of the
+	 * string array, which are separated by the given separator and where
+	 * occurrences of the separator and backslashes are escaped appropriately.
+	 * 
+	 * @see Pref#decodeStrings(String, char)
+	 */
+	private static String encodeStrings(String[] parts, String sep) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < parts.length; i++) {
+			sb.append(parts[i].replace("\\", "\\\\").replace(sep, "\\" + sep)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (i != parts.length - 1)
+				sb.append(sep);
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Decodes the given string into an array of strings, using the specified
+	 * separator. This method basically splits the given string at those
+	 * occurrences of the separator that aren't escaped with a backslash.
+	 * 
+	 * @see Pref#encodeStrings(String[], String)
+	 */
+	private static String[] decodeStrings(String str, char sep) {
+		boolean precedingBackslash = false;
+		List<String> parts = new ArrayList<String> ();
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			if (c == sep && ! precedingBackslash) {
+				parts.add(sb.toString());
+				sb.delete(0, sb.length());
+			}
+			else if (c != '\\' || precedingBackslash)
+				sb.append(c);
+			if (c == '\\')
+				precedingBackslash = ! precedingBackslash;
+			else
+				precedingBackslash = false;
+		}
+		parts.add(sb.toString());
+		return parts.toArray(new String[parts.size()]);
 	}
 
 }

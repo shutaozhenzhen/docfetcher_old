@@ -39,7 +39,7 @@ public privileged aspect DiskWritingSuppressor {
 			writable = false;
 	}
 	
-	after(): execution(* DocFetcher.createContents(..)) {
+	after(): execution(* DocFetcher.createTemporaryIndexes(..)) {
 		if (! writable)
 			DocFetcher.getInstance().setStatus(Msg.write_warning.value());
 	}
