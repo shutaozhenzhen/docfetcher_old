@@ -193,6 +193,14 @@ public class ProgressPanel extends Composite {
 				FileTransfer.getInstance(),
 				TextTransfer.getInstance()
 		};
+		
+		/*
+		 * Bug #2904322: When this context menu action is activated, but no
+		 * items in the table are selected, the arrays 'items' and 'filePaths'
+		 * are empty, which leads to a crash.
+		 */
+		if (filePaths.length == 0) return;
+		
 		DocFetcher.getInstance().getClipboard().setContents(
 				new Object[] {
 						filePaths,
