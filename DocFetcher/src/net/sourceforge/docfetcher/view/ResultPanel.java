@@ -654,26 +654,36 @@ public class ResultPanel extends Composite {
 		
 		public Image getColumnImage(Object element, int columnIndex) {
 			if (columnIndex == 0) {
-				ResultDocument result = (ResultDocument) element;
-				String extension = UtilFile.getExtension(result.getFile());
-				
-				/*
-				 * FIXME On Ubuntu 8.10 the SVG icon returned from the OS would
-				 * be too big, causing the result panel rows to expand beyond
-				 * their normal height.
-				 */
-				if (Const.IS_LINUX && extension.equals("svg")) //$NON-NLS-1$
-					return Icon.FILE.getImage();
-				
-				Program program = Program.findProgram(extension);
-				if (program == null)
-					return Icon.FILE.getImage(); // Program icon not available, return generic file icon
-				ImageData imgData = program.getImageData();
-				if (imgData == null)
-					return Icon.FILE.getImage(); // Program icon not available, return generic file icon
-				Image image = new Image(Display.getCurrent(), imgData);
-				disposables.add(image);
-				return image;
+				try {
+					ResultDocument result = (ResultDocument) element;
+					String extension = UtilFile.getExtension(result.getFile());
+
+					/*
+					 * FIXME On Ubuntu 8.10 the SVG icon returned from the OS would
+					 * be too big, causing the result panel rows to expand beyond
+					 * their normal height.
+					 */
+					if (Const.IS_LINUX && extension.equals("svg")) //$NON-NLS-1$
+						return Icon.FILE.getImage();
+
+					Program program = Program.findProgram(extension);
+					if (program == null)
+						return Icon.FILE.getImage(); // Program icon not available, return generic file icon
+					ImageData imgData = program.getImageData();
+					if (imgData == null)
+						return Icon.FILE.getImage(); // Program icon not available, return generic file icon
+					Image image = new Image(Display.getCurrent(), imgData);
+					disposables.add(image);
+					return image;
+				} catch (Exception e) {
+					/**
+					 * TODO This can happen when we've reached the limit for the
+					 * number of image handles. See bug #2916975 and bug
+					 * #2829490. Returning null here is only a temporary
+					 * solution.
+					 */
+					return null;
+				}
 			}
 			return null;
 		}
