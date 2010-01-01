@@ -18,7 +18,7 @@ import net.sourceforge.docfetcher.model.Document;
 
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
-import org.apache.poi.openxml4j.opc.Package;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.openxml4j.opc.PackageProperties;
 
@@ -34,7 +34,7 @@ public abstract class MSOffice2007Parser extends Parser {
 			StringBuffer contents = new StringBuffer(ef.getText());
 			
 			// Open up properties
-			Package pkg = Package.open(file.getAbsolutePath(), PackageAccess.READ);
+			OPCPackage pkg = OPCPackage.open(file.getAbsolutePath(), PackageAccess.READ);
 			PackageProperties props = pkg.getPackageProperties();
 			
 			// Get author(s)
