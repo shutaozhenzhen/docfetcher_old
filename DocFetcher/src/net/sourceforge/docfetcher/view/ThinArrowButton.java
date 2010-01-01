@@ -43,7 +43,12 @@ public class ThinArrowButton extends Canvas {
 	 *            Either SWT.LEFT, SWT.RIGHT, SWT.UP or SWT.DOWN.
 	 */
 	public ThinArrowButton(Composite parent, int style) {
-		super(parent, Const.IS_WINDOWS ? SWT.NONE : SWT.BORDER);
+		/*
+		 * Note: For some unknown reason, the arrow is not visible if the widget
+		 * has no SWT.NO_BACKGROUND flag. This bug seemed to have occurred after
+		 * migrating from SWT 3.4 to SWT 3.5.
+		 */
+		super(parent, Const.IS_WINDOWS ? SWT.NONE : SWT.BORDER | SWT.NO_BACKGROUND);
 		
 		if (Const.IS_WINDOWS)
 			UtilGUI.paintBorder(this);
@@ -85,6 +90,7 @@ public class ThinArrowButton extends Canvas {
 				for (int i = 1; i < coords.length; i = i + 2)
 					coords[i] += btHeight / 2;
 				
+				e.gc.fillRectangle(0, 0, btWidth, btHeight);
 				e.gc.setBackground(UtilGUI.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 				e.gc.setAntialias(SWT.ON);
 				e.gc.fillPolygon(coords);

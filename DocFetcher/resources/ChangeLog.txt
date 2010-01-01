@@ -23,6 +23,7 @@ Changes:
   * Search scope panel displays paths of indexed folders in dark grey.
   * Default maximum heap size increased to 256 MB. This will make it less likely that DocFetcher runs out of memory during indexing.
   * Manual updated.
+  * All libraries updated (except Apache Lucene).
 
 
 2009-05-12 - DocFetcher 1.0
