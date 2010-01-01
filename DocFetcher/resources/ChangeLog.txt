@@ -1,6 +1,33 @@
 @DATE@ - DocFetcher @VERSION@
 ---------------------------------------------
 Features:
+  * French GUI translation.
+  * German manual translation.
+  * DocFetcher now runs on KDE.
+
+Bugfixes:
+  * Bug #2811753: Backslashes in the custom exclusion patterns weren't correctly saved (only one backslash instead of two), thus after restart all backslashes were gone. Also, Unicode characters in the preferences weren't handled correctly.
+  * When the installed Linux version crashed, it unsuccessfully tried to write the stacktrace to /usr/share/docfetcher. This has been corrected to ~/.docfetcher.
+  * Bug #2792186: Crash because DocFetcher is trying to display a message box when there's no active shell.
+  * Bug #2791378: Crash when trying to list file extensions in a directory DocFetcher has no access to.
+  * DocFetcher crashed with an OutOfMemoryError when the progress panel contained too much text.
+  * Bug #2807587: DocFetcher freezed when there were many indexes and/or result items and the user checked or unchecked items on the left panel.
+  * The Linux launch script of the portable version now has an executable flag.
+  * Bug #2911343 and #2924235: XPCOM error on Linux due to incompatibility between latest version of XULRunner and SWT 3.4.
+
+Changes:
+  * Feature Request #2788390: With the user.properties entry "AllowRepositoryModification" one can disable all context menu entries that modify the document repositories.
+  * Feature Request #2812668: Option to save the search history on exit
+  * Sorting of results by title, filename and path takes numberings into account (e.g. file12 > file2).
+  * When DocFetcher crashes, a more informative stacktrace is shown.
+  * Search scope panel displays paths of indexed folders in dark grey.
+  * Default maximum heap size increased to 256 MB. This will make it less likely that DocFetcher runs out of memory during indexing.
+  * Manual updated.
+
+
+2009-05-12 - DocFetcher 1.0
+---------------------------------------------
+Features:
   * Portable version: When the indexed documents are inside the program folder, the latter can be moved around freely without breaking file references. Also works on CD-ROMs.
   * Global hotkey: Pressing a certain key combination moves DocFetcher to the front.
   * DocFetcher can be launched by rightclicking on a folder.
