@@ -13,7 +13,6 @@ package net.sourceforge.docfetcher.util;
 
 
 import net.sourceforge.docfetcher.Const;
-import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Msg;
 
 import org.eclipse.swt.SWT;
@@ -87,137 +86,94 @@ public class UtilGUI {
 		}
 		shell.setLocation(shellPosX, shellPosY);
 	}
-
-	public static Shell getActiveShell() {
-		return Display.getDefault().getActiveShell();
-	}
-
-	/**
-	 * Shows a message box with an error icon. It is expected that the main
-	 * application shell has already been created.
-	 * 
-	 * @param text
-	 *            The message box title. If set to null, a generic "System
-	 *            Error" string will be displayed.
-	 * @param message
-	 *            The error message to display.
-	 */
-	public static void showErrorMsg(final String text, final String message) {
-		if (Display.getCurrent() == null) {
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					showErrorMsg(text, message);
-				}
-			});
-			return;
-		}
-		Shell activeShell = getActiveShell();
-		if (activeShell != null) {  
-			MessageBox msgBox = new MessageBox(activeShell, SWT.ICON_ERROR | SWT.OK | SWT.PRIMARY_MODAL);
-			msgBox.setText(text == null ? Msg.system_error.value() : text);
-			msgBox.setMessage(message);
-			msgBox.open();
-		}
-		/*
-		 * Somehow, activeShell can be null at this point. See bug #2792186.
-		 */
-		else
-			showErrorMsgOnStart(message);
-	}
 	
 	/**
-	 * Displays an error message. This method can be used before any GUI
-	 * components are created, because it creates its own display and shell.
+	 * Displays a message box with the given title, message and SWT flags
+	 * (SWT.OK, SWT.CANCEL, etc.). Returns the return code of the message box
+	 * (e.g. SWT.OK if the OK button was pressed).
+	 * <p>
+	 * This method creates its own shell if none is found, and it can be called
+	 * from a non-GUI thread.
 	 */
-	public static void showErrorMsgOnStart(String message) {
-		Display display = new Display();
-		Shell shell = new Shell(display);
-		shell.setSize(1, 1);
-		UtilGUI.centerShell(null, shell);
-		shell.open();
-		shell.setVisible(false);
-		MessageBox msgBox = new MessageBox(shell, SWT.ICON_ERROR | SWT.OK | SWT.PRIMARY_MODAL);
-		msgBox.setText(Msg.system_error.value());
-		msgBox.setMessage(message);
-		msgBox.open();
-	}
-
-	/**
-	 * Shows a message box with a question icon. It is expected that the main
-	 * application shell has already been created.
-	 * 
-	 * @param text
-	 *            The message box title. If set to null, a generic "Confirm
-	 *            Operation" will be displayed.
-	 * @param message
-	 *            The message to display
-	 * @return The return code of the message box, either SWT.OK or SWT.CANCEL
-	 */
-	public static int showConfirmMsg(final String text, final String message) {
+	private static int showMsg(final String title, final String message, final int flags) {
 		if (Display.getCurrent() == null) {
 			class MyRunnable implements Runnable {
 				public int answer = -1;
 				public void run() {
-					answer = showConfirmMsg(text, message);
+					answer = showMsg(title, message, flags);
 				}
 			}
 			MyRunnable myRunnable = new MyRunnable();
 			Display.getDefault().syncExec(myRunnable);
 			return myRunnable.answer;
 		}
-		MessageBox msgBox = new MessageBox(getActiveShell(), SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL | SWT.PRIMARY_MODAL);
-		msgBox.setText(text == null ? Msg.confirm_operation.value() : text);
-		msgBox.setMessage(message);
-		return msgBox.open();
+		Shell activeShell = Display.getDefault().getActiveShell();
+		if (activeShell != null) {  
+			MessageBox msgBox = new MessageBox(activeShell, flags);
+			msgBox.setText(title);
+			msgBox.setMessage(message);
+			return msgBox.open();
+		}
+		/*
+		 * Somehow, activeShell can be null at this point. See bug #2792186.
+		 */
+		else {
+			Display display = Display.getDefault();
+			Shell shell = new Shell(display);
+			shell.setSize(1, 1);
+			UtilGUI.centerShell(null, shell);
+			shell.open();
+			shell.setVisible(false);
+			MessageBox msgBox = new MessageBox(shell, flags);
+			msgBox.setText(title);
+			msgBox.setMessage(message);
+			int answer = msgBox.open();
+			shell.close();
+			display.dispose();
+			return answer;
+		}
 	}
 
 	/**
-	 * Shows a message box with an information icon. It is expected that the
-	 * main application shell has already been created.
-	 * 
-	 * @param text
-	 *            The message box title. If set to null, no title is shown.
-	 * @param message
-	 *            The message to display
+	 * Shows a message box with an error icon.
+	 * <p>
+	 * This method creates its own shell if none is found, and it can be called
+	 * from a non-GUI thread.
 	 */
-	public static void showInfoMsg(final String text, final String message) {
-		if (Display.getCurrent() == null) {
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					showInfoMsg(text, message);
-				}
-			});
-			return;
-		}
-		MessageBox msgBox = new MessageBox(getActiveShell(), SWT.ICON_INFORMATION | SWT.OK | SWT.PRIMARY_MODAL);
-		msgBox.setText(text == null ? "" : text); //$NON-NLS-1$
-		msgBox.setMessage(message);
-		msgBox.open();
+	public static void showErrorMsg(String message) {
+		showMsg(Msg.system_error.value(), message, SWT.ICON_ERROR | SWT.OK | SWT.PRIMARY_MODAL);
 	}
 
 	/**
-	 * Shows a message box with a warning icon. It is expected that the main
-	 * application shell has already been created.
+	 * Shows a message box with a question icon.
+	 * <p>
+	 * This method creates its own shell if none is found, and it can be called
+	 * from a non-GUI thread.
 	 * 
-	 * @param text
-	 *            The message box title. If set to null, a generic "Invalid
-	 *            Operation" message will be displayed.
-	 * @param message
-	 *            The message to display
+	 * @return The return code of the message box, either SWT.OK or SWT.CANCEL
 	 */
-	public static void showWarningMsg(final String text, final String message) {
-		if (Display.getCurrent() == null) {
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					showWarningMsg(text, message);
-				}
-			});
-			return;
-		}
-		MessageBox msgBox = new MessageBox(DocFetcher.getInstance().getShell(), SWT.ICON_WARNING | SWT.OK | SWT.PRIMARY_MODAL);
-		msgBox.setText(text == null ? Msg.invalid_operation.value() : text);
-		msgBox.setMessage(message);
-		msgBox.open();
+	public static int showConfirmMsg(String message) {
+		return showMsg(Msg.confirm_operation.value(), message, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL | SWT.PRIMARY_MODAL);
+	}
+
+	/**
+	 * Shows a message box with an information icon.
+	 * <p>
+	 * This method creates its own shell if none is found, and it can be called
+	 * from a non-GUI thread.
+	 */
+	public static void showInfoMsg(String message) {
+		showMsg("", message, SWT.ICON_INFORMATION | SWT.OK | SWT.PRIMARY_MODAL);
+	}
+
+	/**
+	 * Shows a message box with a warning icon.
+	 * <p>
+	 * This method creates its own shell if none is found, and it can be called
+	 * from a non-GUI thread.
+	 */
+	public static void showWarningMsg(String message) {
+		showMsg(Msg.invalid_operation.value(), message, SWT.ICON_WARNING | SWT.OK | SWT.PRIMARY_MODAL);
 	}
 
 	public static Point minimum(Point target, Point min) {

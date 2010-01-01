@@ -166,7 +166,7 @@ public class IndexingDialog {
 		// Check for intersections, if so, show warning message and open the dialog again
 		String msg = ScopeRegistry.getInstance().checkIntersection(newScope);
 		if (msg != null) {
-			UtilGUI.showWarningMsg(null, msg);
+			UtilGUI.showWarningMsg(msg);
 			return addJobFromDialog();
 		}
 
@@ -323,7 +323,7 @@ public class IndexingDialog {
 		// Ask for confirmation if the indexing job to be stopped is a full index (re)creation.
 		if (job.isDoRebuild()
 				&& job.equals(ScopeRegistry.getInstance().getCurrentJob())) {
-			int ans = UtilGUI.showConfirmMsg(null, Msg.discard_incomplete_index.value());
+			int ans = UtilGUI.showConfirmMsg(Msg.discard_incomplete_index.value());
 			if (ans != SWT.OK) {
 				event.doit = false;
 				return;
@@ -343,7 +343,7 @@ public class IndexingDialog {
 		ScopeRegistry scopeReg = ScopeRegistry.getInstance();
 		Job job = scopeReg.getCurrentJob();
 		if (job != null && job.isDoRebuild()) {
-			int ans = UtilGUI.showConfirmMsg(null, Msg.discard_incomplete_index.value());
+			int ans = UtilGUI.showConfirmMsg(Msg.discard_incomplete_index.value());
 			if (ans != SWT.OK)
 				return;
 		}
@@ -357,7 +357,7 @@ public class IndexingDialog {
 		try {
 			scopeReg.save();
 		} catch (IOException e1) {
-			UtilGUI.showErrorMsg(null, Msg.write_error.value());
+			UtilGUI.showErrorMsg(Msg.write_error.value());
 		}
 		close();
 	}

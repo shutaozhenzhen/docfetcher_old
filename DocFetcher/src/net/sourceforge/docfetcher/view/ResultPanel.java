@@ -432,7 +432,7 @@ public class ResultPanel extends Composite {
 		if (sel.isEmpty()) return;
 		int openLimit = Pref.Int.OpenLimit.getValue();
 		if (sel.size() > openLimit) {
-			UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
+			UtilGUI.showInfoMsg(Msg.open_limit.format(openLimit));
 			return;
 		}
 		Iterator<?> it = sel.iterator();
@@ -460,7 +460,7 @@ public class ResultPanel extends Composite {
 		}
 		int openLimit = Pref.Int.OpenLimit.getValue();
 		if (dirsToOpen.size() > openLimit) {
-			UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
+			UtilGUI.showInfoMsg(Msg.open_limit.format(openLimit));
 			return;
 		}
 		for (String dir : dirsToOpen)
@@ -522,7 +522,7 @@ public class ResultPanel extends Composite {
 		
 		// Ask user whether to proceed
 		if (deleteCount == 0) return;
-		int ans = UtilGUI.showConfirmMsg(null, Msg.confirm_delete_file.format(deleteCount));
+		int ans = UtilGUI.showConfirmMsg(Msg.confirm_delete_file.format(deleteCount));
 		if (ans != SWT.OK) return;
 		
 		Set<File> emptyParents = new HashSet<File> ();

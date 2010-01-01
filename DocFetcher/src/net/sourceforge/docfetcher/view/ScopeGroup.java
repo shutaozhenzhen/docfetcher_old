@@ -276,7 +276,7 @@ public class ScopeGroup extends GroupWrapper {
 				else if (event.data instanceof String[])
 					paths = (String[]) event.data;
 				else {
-					UtilGUI.showWarningMsg(null, Msg.invalid_dnd_source.value());
+					UtilGUI.showWarningMsg(Msg.invalid_dnd_source.value());
 					return;
 				}
 				
@@ -285,14 +285,14 @@ public class ScopeGroup extends GroupWrapper {
 				for (String path : paths) {
 					File file = new File(path);
 					if (! file.isDirectory()) {
-						UtilGUI.showWarningMsg(null, Msg.contains_file.value());
+						UtilGUI.showWarningMsg(Msg.contains_file.value());
 						return;
 					}
 					newScopes.add(new RootScope(file));
 				}
 				String msg = ScopeRegistry.getInstance().checkIntersection(newScopes.toArray(new RootScope[newScopes.size()]));
 				if (msg != null) {
-					UtilGUI.showWarningMsg(Msg.invalid_operation.value(), msg);
+					UtilGUI.showWarningMsg(msg);
 					return;
 				}
 				
@@ -401,7 +401,7 @@ public class ScopeGroup extends GroupWrapper {
 		// Show warning message for missing RootScopes
 		if (! missing.isEmpty()) {
 			String items = "\n" + UtilList.toString("\n", missing); //$NON-NLS-1$ //$NON-NLS-2$
-			UtilGUI.showWarningMsg(Msg.folders_not_found_title.value(), Msg.folders_not_found.value() + items);
+			UtilGUI.showWarningMsg(Msg.folders_not_found.value() + items);
 		}
 		
 		return existing.toArray(new RootScope[existing.size()]);
@@ -432,7 +432,7 @@ public class ScopeGroup extends GroupWrapper {
 		// Show warning message for missing Scopes
 		if (! missing.isEmpty()) {
 			String items = "\n" + UtilList.toString("\n", missing); //$NON-NLS-1$ //$NON-NLS-2$
-			UtilGUI.showWarningMsg(Msg.folders_not_found_title.value(), Msg.folders_not_found.value() + items);
+			UtilGUI.showWarningMsg(Msg.folders_not_found.value() + items);
 		}
 		
 		return existing.toArray(new Scope[existing.size()]);
@@ -497,7 +497,7 @@ public class ScopeGroup extends GroupWrapper {
 			 * when the user hits DELETE without selecting anything.
 			 */
 			if (selRootScopes.size() == 0) return;
-			int ans = UtilGUI.showConfirmMsg(null, Msg.remove_sel_indexes.value());
+			int ans = UtilGUI.showConfirmMsg(Msg.remove_sel_indexes.value());
 			if (ans == SWT.OK)
 				ScopeRegistry.getInstance().remove(selRootScopes.toArray(new RootScope[selRootScopes.size()]));
 		}
@@ -515,7 +515,7 @@ public class ScopeGroup extends GroupWrapper {
 			RootScope[] rootScopes = scopeReg.getEntries();
 			if (rootScopes.length == 0) return;
 			
-			int ans = UtilGUI.showConfirmMsg(null, Msg.remove_orphaned_indexes_msg.value());
+			int ans = UtilGUI.showConfirmMsg(Msg.remove_orphaned_indexes_msg.value());
 			if (ans != SWT.OK) return;
 			for (RootScope rootScope : rootScopes)
 				if (! rootScope.getFile().exists())
@@ -619,7 +619,7 @@ public class ScopeGroup extends GroupWrapper {
 			if (scopes.length == 0) return;
 			int openLimit = Pref.Int.OpenLimit.getValue();
 			if (scopes.length > openLimit) {
-				UtilGUI.showInfoMsg(null, Msg.open_limit.format(openLimit));
+				UtilGUI.showInfoMsg(Msg.open_limit.format(openLimit));
 				return;
 			}
 			for (Scope scope : scopes)
@@ -684,7 +684,7 @@ public class ScopeGroup extends GroupWrapper {
 			if (newFolderName == null) return;
 			File newFolder = new File(parentFolder.getAbsolutePath(), newFolderName);
 			if (newFolder.exists()) {
-				UtilGUI.showInfoMsg(null, Msg.folder_already_exists.value());
+				UtilGUI.showInfoMsg(Msg.folder_already_exists.value());
 				return;
 			}
 			
@@ -694,7 +694,7 @@ public class ScopeGroup extends GroupWrapper {
 			DocFetcher.getInstance().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
 			
 			if (! success) {
-				UtilGUI.showErrorMsg(null, Msg.create_subfolder_failed.value());
+				UtilGUI.showErrorMsg(Msg.create_subfolder_failed.value());
 			}
 			else {
 				// Update indexes, but silently
@@ -721,7 +721,7 @@ public class ScopeGroup extends GroupWrapper {
 			
 			// Show confirmation message for root folders
 			if (scopes[0] instanceof RootScope) {
-				int ans = UtilGUI.showConfirmMsg(null, Msg.rename_requires_full_rebuild.value());
+				int ans = UtilGUI.showConfirmMsg(Msg.rename_requires_full_rebuild.value());
 				if (ans != SWT.OK) return;
 			}
 			
@@ -738,7 +738,7 @@ public class ScopeGroup extends GroupWrapper {
 			boolean success = targetFolder.renameTo(newFile);
 			DocFetcher.getInstance().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);
 			if (! success) {
-				UtilGUI.showErrorMsg(null, Msg.cant_rename_folder.value());
+				UtilGUI.showErrorMsg(Msg.cant_rename_folder.value());
 				return;
 			}
 			
@@ -788,7 +788,7 @@ public class ScopeGroup extends GroupWrapper {
 			
 			// Ask user to confirm operation
 			String msg = Msg.delete_folder_q.value() + Const.LS + UtilList.toString(Const.LS, scopeList);
-			int ans = UtilGUI.showConfirmMsg(null, msg);
+			int ans = UtilGUI.showConfirmMsg(msg);
 			if (ans != SWT.OK) return;
 			
 			// Do it
@@ -845,7 +845,7 @@ public class ScopeGroup extends GroupWrapper {
 				enabled |= data == null;
 				enabled |= ! (data instanceof String[]);
 				if (! enabled) {
-					UtilGUI.showWarningMsg(null, Msg.no_files_in_cb.value());
+					UtilGUI.showWarningMsg(Msg.no_files_in_cb.value());
 					return;
 				}
 				String[] filepaths = (String[]) data;
@@ -858,14 +858,14 @@ public class ScopeGroup extends GroupWrapper {
 			else if (Const.IS_LINUX) {
 				Object data = cb.getContents(TextTransfer.getInstance());
 				if (data == null) {
-					UtilGUI.showWarningMsg(null, Msg.no_files_in_cb.value());
+					UtilGUI.showWarningMsg(Msg.no_files_in_cb.value());
 					return;
 				}
 				String[] filePaths = ((String) data).trim().split(Const.LS);
 				files = UtilFile.toFiles(filePaths);
 				for (File file : files)
 					if (! file.exists()) {
-						UtilGUI.showWarningMsg(null, Msg.no_files_in_cb.value());
+						UtilGUI.showWarningMsg(Msg.no_files_in_cb.value());
 						return;
 					}	
 			}

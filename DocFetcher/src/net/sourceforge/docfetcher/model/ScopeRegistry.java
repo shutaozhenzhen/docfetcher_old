@@ -366,7 +366,7 @@ public class ScopeRegistry implements Serializable {
 			try {
 				save(); // Save registry after queue is emptied, just in case the user successfully kills the app...
 			} catch (IOException e) {
-				UtilGUI.showErrorMsg(null, Msg.write_error.value());
+				UtilGUI.showErrorMsg(Msg.write_error.value());
 			}
 			return;
 		}
@@ -405,7 +405,7 @@ public class ScopeRegistry implements Serializable {
 					// This happens when the file system is not writable for some reason
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
-							UtilGUI.showErrorMsg(null, Msg.write_error.value());
+							UtilGUI.showErrorMsg(Msg.write_error.value());
 						}
 					});
 				} finally {

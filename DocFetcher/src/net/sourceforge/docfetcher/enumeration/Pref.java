@@ -308,7 +308,7 @@ public class Pref {
 				);
 		}
 		catch (IOException e) {
-			UtilGUI.showErrorMsgOnStart(Msg.read_error.format(propFile.getAbsolutePath()));
+			UtilGUI.showErrorMsg(Msg.read_error.format(propFile.getAbsolutePath()));
 			System.exit(0);
 		}
 	}

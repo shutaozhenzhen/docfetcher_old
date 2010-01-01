@@ -315,7 +315,7 @@ public class PrefDialog {
 			if (i == 0)
 				throw new NumberFormatException();
 		} catch (NumberFormatException e) {
-			UtilGUI.showWarningMsg(null, Msg.pref_max_results_range.format(Integer.MAX_VALUE));
+			UtilGUI.showWarningMsg(Msg.pref_max_results_range.format(Integer.MAX_VALUE));
 			maxResultsBox.setText(Integer.toString(Math.max(1, Pref.Int.MaxResultsPerPage.getValue())));
 			return;
 		}
@@ -388,7 +388,7 @@ public class PrefDialog {
 			try {
 				Pref.save();
 			} catch (IOException e) {
-				UtilGUI.showErrorMsg(null, Msg.write_error.value());
+				UtilGUI.showErrorMsg(Msg.write_error.value());
 			}
 		}
 	}

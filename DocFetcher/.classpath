@@ -49,6 +49,6 @@
 	<classpathentry kind="lib" path="lib/poi-ooxml-3.5-beta5-20090219.jar"/>
 	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar" sourcepath="/media/Data/Dev/Software/Java Libraries/commons-cli-1.2-src.zip"/>
-	<classpathentry kind="lib" path="lib/swt-3.5.1-gtk-linux-x86.jar"/>
+	<classpathentry kind="lib" path="lib/swt-3.5.1-gtk-linux-x86.jar" sourcepath="/media/Data/eclipse-3.5.1-linux/plugins/org.eclipse.swt.gtk.linux.x86.source_3.5.1.v3555a.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

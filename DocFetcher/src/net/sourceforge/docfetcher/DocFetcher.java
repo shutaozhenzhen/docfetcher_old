@@ -425,7 +425,7 @@ public class DocFetcher extends ApplicationWindow {
 		hotkeyHandler.evtHotkeyConflict.add(new Event.Listener<int[]> () {
 			public void update(int[] eventData) {
 				String key = Key.toString(eventData);
-				UtilGUI.showWarningMsg(null, Msg.hotkey_in_use.format(key));
+				UtilGUI.showWarningMsg(Msg.hotkey_in_use.format(key));
 				
 				/*
 				 * Don't open preferences dialog when the hotkey conflict occurs
@@ -640,7 +640,7 @@ public class DocFetcher extends ApplicationWindow {
 		 * before terminating it and exiting.
 		 */
 		if (scopeReg.getCurrentJob() != null) {
-			int ans = UtilGUI.showConfirmMsg(null, Msg.force_quit.value());
+			int ans = UtilGUI.showConfirmMsg(Msg.force_quit.value());
 			if (ans != SWT.OK) return false;
 			scopeReg.clearQueue();
 		}
@@ -665,7 +665,7 @@ public class DocFetcher extends ApplicationWindow {
 			Pref.save();
 			scopeReg.save();
 		} catch (IOException e) {
-			UtilGUI.showErrorMsg(null, Msg.write_error.value());
+			UtilGUI.showErrorMsg(Msg.write_error.value());
 		}
 		
 		if (hotkeyHandler != null)
@@ -711,7 +711,7 @@ public class DocFetcher extends ApplicationWindow {
 			errorMsg = Msg.no_filetypes_selected.value();
 		
 		if (errorMsg != null) {
-			UtilGUI.showWarningMsg(Msg.invalid_operation.value(), errorMsg);
+			UtilGUI.showWarningMsg(errorMsg);
 			return;
 		}
 		
@@ -721,7 +721,6 @@ public class DocFetcher extends ApplicationWindow {
 		 */
 		if (searchString.startsWith("*") || searchString.startsWith("?")) { //$NON-NLS-1$ //$NON-NLS-2$
 			UtilGUI.showWarningMsg(
-					Msg.invalid_query_syntax.value(),
 					Msg.wildcard_first_char.value()
 			);
 			return;
@@ -742,7 +741,7 @@ public class DocFetcher extends ApplicationWindow {
 					});
 				}
 				catch (SearchException e) {
-					UtilGUI.showWarningMsg(null, e.getMessage());
+					UtilGUI.showWarningMsg(e.getMessage());
 				}
 				finally {
 					Display.getDefault().syncExec(new Runnable() {
@@ -819,7 +818,7 @@ public class DocFetcher extends ApplicationWindow {
 		// Get tray; abort and display error message if it's not available
 		Tray tray = shell.getDisplay().getSystemTray();
 		if (tray == null) {
-			UtilGUI.showErrorMsg(null, Msg.systray_not_available.value());
+			UtilGUI.showErrorMsg(Msg.systray_not_available.value());
 			return;
 		}
 		

@@ -291,7 +291,7 @@ public class IndexingTab extends Composite {
 		
 		// Check if target directory still exists
 		if (! scope.getFile().exists()) {
-			UtilGUI.showErrorMsg(null, Msg.target_folder_deleted.value());
+			UtilGUI.showErrorMsg(Msg.target_folder_deleted.value());
 			return false;
 		}
 		
@@ -301,7 +301,7 @@ public class IndexingTab extends Composite {
 			try {
 				Pattern.compile(filter);
 			} catch (PatternSyntaxException e) {
-				UtilGUI.showWarningMsg(null, Msg.not_a_regex.format(filter));
+				UtilGUI.showWarningMsg(Msg.not_a_regex.format(filter));
 				return false;
 			}
 		}
