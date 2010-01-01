@@ -7,7 +7,6 @@
 	</classpathentry>
 	<classpathentry excluding="lang/" kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/FontBox-0.1.0-dev.jar"/>
 	<classpathentry kind="lib" path="lib/jnotify-0.91.jar">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher/lib"/>
@@ -17,7 +16,6 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl2_3.2.0.v200606220026.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl2a_3.2.0.v200606220026.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nlBidi_3.2.0.v200606220026.jar"/>
-	<classpathentry kind="lib" path="lib/PDFBox-0.7.3.jar"/>
 	<classpathentry kind="lib" path="lib/poi-3.5-beta5-20090219.jar"/>
 	<classpathentry kind="lib" path="lib/poi-scratchpad-3.5-beta5-20090219.jar"/>
 	<classpathentry kind="lib" path="lib/jericho-html-3.0.jar"/>
@@ -50,5 +48,7 @@
 	<classpathentry kind="lib" path="lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar" sourcepath="/media/Data/Dev/Software/Java Libraries/commons-cli-1.2-src.zip"/>
 	<classpathentry kind="lib" path="lib/swt-3.5.1-gtk-linux-x86.jar" sourcepath="/media/Data/eclipse-3.5.1-linux/plugins/org.eclipse.swt.gtk.linux.x86.source_3.5.1.v3555a.jar"/>
+	<classpathentry kind="lib" path="lib/fontbox-0.8.0-incubating.jar"/>
+	<classpathentry kind="lib" path="lib/pdfbox-0.8.0-incubating.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

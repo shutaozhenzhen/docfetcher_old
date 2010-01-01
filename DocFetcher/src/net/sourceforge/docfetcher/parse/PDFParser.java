@@ -15,12 +15,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.Document;
 
-import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.pdmodel.PDDocumentInformation;
-import org.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.util.PDFTextStripper;
 
 /**
  * @author Tran Nam Quang
@@ -66,6 +67,7 @@ public class PDFParser extends Parser {
 			PDFTextStripper stripper = new PDFTextStripper();
 			StringWriter writer = new StringWriter();
 			stripper.writeText(pdfDoc, writer);
+			DocFetcher.getInstance().setExceptionHandlerEnabled(true);
 			PDDocumentInformation pdInfo = pdfDoc.getDocumentInformation();
 			String[] metaData = new String[] {
 					pdInfo.getTitle(),
