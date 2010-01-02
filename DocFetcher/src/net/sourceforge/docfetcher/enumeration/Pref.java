@@ -37,6 +37,7 @@ import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Represents generic program preferences and allows type safe access to them
@@ -309,6 +310,7 @@ public class Pref {
 		}
 		catch (IOException e) {
 			UtilGUI.showErrorMsg(Msg.read_error.format(propFile.getAbsolutePath()));
+			Display.getDefault().dispose();
 			System.exit(0);
 		}
 	}

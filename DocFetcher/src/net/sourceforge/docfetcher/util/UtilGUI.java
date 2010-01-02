@@ -128,8 +128,6 @@ public class UtilGUI {
 			msgBox.setText(title);
 			msgBox.setMessage(message);
 			int answer = msgBox.open();
-			shell.close();
-			display.dispose();
 			return answer;
 		}
 	}
