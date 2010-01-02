@@ -30,11 +30,15 @@ public aspect ParserSilencer {
 		call(* PDFTextStripper.writeText(..));
 	
 	before(): parsing() {
-		DocFetcher.getInstance().setExceptionHandlerEnabled(false);
+		DocFetcher docFetcher = DocFetcher.getInstance();
+		if (docFetcher != null) // this is null if DocFetcher is used as a command line tool
+			docFetcher.setExceptionHandlerEnabled(false);
 	}
 	
 	after(): parsing() {
-		DocFetcher.getInstance().setExceptionHandlerEnabled(true);
+		DocFetcher docFetcher = DocFetcher.getInstance();
+		if (docFetcher != null) // this is null if DocFetcher is used as a command line tool
+			docFetcher.setExceptionHandlerEnabled(true);
 	}
 
 }

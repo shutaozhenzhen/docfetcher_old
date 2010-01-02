@@ -140,6 +140,8 @@ public class CommandLineHandler {
 	 * true if the program is allowed to proceed.
 	 */
 	private static boolean handleWindowsRegistry(CommandLine line) {
+		if (! line.hasOption(REGISTER_CONTEXTMENU) && ! line.hasOption(UNREGISTER_CONTEXTMENU))
+			return true;
 		if (! Const.IS_WINDOWS) {
 			System.out.println("This option is only available on Windows.");
 			return false;
