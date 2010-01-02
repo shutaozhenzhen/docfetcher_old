@@ -5,7 +5,7 @@
 ;
 ; When building a new release, remember to update the version number in the next command.
 
-!define VERSION 1.0
+!define VERSION 1.0.1
 
 SetCompress force
 SetCompressor /SOLID lzma
@@ -121,7 +121,7 @@ Section "DocFetcher"
     File /r /x .svn resources\lang\*.*
     
     SetOutPath $INSTDIR\lib
-    File /x *.so /x *.so.* /x swt-*-linux-gtk.jar /x .svn lib\*.*
+    File /x *.so /x *.so.* /x swt*linux*.jar /x .svn lib\*.*
     File build\net.sourceforge.docfetcher_*.jar
     
     ; Uninstaller

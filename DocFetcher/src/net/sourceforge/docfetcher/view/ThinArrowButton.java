@@ -90,7 +90,11 @@ public class ThinArrowButton extends Canvas {
 				for (int i = 1; i < coords.length; i = i + 2)
 					coords[i] += btHeight / 2;
 				
-				e.gc.fillRectangle(0, 0, btWidth, btHeight);
+				if (Const.IS_WINDOWS)
+					e.gc.fillRectangle(2, 2, btWidth - 4, btHeight - 4);
+				else
+					e.gc.fillRectangle(0, 0, btWidth, btHeight);
+				
 				e.gc.setBackground(UtilGUI.getColor(SWT.COLOR_WIDGET_FOREGROUND));
 				e.gc.setAntialias(SWT.ON);
 				e.gc.fillPolygon(coords);

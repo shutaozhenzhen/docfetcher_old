@@ -1,6 +1,6 @@
 DocFetcher @VERSION@ - General description
 =============================================
-DocFetcher is an Open Source desktop search application: It allows you to quickly access documents on your computer by typing keywords. - You can think of it as Google for your local document repository.
+DocFetcher is an Open Source desktop search application: It allows you to search the contents of documents on your computer. - You can think of it as Google for your local document repository.
 
 
 How to start DocFetcher
