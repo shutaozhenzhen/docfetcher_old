@@ -48,9 +48,9 @@ public class ThinArrowButton extends Canvas {
 		 * has no SWT.NO_BACKGROUND flag. This bug seemed to have occurred after
 		 * migrating from SWT 3.4 to SWT 3.5.
 		 */
-		super(parent, Const.IS_WINDOWS ? SWT.NONE : SWT.BORDER | SWT.NO_BACKGROUND);
+		super(parent, useCustomBorder() ? SWT.NONE : SWT.BORDER | SWT.NO_BACKGROUND);
 		
-		if (Const.IS_WINDOWS)
+		if (useCustomBorder())
 			UtilGUI.paintBorder(this);
 		
 		this.style = style;
@@ -90,7 +90,7 @@ public class ThinArrowButton extends Canvas {
 				for (int i = 1; i < coords.length; i = i + 2)
 					coords[i] += btHeight / 2;
 				
-				if (Const.IS_WINDOWS)
+				if (useCustomBorder())
 					e.gc.fillRectangle(2, 2, btWidth - 4, btHeight - 4);
 				else
 					e.gc.fillRectangle(0, 0, btWidth, btHeight);
@@ -100,6 +100,15 @@ public class ThinArrowButton extends Canvas {
 				e.gc.fillPolygon(coords);
 			}
 		});
+	}
+	
+	/**
+	 * Returns true if we should draw our own borders instead of using the
+	 * system borders. This is necessary on Windows (classic theme) and KDE,
+	 * where the system borders look sort of ugly.
+	 */
+	private static boolean useCustomBorder() {
+		return Const.IS_WINDOWS || System.getenv("KDE_FULL_SESSION") != null; //$NON-NLS-1$
 	}
 	
 	public Point computeSize(int hint, int hint2, boolean changed) {
