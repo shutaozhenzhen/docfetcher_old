@@ -152,6 +152,13 @@ public class RootScope extends Scope {
 				int numDocs = reader.numDocs();
 				for (int i = 0; i < numDocs; i++) {
 					if (Thread.currentThread().isInterrupted()) break;
+					
+					/*
+					 * DocFetcher crashes if we try to access a deleted
+					 * document. See bug #2881245 and bug #2925127.
+					 */
+					if (reader.isDeleted(i)) continue;
+					
 					String pathCandidate = reader.document(i).get(Document.path);
 					pathCandidate = new File(pathCandidate).getAbsolutePath();
 					File removeFile = null;
