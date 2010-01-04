@@ -437,6 +437,48 @@ public class DocFetcher extends ApplicationWindow {
 		});
 		hotkeyHandler.registerHotkey();
 		
+		scopeReg = ScopeRegistry.getInstance();
+		
+		// Remove scope registry entries whose index folders don't exist anymore
+		RootScope[] rootScopes = scopeReg.getEntries();
+		for (RootScope rootScope : rootScopes)
+			if (! rootScope.getIndexDir().exists())
+				scopeReg.remove(rootScope);
+		
+		/*
+		 * Wipe out unregistered index folders (possibly from older
+		 * installations or program crashes).
+		 */
+		File[] indexDirs = UtilFile.listFolders(Const.INDEX_PARENT_FILE);
+		for (File indexDir : indexDirs)
+			if (! scopeReg.containsIndexDir(indexDir) && indexDir.getName().matches(".*_[0-9]+")) //$NON-NLS-1$
+				UtilFile.delete(indexDir, true);
+		
+		// Hook onto scope registry and set app name according to number of jobs
+		scopeReg.getEvtQueueChanged().add(new Event.Listener<ScopeRegistry> () {
+			public void update(ScopeRegistry scopeReg) {
+				Shell shell = getShell();
+				if (shell == null) return;
+				int count = scopeReg.getSubmittedJobs().length;
+				String prefix = Msg.jobs.format(count) + " - "; //$NON-NLS-1$
+				shell.setText((count == 0 ? "" : prefix) + DocFetcher.appName); //$NON-NLS-1$
+			}
+		});
+		
+		folderWatcher = new FolderWatcher(); // must be done after loading the Prefs
+		
+		parserGroup.setParsers(ParserRegistry.getParsers());
+		scopeGroup.setScopes(scopeReg.getEntries());
+		createTemporaryIndexes();
+
+		/*
+		 * Enabling the sash weight handler must be delayed using a Thread;
+		 * otherwise we would get a nasty layout bug that would shrink the width
+		 * of the filter panel after each subsequent program launch, provided
+		 * the program is terminated in maximized state.
+		 */
+		new SashWeightHandler(getShell(), sashHorizontal);
+		
 		/*
 		 * Check if daemon has detected changes in the indexed folders.
 		 * For each change, launches an update
@@ -476,12 +518,6 @@ public class DocFetcher extends ApplicationWindow {
 				// Can't print stacktrace here, no GUI available
 			}
 		}
-		
-		new Thread() {
-			public void run() {
-				initializeApplication();
-			}
-		}.start();
 
 		/*
 		 * We do this at the end of this method (instead of at the beginning of
@@ -492,54 +528,6 @@ public class DocFetcher extends ApplicationWindow {
 		exceptionHandler.setEnabled(true);
 		
 		return topContainer;
-	}
-	
-	private void initializeApplication() {
-		scopeReg = ScopeRegistry.getInstance();
-		
-		// Remove scope registry entries whose index folders don't exist anymore
-		RootScope[] rootScopes = scopeReg.getEntries();
-		for (RootScope rootScope : rootScopes)
-			if (! rootScope.getIndexDir().exists())
-				scopeReg.remove(rootScope);
-		
-		/*
-		 * Wipe out unregistered index folders (possibly from older
-		 * installations or program crashes).
-		 */
-		File[] indexDirs = UtilFile.listFolders(Const.INDEX_PARENT_FILE);
-		for (File indexDir : indexDirs)
-			if (! scopeReg.containsIndexDir(indexDir) && indexDir.getName().matches(".*_[0-9]+")) //$NON-NLS-1$
-				UtilFile.delete(indexDir, true);
-		
-		// Hook onto scope registry and set app name according to number of jobs
-		scopeReg.getEvtQueueChanged().add(new Event.Listener<ScopeRegistry> () {
-			public void update(ScopeRegistry scopeReg) {
-				Shell shell = getShell();
-				if (shell == null) return;
-				int count = scopeReg.getSubmittedJobs().length;
-				String prefix = Msg.jobs.format(count) + " - "; //$NON-NLS-1$
-				shell.setText((count == 0 ? "" : prefix) + DocFetcher.appName); //$NON-NLS-1$
-			}
-		});
-		
-		folderWatcher = new FolderWatcher(); // must be done after loading the Prefs
-		
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				parserGroup.setParsers(ParserRegistry.getParsers());
-				scopeGroup.setScopes(scopeReg.getEntries());
-				createTemporaryIndexes();
-				
-				/*
-				 * Enabling the sash weight handler must be delayed using a Thread;
-				 * otherwise we would get a nasty layout bug that would shrink the width
-				 * of the filter panel after each subsequent program launch, provided
-				 * the program is terminated in maximized state.
-				 */
-				new SashWeightHandler(getShell(), sashHorizontal);
-			}
-		});
 	}
 	
 	/**
