@@ -477,7 +477,15 @@ public class DocFetcher extends ApplicationWindow {
 		 * of the filter panel after each subsequent program launch, provided
 		 * the program is terminated in maximized state.
 		 */
-		new SashWeightHandler(getShell(), sashHorizontal);
+		new Thread() {
+			public void run() {
+				Display.getDefault().syncExec(new Runnable() {
+					public void run() {
+						new SashWeightHandler(getShell(), sashHorizontal);
+					}
+				});
+			}
+		}.start();
 		
 		/*
 		 * Check if daemon has detected changes in the indexed folders.

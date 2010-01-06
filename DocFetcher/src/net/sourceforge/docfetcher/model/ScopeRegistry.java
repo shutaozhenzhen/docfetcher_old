@@ -26,6 +26,7 @@ import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.util.Event;
+import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
 import org.apache.lucene.index.Term;
@@ -220,8 +221,9 @@ public class ScopeRegistry implements Serializable {
 	 * Returns whether the given directory is already registered herein.
 	 */
 	public boolean containsEntry(File directory) {
+		File relativeDir = UtilFile.getRelativeFile(Const.USER_DIR_FILE, directory);
 		for (RootScope rootScope : rootScopes) {
-			if (rootScope.file.equals(directory))
+			if (rootScope.file.equals(relativeDir))
 				return true;
 		}
 		return false;
@@ -231,8 +233,9 @@ public class ScopeRegistry implements Serializable {
 	 * Returns the <tt>RootScope</tt> for a given directory
 	 */
 	public RootScope getEntry(File directory) {
+		File relativeDir = UtilFile.getRelativeFile(Const.USER_DIR_FILE, directory);
 		for (RootScope rootScope : rootScopes) {
-			if (rootScope.file.equals(directory))
+			if (rootScope.file.equals(relativeDir))
 				return rootScope;
 		}
 		return null;
