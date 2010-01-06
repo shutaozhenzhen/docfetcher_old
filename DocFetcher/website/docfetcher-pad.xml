@@ -34,18 +34,18 @@
 	</Company_Info>
 	<Program_Info>
 		<Program_Name>DocFetcher</Program_Name>
-		<Program_Version>1.0</Program_Version>
-		<Program_Release_Month>05</Program_Release_Month>
-		<Program_Release_Day>12</Program_Release_Day>
-		<Program_Release_Year>2009</Program_Release_Year>
+		<Program_Version>1.0.1</Program_Version>
+		<Program_Release_Month>01</Program_Release_Month>
+		<Program_Release_Day>06</Program_Release_Day>
+		<Program_Release_Year>2010</Program_Release_Year>
 		<Program_Cost_Dollars/>
 		<Program_Cost_Other_Code/>
 		<Program_Cost_Other/>
 		<Program_Type>Freeware</Program_Type>
-		<Program_Release_Status>Major Update</Program_Release_Status>
+		<Program_Release_Status>Minor Update</Program_Release_Status>
 		<Program_Install_Support>Install and Uninstall</Program_Install_Support>
 		<Program_OS_Support>WinME,WinXP,Windows2000,Windows2003,Linux,Linux GPL,Linux Open Source,Java</Program_OS_Support>
-		<Program_Language>English,German,Portuguese,Persian</Program_Language>
+		<Program_Language>English,German,Portuguese,Persian,French</Program_Language>
 		<Program_Change_Info/>
 		<Program_Specific_Category>Utilities</Program_Specific_Category>
 		<Program_Category_Class>System Utilities::File &amp; Disk Management</Program_Category_Class>
@@ -59,9 +59,9 @@
 			<Filename_Previous/>
 			<Filename_Generic/>
 			<Filename_Long/>
-			<File_Size_Bytes>22720356</File_Size_Bytes>
-			<File_Size_K>22187.85</File_Size_K>
-			<File_Size_MB>21.67</File_Size_MB>
+			<File_Size_Bytes>18480165</File_Size_Bytes>
+			<File_Size_K>18047.04</File_Size_K>
+			<File_Size_MB>17.62</File_Size_MB>
 		</File_Info>
 		<Expire_Info>
 			<Has_Expire_Info>N</Has_Expire_Info>
@@ -78,9 +78,9 @@
 			<Keywords>Document Search Indexing</Keywords>
 			<Char_Desc_45>Fast document search</Char_Desc_45>
 			<Char_Desc_80>Google-style access to documents on the computer</Char_Desc_80>
-			<Char_Desc_250>DocFetcher is an Open Source desktop search application: It allows you to quickly access documents on your computer by typing keywords. - You can think of it as Google for your local document repository.</Char_Desc_250>
-			<Char_Desc_450>DocFetcher is an Open Source desktop search application: It allows you to quickly access documents on your computer by typing keywords. - You can think of it as Google for your local document repository. The program provides a preview panel with search term highlighting. The results can be sorted and filtered. The following document formats are supported: MS Office, OpenOffice.org, PDF, HTML, plain text, RTF, </Char_Desc_450>
-			<Char_Desc_2000>DocFetcher is an Open Source desktop search application: It allows you to quickly access documents on your computer by typing keywords. - You can think of it as Google for your local document repository. The program provides a preview panel with search term highlighting. The results can be sorted and filtered. The following document formats are supported: MS Office, OpenOffice.org, PDF, HTML, plain text, RTF, AbiWord, CHM files.</Char_Desc_2000>
+			<Char_Desc_250>DocFetcher is an Open Source desktop search application: It allows you to search the contents of documents on your computer. - You can think of it as Google for your local document repository.</Char_Desc_250>
+			<Char_Desc_450>DocFetcher is an Open Source desktop search application: It allows you to search the contents of documents on your computer. - You can think of it as Google for your local document repository. The program provides a preview panel with search term highlighting. The results can be sorted and filtered. The following document formats are supported: MS Office, OpenOffice.org, PDF, HTML, plain text, RTF, </Char_Desc_450>
+			<Char_Desc_2000>DocFetcher is an Open Source desktop search application: It allows you to  search the contents of documents on your computer. - You can think of it as Google for your local document repository. The program provides a preview panel with search term highlighting. The results can be sorted and filtered. The following document formats are supported: MS Office, OpenOffice.org, PDF, HTML, plain text, RTF, AbiWord, CHM files.</Char_Desc_2000>
 		</English>
 	</Program_Descriptions>
 	<Web_Info>
