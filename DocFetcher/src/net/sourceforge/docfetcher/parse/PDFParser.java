@@ -35,7 +35,7 @@ public class PDFParser extends Parser {
 		try {
 			pdfDoc = PDDocument.load(file);
 			if (pdfDoc.isEncrypted())
-				throw new ParseException(file, Msg.doc_pw_protected.value());
+				throw new ParseException(file, Msg.no_extraction_permission.value());
 			PDFTextStripper stripper = new PDFTextStripper();
 			StringWriter writer = new StringWriter();
 			stripper.writeText(pdfDoc, writer);
@@ -61,7 +61,7 @@ public class PDFParser extends Parser {
 			// Check if PDF file is encrypted
 			pdfDoc = PDDocument.load(file);
 			if (pdfDoc.isEncrypted())
-				throw new ParseException(file, Msg.doc_pw_protected.value());
+				throw new ParseException(file, Msg.no_extraction_permission.value());
 
 			// Get tags and contents
 			PDFTextStripper stripper = new PDFTextStripper();

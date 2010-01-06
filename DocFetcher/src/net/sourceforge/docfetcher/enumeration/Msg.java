@@ -207,6 +207,7 @@ public enum Msg {
 	file_corrupted,
 	unsupported_encoding,
 	doc_pw_protected,
+	no_extraction_permission,
 	parser_error,
 	wordperfect_expected,
 	wordperfect_parser_not_installed,

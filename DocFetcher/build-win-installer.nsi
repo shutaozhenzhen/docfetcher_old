@@ -186,12 +186,12 @@ Section "DocFetcher"
 SectionEnd
 
 Section "un.Uninstall"
-	; Unregister context menu entry
-	ExecWait '"$INSTDIR\DocFetcher.exe" --unregister-contextmenu'
-	Sleep 3000
-	
 	; Kill daemon
 	Processes::KillProcess "docfetcher-daemon-win"
+	Sleep 1000
+	
+	; Unregister context menu entry
+	ExecWait '"$INSTDIR\DocFetcher.exe" --unregister-contextmenu'
 	
 	; Remove program folder
 	Delete $INSTDIR\DocFetcher.exe
@@ -212,7 +212,10 @@ Section "un.Uninstall"
 	Delete $INSTDIR\lang\*.properties
 	RMDir $INSTDIR\lang
 	
-    RMDir /r $INSTDIR\lib
+	Delete $INSTDIR\lib\*.jar
+	Delete $INSTDIR\lib\*.dll
+	Delete $INSTDIR\lib\*.so
+    RMDir $INSTDIR\lib
     
     RMDir /r $INSTDIR\indexes
 	RMDir /r $INSTDIR\licenses
