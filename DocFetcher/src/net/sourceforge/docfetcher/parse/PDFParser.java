@@ -35,10 +35,12 @@ public class PDFParser extends Parser {
 		PDDocument pdfDoc = null;
 		try {
 			pdfDoc = PDDocument.load(file);
-			try {
-				pdfDoc.openProtection(new StandardDecryptionMaterial(""));
-			} catch (Exception e) {
-				throw new ParseException(file, Msg.no_extraction_permission.value());
+			if (pdfDoc.isEncrypted()) {
+				try {
+					pdfDoc.openProtection(new StandardDecryptionMaterial(""));
+				} catch (Exception e) {
+					throw new ParseException(file, Msg.no_extraction_permission.value());
+				}
 			}
 			PDFTextStripper stripper = new PDFTextStripper();
 			StringWriter writer = new StringWriter();
@@ -64,10 +66,12 @@ public class PDFParser extends Parser {
 		try {
 			// Check if PDF file is encrypted
 			pdfDoc = PDDocument.load(file);
-			try {
-				pdfDoc.openProtection(new StandardDecryptionMaterial(""));
-			} catch (Exception e) {
-				throw new ParseException(file, Msg.no_extraction_permission.value());
+			if (pdfDoc.isEncrypted()) {
+				try {
+					pdfDoc.openProtection(new StandardDecryptionMaterial(""));
+				} catch (Exception e) {
+					throw new ParseException(file, Msg.no_extraction_permission.value());
+				}
 			}
 
 			// Get tags and contents
