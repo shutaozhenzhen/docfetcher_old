@@ -21,6 +21,7 @@ import net.sourceforge.docfetcher.model.Document;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
 import org.apache.pdfbox.util.PDFTextStripper;
 
 /**
@@ -34,8 +35,11 @@ public class PDFParser extends Parser {
 		PDDocument pdfDoc = null;
 		try {
 			pdfDoc = PDDocument.load(file);
-			if (pdfDoc.isEncrypted())
+			try {
+				pdfDoc.openProtection(new StandardDecryptionMaterial(""));
+			} catch (Exception e) {
 				throw new ParseException(file, Msg.no_extraction_permission.value());
+			}
 			PDFTextStripper stripper = new PDFTextStripper();
 			StringWriter writer = new StringWriter();
 			stripper.writeText(pdfDoc, writer);
@@ -60,8 +64,11 @@ public class PDFParser extends Parser {
 		try {
 			// Check if PDF file is encrypted
 			pdfDoc = PDDocument.load(file);
-			if (pdfDoc.isEncrypted())
+			try {
+				pdfDoc.openProtection(new StandardDecryptionMaterial(""));
+			} catch (Exception e) {
 				throw new ParseException(file, Msg.no_extraction_permission.value());
+			}
 
 			// Get tags and contents
 			PDFTextStripper stripper = new PDFTextStripper();
@@ -81,6 +88,7 @@ public class PDFParser extends Parser {
 			return new Document(file, metaData[0], writer.getBuffer()).addAuthor(metaData[1]);
 		}
 		catch (IOException e) {
+			e.printStackTrace();
 			throw new ParseException(file, Msg.file_not_readable.value());
 		}
 		finally {

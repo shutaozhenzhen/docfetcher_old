@@ -14,8 +14,8 @@ package net.sourceforge.docfetcher.model;
 import java.io.File;
 
 import net.sourceforge.docfetcher.enumeration.Msg;
-import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParseException;
+import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
 
 /**
