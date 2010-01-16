@@ -523,10 +523,12 @@ public class ScopeRegistry implements Serializable {
 		MultiSearcher multiSearcher = null;
 		try {
 			// Build a lucene query object
-			Query query = new QueryParser(
+			QueryParser queryParser = new QueryParser(
 					Document.contents,
 					RootScope.analyzer
-			).parse(searchString);
+			);
+			queryParser.setAllowLeadingWildcard(true);
+			Query query = queryParser.parse(searchString);
 
 			// Check that all indexes still exist
 			for (RootScope rootScope : rootScopes)

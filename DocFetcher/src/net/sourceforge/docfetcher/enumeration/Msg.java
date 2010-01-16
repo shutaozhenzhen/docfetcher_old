@@ -136,7 +136,7 @@ public enum Msg {
 	enter_nonempty_string,
 	invalid_query,
 	invalid_query_syntax,
-	wildcard_first_char,
+	leading_wildcard,
 	search_scope_empty,
 	minsize_not_greater_maxsize,
 	filesize_out_of_range,

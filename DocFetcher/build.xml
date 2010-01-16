@@ -10,7 +10,7 @@
 		</tstamp>
 		<property name="appname" value="DocFetcher"/>
 		<property name="package" value="net.sourceforge.docfetcher"/>
-		<property name="version" value="1.0.1"/>
+		<property name="version" value="1.0.2-beta"/>
 		<property name="versiondir" value="build/temp_${version}"/>
 		<property name="deploy.name" value="${appname}-${version}"/>
 		<property name="jar.name" value="${package}_${version}_${build.time}.jar"/>

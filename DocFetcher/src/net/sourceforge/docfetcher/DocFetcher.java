@@ -712,14 +712,15 @@ public class DocFetcher extends ApplicationWindow {
 		}
 		
 		/*
-		 * Get query string and check if it starts with '*' or '?'. If
-		 * so, abort with a MessageBox.
+		 * Get query string and check if it starts with '*' or '?'. If so, warn
+		 * the user about performance issues.
 		 */
 		if (searchString.startsWith("*") || searchString.startsWith("?")) { //$NON-NLS-1$ //$NON-NLS-2$
-			UtilGUI.showWarningMsg(
-					Msg.wildcard_first_char.value()
-			);
-			return;
+			boolean msgShown = Pref.Bool.LeadingWildcardMessageShown.getValue();
+			if (! msgShown) {
+				UtilGUI.showInfoMsg(Msg.leading_wildcard.value());
+				Pref.Bool.LeadingWildcardMessageShown.setValue(true);
+			}
 		}
 		
 		searchPanel.setSearchBoxEnabled(false);

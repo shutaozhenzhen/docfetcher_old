@@ -65,8 +65,9 @@ public class Pref {
 		HighlightSearchTerms (true),
 		HotkeyEnabled (true),
 		CloseIndexingTabs (true),
-		AllowRepositoryModification (true),
+		AllowRepositoryModification (false),
 		ClearSearchHistoryOnExit (true),
+		LeadingWildcardMessageShown (false);
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();
