@@ -142,6 +142,7 @@ public class Document {
 		luceneDoc.removeFields(path);
 		luceneDoc.add(new Field(lastModified, String.valueOf(file.lastModified()), Store.YES, Index.NO));
 		luceneDoc.add(new Field(path, UtilFile.getRelativePath(file), Store.YES, Index.NO));
+		luceneDoc.add(new Field(Document.contents, file.getName(), Store.NO, Index.ANALYZED));
 		return this;
 	}
 	
@@ -200,7 +201,8 @@ public class Document {
 	 * contents field will be set to an empty string. Returns the receiver for convenience.
 	 */
 	public Document setContents(StringBuffer contents) {
-		luceneDoc.removeFields(Document.contents);
+		// Don't remove the content field here, because it's used for the filename
+//		luceneDoc.removeFields(Document.contents);
 		if (contents == null)
 			luceneDoc.add(new Field(Document.contents, "", Store.NO, Index.ANALYZED)); //$NON-NLS-1$
 		else
@@ -215,7 +217,8 @@ public class Document {
 	public Document setContents(String contents) {
 		if (contents == null)
 			contents = ""; //$NON-NLS-1$
-		luceneDoc.removeFields(Document.contents);
+		// Don't remove the content field here, because it's used for the filename
+//		luceneDoc.removeFields(Document.contents);
 		luceneDoc.add(new Field(Document.contents, contents, Store.NO, Index.ANALYZED));
 		return this;
 	}
