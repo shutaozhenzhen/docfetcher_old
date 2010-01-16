@@ -39,7 +39,8 @@ public class MSExcelParser extends MSOfficeParser {
 			in = new FileInputStream(file);
 			ExcelExtractor extractor = null;
 			try {
-				extractor = new ExcelExtractor(new POIFSFileSystem(in));
+				POIFSFileSystem fs = new POIFSFileSystem(in);
+				extractor = new ExcelExtractor(fs);
 			}
 			catch (OldExcelFormatException e) {
 				/*

@@ -14,6 +14,8 @@ package net.sourceforge.docfetcher.aspect;
 import net.sourceforge.docfetcher.DocFetcher;
 
 import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.poi.poifs.eventfilesystem.POIFSReader;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.POIOLE2TextExtractor;
 
 /**
@@ -27,6 +29,8 @@ public aspect ParserSilencer {
 	
 	pointcut parsing():
 		call(POIOLE2TextExtractor+.new(..)) ||
+		call(POIFSFileSystem+.new(..)) ||
+		call(void POIFSReader.read(..)) ||
 		call(* PDFTextStripper.writeText(..));
 	
 	before(): parsing() {
