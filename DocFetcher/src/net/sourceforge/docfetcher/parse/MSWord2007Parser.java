@@ -18,7 +18,7 @@ import net.sourceforge.docfetcher.enumeration.Msg;
  */
 public class MSWord2007Parser extends MSOffice2007Parser {
 
-	private static final String[] extensions = new String[] {"docx"}; //$NON-NLS-1$
+	private static final String[] extensions = new String[] {"docx", "docm"}; //$NON-NLS-1$
 	
 	public String[] getExtensions() {
 		return extensions;

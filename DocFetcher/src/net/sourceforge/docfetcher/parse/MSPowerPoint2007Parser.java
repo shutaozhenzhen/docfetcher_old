@@ -18,7 +18,7 @@ import net.sourceforge.docfetcher.enumeration.Msg;
  */
 public class MSPowerPoint2007Parser extends MSOffice2007Parser {
 
-	private static final String[] extensions = new String[] {"pptx"}; //$NON-NLS-1$
+	private static final String[] extensions = new String[] {"pptx", "pptm"}; //$NON-NLS-1$
 	
 	public String[] getExtensions() {
 		return extensions;

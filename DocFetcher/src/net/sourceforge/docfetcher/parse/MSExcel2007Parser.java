@@ -18,7 +18,7 @@ import net.sourceforge.docfetcher.enumeration.Msg;
  */
 public class MSExcel2007Parser extends MSOffice2007Parser {
 
-	private static final String[] extensions = new String[] {"xlsx"}; //$NON-NLS-1$
+	private static final String[] extensions = new String[] {"xlsx", "xlsm"}; //$NON-NLS-1$
 	
 	public String[] getExtensions() {
 		return extensions;
