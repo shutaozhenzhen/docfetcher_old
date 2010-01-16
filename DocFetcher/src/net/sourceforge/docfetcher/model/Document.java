@@ -30,6 +30,11 @@ import org.apache.lucene.document.Field.Store;
 public class Document {
 	
 	/**
+	 * Lucene field name for the filename of a <tt>Document</tt> file.
+	 */
+	public static final String filename = "filename"; //$NON-NLS-1$
+	
+	/**
 	 * Lucene field name for the absolute path of a <tt>Document</tt> file.
 	 */
 	public static final String path = "path"; //$NON-NLS-1$
@@ -140,9 +145,13 @@ public class Document {
 		this.file = UtilFile.getRelativeFile(Const.USER_DIR_FILE, file);
 		luceneDoc.removeFields(lastModified);
 		luceneDoc.removeFields(path);
+		luceneDoc.removeFields(filename);
 		luceneDoc.add(new Field(lastModified, String.valueOf(file.lastModified()), Store.YES, Index.NO));
 		luceneDoc.add(new Field(path, UtilFile.getRelativePath(file), Store.YES, Index.NO));
-		luceneDoc.add(new Field(Document.contents, file.getName(), Store.NO, Index.ANALYZED));
+		
+		String basename = UtilFile.getNameNoExt(file);
+		luceneDoc.add(new Field(filename, basename, Store.NO, Index.ANALYZED));
+		luceneDoc.add(new Field(Document.contents, basename, Store.NO, Index.ANALYZED));
 		return this;
 	}
 	
