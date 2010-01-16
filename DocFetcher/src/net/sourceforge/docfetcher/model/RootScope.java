@@ -338,6 +338,11 @@ public class RootScope extends Scope {
 		// Process normal files in the current directory
 		for (File subFile : subFiles) {
 			if (Thread.currentThread().isInterrupted()) return;
+			
+			// See bug #2927439: DocFetcher fails on temporary MS Word files
+			if (subFile.getName().matches("~\\$.*\\.docx?")) //$NON-NLS-1$
+				continue;
+			
 			if (scope.isFileRegistered(subFile)) continue;
 			if (isExcluded(subFile)) continue;
 			try {
