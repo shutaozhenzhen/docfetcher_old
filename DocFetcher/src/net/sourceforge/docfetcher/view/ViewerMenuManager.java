@@ -82,7 +82,7 @@ public class ViewerMenuManager {
 		
 		// Activate context menu entries through keyboard shortcuts
 		viewer.getControl().addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
 				Key key = Key.getKey(e.stateMask, e.keyCode);
 				if (key == null) return;
 				Action action = keyActionMap.get(key);

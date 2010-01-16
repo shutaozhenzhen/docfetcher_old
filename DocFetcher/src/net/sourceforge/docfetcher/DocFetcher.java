@@ -742,8 +742,8 @@ public class DocFetcher extends ApplicationWindow {
 				finally {
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
-							resultPanel.setFocus();
 							searchPanel.setSearchBoxEnabled(true);
+							resultPanel.setFocus();
 						}
 					});
 				}

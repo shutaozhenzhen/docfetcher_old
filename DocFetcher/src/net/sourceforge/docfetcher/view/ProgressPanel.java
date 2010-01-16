@@ -113,7 +113,7 @@ public class ProgressPanel extends Composite {
 		
 		// Some keyboard shortcuts
 		errorTable.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
 				Key key = Key.getKey(e.stateMask, e.keyCode);
 				if (key == null) return;
 				switch (key) {

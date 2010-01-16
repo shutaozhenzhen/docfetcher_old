@@ -228,7 +228,7 @@ public class IndexingTab extends Composite {
 			}
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
-			public void keyPressed(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
 				if (UtilGUI.isCRKey(e))
 					runJob();
 			}

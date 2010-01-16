@@ -152,7 +152,7 @@ public class ParserGroup extends GroupWrapper {
 	 * Navigation in the parser group
 	 */
 	private class ParserGroupNavigator extends KeyAdapter {
-		public void keyPressed(KeyEvent e) {
+		public void keyReleased(KeyEvent e) {
 			Key key = Key.getKey(e.stateMask, e.keyCode);
 			if (key == null) return;
 			Table table = (Table) e.widget;

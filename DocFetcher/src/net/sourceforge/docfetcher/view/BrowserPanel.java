@@ -140,7 +140,7 @@ public class BrowserPanel extends Composite {
 		});
 		
 		locationBar.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
 				if (UtilGUI.isCRKey(e))
 					browser.setUrl(locationBar.getText());
 			}

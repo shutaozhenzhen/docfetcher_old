@@ -17,8 +17,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
 import net.sourceforge.docfetcher.enumeration.Msg;
 
+import org.apache.poi.hssf.OldExcelFormatException;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
@@ -37,6 +41,15 @@ public class MSExcelParser extends MSOfficeParser {
 			try {
 				extractor = new ExcelExtractor(new POIFSFileSystem(in));
 			}
+			catch (OldExcelFormatException e) {
+				/*
+				 * POI doesn't support the old Excel 5.0/7.0 (BIFF5) format,
+				 * only the BIFF8 format from Excel 97/2000/XP/2003. Thus, we
+				 * fall back to another Excel library.
+				 */
+				in.close();
+				return extractWithJexcelAPI(file);
+			}
 			catch (Exception e) {
 				// This can happen if the file has the "xls" extension, but is not an Excel document
 				throw new ParseException(file, Msg.file_corrupted.value());
@@ -53,6 +66,28 @@ public class MSExcelParser extends MSOfficeParser {
 		catch (IOException ioe) {
 			throw new ParseException(file, Msg.file_not_readable.value());
 		}
+	}
+	
+	private String extractWithJexcelAPI(File file) throws ParseException {
+		StringBuilder sb = new StringBuilder();
+		try {
+			Workbook workbook = Workbook.getWorkbook(file);
+			for (int sIndex = 0; sIndex < workbook.getNumberOfSheets(); sIndex++) {
+				Sheet sheet = workbook.getSheet(sIndex);
+				sb.append(sheet.getName()).append("\n\n"); //$NON-NLS-1$
+				for (int i = 0; i < sheet.getRows(); i++) {
+					Cell[] row = sheet.getRow(i);
+					for (int j = 0; j < row.length; j++)
+						sb.append(row[j].getContents()).append(" "); //$NON-NLS-1$
+					sb.append("\n");
+				}
+				sb.append("\n\n\n"); //$NON-NLS-1$
+			}
+		}
+		catch (Exception e) {
+			throw new ParseException(file, Msg.file_not_readable.value());
+		}
+		return sb.toString();
 	}
 
 	public String[] getExtensions() {

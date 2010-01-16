@@ -82,7 +82,7 @@ public class InputDialog {
 		});
 		
 		text.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
+			public void keyReleased(KeyEvent e) {
 				if (UtilGUI.isCRKey(e)) {
 					answer = text.getText();
 					shell.close();

@@ -11,6 +11,7 @@
 
 package net.sourceforge.docfetcher.view;
 
+import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Msg;
@@ -66,8 +67,8 @@ public class SearchPanel extends Composite {
 		UtilGUI.selectAllOnFocus(searchBox);
 		
 		searchBox.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				if (UtilGUI.isCRKey(e)) 
+			public void keyReleased(KeyEvent e) {
+				if (UtilGUI.isCRKey(e))
 					evtSearchRequest.fireUpdate(searchBox.getText());
 			}
 		});
@@ -207,7 +208,18 @@ public class SearchPanel extends Composite {
 	}
 	
 	public void setSearchBoxEnabled(boolean enabled) {
-		searchBox.setEnabled(enabled);
+		/*
+		 * From SWT 3.4 to 3.5, something in the Linux implementation has
+		 * changed, causing widget focus problems after pressing Enter in the
+		 * search box if searchBox.setEnabled is used (see below). The
+		 * workaround is to change the widget background color instead.
+		 */
+		if (Const.IS_LINUX) {
+			int color = enabled ? SWT.COLOR_LIST_BACKGROUND : SWT.COLOR_WIDGET_BACKGROUND;
+			searchBox.setBackground(UtilGUI.getColor(color));
+		}
+		else
+			searchBox.setEnabled(enabled);
 	}
 	
 	public boolean isFocusControl() {

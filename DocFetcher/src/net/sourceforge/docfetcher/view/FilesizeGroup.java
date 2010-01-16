@@ -252,7 +252,7 @@ public class FilesizeGroup extends GroupWrapper {
 				control.addKeyListener(this);
 		}
 		
-		public void keyPressed(KeyEvent e) {
+		public void keyReleased(KeyEvent e) {
 			Key key = Key.getKey(e.stateMask, e.keyCode);
 			if (key == null) return;
 			

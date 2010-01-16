@@ -30,7 +30,7 @@ public privileged aspect TextWidgetDecorator {
 	 * or StyledText) with a Select-All key.
 	 */
 	static KeyAdapter stdTextKeyProvider = new KeyAdapter() {
-		public void keyPressed(KeyEvent e) {
+		public void keyReleased(KeyEvent e) {
 			Key key = Key.getKey(e.stateMask, e.keyCode);
 			if (key == Key.SelectAll) {
 				if (e.widget instanceof Text)

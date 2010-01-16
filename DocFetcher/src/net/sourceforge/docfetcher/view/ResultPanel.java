@@ -931,7 +931,7 @@ public class ResultPanel extends Composite {
 	 */
 	class ResultPanelNavigator extends KeyAdapter {
 		
-		public void keyPressed(KeyEvent e) {
+		public void keyReleased(KeyEvent e) {
 			Key key = Key.getKey(e.stateMask, e.keyCode);
 			if (key == null) return;
 			
@@ -978,7 +978,7 @@ public class ResultPanel extends Composite {
 	 */
 	class SortSelector extends KeyAdapter {
 		
-		public void keyPressed(KeyEvent e) {
+		public void keyReleased(KeyEvent e) {
 			if (e.stateMask != SWT.ALT) return;
 			int key = 0;
 			try {
