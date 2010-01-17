@@ -48,7 +48,7 @@ public class MSWordParser extends MSOfficeParser {
 		catch (FileNotFoundException e) {
 			throw new ParseException(file, Msg.file_not_found.value());
 		}
-		catch (IOException ioe) {
+		catch (IOException e) {
 			throw new ParseException(file, Msg.file_not_readable.value());
 		}
 	}

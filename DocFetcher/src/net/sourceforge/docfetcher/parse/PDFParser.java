@@ -92,7 +92,6 @@ public class PDFParser extends Parser {
 			return new Document(file, metaData[0], writer.getBuffer()).addAuthor(metaData[1]);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
 			throw new ParseException(file, Msg.file_not_readable.value());
 		}
 		finally {
