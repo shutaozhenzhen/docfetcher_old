@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.view;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 
 import net.sourceforge.docfetcher.DocFetcher;
@@ -189,7 +190,12 @@ public class BrowserPanel extends Composite {
 	 */
 	public void setFile(File file) {
 		String path = file.getAbsolutePath();
-		browser.setUrl(path);
+		try {
+			String url = file.toURI().toURL().toString();
+			browser.setUrl(url);
+		} catch (MalformedURLException e) {
+			browser.setUrl(path);
+		}
 		locationBar.setText(path);
 	}
 	
