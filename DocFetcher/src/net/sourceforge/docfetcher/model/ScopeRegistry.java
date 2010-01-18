@@ -35,10 +35,14 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiSearcher;
+import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Searchable;
-import org.apache.lucene.search.TopDocCollector;
+import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.Version;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -524,10 +528,12 @@ public class ScopeRegistry implements Serializable {
 		try {
 			// Build a lucene query object
 			QueryParser queryParser = new QueryParser(
+					Version.LUCENE_CURRENT,
 					Document.contents,
 					RootScope.analyzer
 			);
 			queryParser.setAllowLeadingWildcard(true);
+			queryParser.setMultiTermRewriteMethod(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
 			Query query = queryParser.parse(searchString);
 
 			// Check that all indexes still exist
@@ -539,11 +545,13 @@ public class ScopeRegistry implements Serializable {
 			// Perform search
 			Searchable[] searchables = new Searchable[rootScopes.size()];
 			int i = 0;
-			for (RootScope rootScope : rootScopes)
-				searchables[i++] = new IndexSearcher(rootScope.getIndexDir().getAbsolutePath());
+			for (RootScope rootScope : rootScopes) {
+				Directory luceneIndexDir = new SimpleFSDirectory(rootScope.getIndexDir());
+				searchables[i++] = new IndexSearcher(luceneIndexDir);
+			}
 			multiSearcher = new MultiSearcher(searchables);
 			
-			TopDocCollector collector = new TopDocCollector(Pref.Int.MaxResultsTotal.getValue());
+			TopScoreDocCollector collector = TopScoreDocCollector.create(Pref.Int.MaxResultsTotal.getValue(), false);
 			multiSearcher.search(query, collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;
 			
@@ -556,11 +564,13 @@ public class ScopeRegistry implements Serializable {
 				);
 			
 			// Get search terms (for term highlighting in the preview panel)
-			Set<Object> termsSet = new HashSet<Object>();
+			query = multiSearcher.rewrite(query);
+			
+			Set<Term> termsSet = new HashSet<Term>();
 			query = multiSearcher.rewrite(query);
 			query.extractTerms(termsSet);
-			for (Object term : termsSet)
-				terms.add(((Term) term).text());
+			for (Term term : termsSet)
+				terms.add(term.text());
 			
 			return results;
 		}

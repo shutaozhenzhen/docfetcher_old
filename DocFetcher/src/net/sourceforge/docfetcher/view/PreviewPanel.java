@@ -34,8 +34,8 @@ import net.sourceforge.docfetcher.util.UtilGUI;
 import net.sourceforge.docfetcher.util.UtilList;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.ProgressAdapter;
@@ -424,7 +424,8 @@ public class PreviewPanel extends Composite {
 					List<Integer> rangesList = new ArrayList<Integer> ();
 					Analyzer analyzer = RootScope.analyzer;
 					TokenStream tokenStream = analyzer.tokenStream("", new StringReader(text)); //$NON-NLS-1$
-					Token token = new Token();
+					OffsetAttribute offsetAttr = tokenStream.getAttribute(OffsetAttribute.class);
+					
 					try {
 						/*
 						 * Read one token after another from the token stream.
@@ -433,9 +434,9 @@ public class PreviewPanel extends Composite {
 						 * length of the token, then put the integer pair into a
 						 * list.
 						 */
-						while ((token = tokenStream.next(token)) != null) {
-							int start = token.startOffset();
-							int end = token.endOffset();
+						while (tokenStream.incrementToken()) {
+							int start = offsetAttr.startOffset();
+							int end = offsetAttr.endOffset();
 							String word = text.substring(start, end).toLowerCase();
 							if (! UtilList.containsEquality(terms, word)) continue;
 							rangesList.add(start);

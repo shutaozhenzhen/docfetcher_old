@@ -30,7 +30,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/lucene-core-2.4.0.jar" sourcepath="/media/Data/Dev/Software/Java Libraries/lucene-2.4.0-src.zip"/>
 	<classpathentry kind="lib" path="lib/jRegistryKey.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/jsr173_1.0_api.jar"/>
@@ -56,5 +55,6 @@
 	<classpathentry kind="lib" path="lib/bcprov-jdk14-136.jar"/>
 	<classpathentry kind="lib" path="lib/bcmail-jdk14-136.jar"/>
 	<classpathentry kind="lib" path="lib/jxl.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-3.0.0.jar" sourcepath="/media/Data/Dev/Software/Java Libraries/lucene-3.0.0-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

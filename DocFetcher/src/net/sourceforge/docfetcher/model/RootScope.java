@@ -34,6 +34,9 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.Version;
 
 /**
  * An object representation for top-level-directories in the search scope.
@@ -46,7 +49,7 @@ public class RootScope extends Scope {
 	static final long serialVersionUID = 2;
 	
 	/** The Lucene Analyzer used. */
-	public static final Analyzer analyzer = new StandardAnalyzer();
+	public static final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_CURRENT);
 	
 	/** The Lucene IndexWriter used. */
 	private transient IndexWriter writer;
@@ -130,7 +133,8 @@ public class RootScope extends Scope {
 		
 		try {
 			// Create index if it doesn't exist yet
-			writer = new IndexWriter(indexDir, analyzer, MaxFieldLength.UNLIMITED); 
+			Directory luceneIndexDir = new SimpleFSDirectory(indexDir);
+			writer = new IndexWriter(luceneIndexDir, analyzer, MaxFieldLength.UNLIMITED); 
 			writer.close();
 			
 			/*
@@ -142,7 +146,7 @@ public class RootScope extends Scope {
 			
 			// Delete missing files from Lucene index
 			try {
-				reader = IndexReader.open(indexDir);
+				reader = IndexReader.open(luceneIndexDir);
 				
 				/*
 				 * Do not use 'reader.numDocs()' in the for-loop header; it will
@@ -186,7 +190,7 @@ public class RootScope extends Scope {
 
 			// Recursively index new files
 			if (! Thread.currentThread().isInterrupted()) {
-				writer = new IndexWriter(indexDir, analyzer, MaxFieldLength.UNLIMITED);
+				writer = new IndexWriter(luceneIndexDir, analyzer, MaxFieldLength.UNLIMITED);
 				indexNewFiles(this);
 				writer.optimize();
 			}
@@ -624,8 +628,10 @@ public class RootScope extends Scope {
 		try {
 			// Get all documents under the root elements
 			IndexReader[] readers = new IndexReader[rootScopes.length];
-			for (int i = 0; i < rootScopes.length; i++)
-				readers[i] = IndexReader.open(rootScopes[i].getIndexDir());
+			for (int i = 0; i < rootScopes.length; i++) {
+				Directory dir = new SimpleFSDirectory(rootScopes[i].getIndexDir());
+				readers[i] = IndexReader.open(dir);
+			}
 			MultiReader multiReader = new MultiReader(readers);
 			ResultDocument[] rootScopeDocs = new ResultDocument[multiReader.numDocs()];
 			for (int i = 0; i < multiReader.numDocs(); i++)
