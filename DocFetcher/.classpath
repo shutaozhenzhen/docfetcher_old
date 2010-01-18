@@ -56,5 +56,7 @@
 	<classpathentry kind="lib" path="lib/bcmail-jdk14-136.jar"/>
 	<classpathentry kind="lib" path="lib/jxl.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-core-3.0.0.jar" sourcepath="/media/Data/Dev/Software/Java Libraries/lucene-3.0.0-src.zip"/>
+	<classpathentry kind="lib" path="lib/lucene-highlighter-3.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-memory-3.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

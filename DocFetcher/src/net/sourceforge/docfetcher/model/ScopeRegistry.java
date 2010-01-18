@@ -560,7 +560,8 @@ public class ScopeRegistry implements Serializable {
 			for (i = 0; i < results.length; i++)
 				results[i] = new ResultDocument(
 						multiSearcher.doc(hits[i].doc),
-						hits[i].score
+						hits[i].score,
+						query
 				);
 			
 			// Get search terms (for term highlighting in the preview panel)

@@ -15,6 +15,8 @@ import java.io.File;
 
 import net.sourceforge.docfetcher.util.UtilFile;
 
+import org.apache.lucene.search.Query;
+
 /**
  * A <code>net.sourceforge.docfetcher.model.Document</code> with an additional
  * score field.
@@ -35,15 +37,19 @@ public class ResultDocument extends Document implements Comparable<ResultDocumen
 	 */
 	private String title;
 	
+	/** The query used to obtain this result object. */
+	private Query query;
+	
 	/**
 	 * @param doc
 	 *            The Lucene document returned by a Lucene search.
 	 * @param score
 	 *            The score achieved in the search.
 	 */
-	public ResultDocument(org.apache.lucene.document.Document doc, float score) {
+	public ResultDocument(org.apache.lucene.document.Document doc, float score, Query query) {
 		luceneDoc = doc;
 		this.score = score;
+		this.query = query;
 		
 		/*
 		 * The call to UtilFile.normPathSep(..) is needed here because the
@@ -60,6 +66,10 @@ public class ResultDocument extends Document implements Comparable<ResultDocumen
 	 */
 	public float getScore() {
 		return score;
+	}
+	
+	public Query getQuery() {
+		return query;
 	}
 	
 	public String getTitle() {

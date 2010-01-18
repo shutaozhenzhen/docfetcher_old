@@ -346,7 +346,7 @@ public class DocFetcher extends ApplicationWindow {
 			public void update(ResultPanel resultPanel) {
 				ResultDocument doc = (ResultDocument) resultPanel.getSelection().getFirstElement();
 				if (doc == null) return;
-				previewPanel.setFile(doc.getFile(), doc.getParser());
+				previewPanel.setFile(doc.getFile(), doc.getParser(), doc.getQuery());
 				showResultStatus();
 			}
 		});
@@ -355,7 +355,6 @@ public class DocFetcher extends ApplicationWindow {
 		scopeGroup.evtListDocuments.add(new Event.Listener<ResultDocument[]> () {
 			public void update(ResultDocument[] docs) {
 				resultPanel.setResults(docs);
-				previewPanel.setTerms(new String[0]);
 			}
 		});
 		
@@ -732,7 +731,6 @@ public class DocFetcher extends ApplicationWindow {
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
 							resultPanel.setResults(results);
-							previewPanel.setTerms(terms.toArray(new String[terms.size()]));
 							searchPanel.addToSearchHistory(searchString);
 						}
 					});

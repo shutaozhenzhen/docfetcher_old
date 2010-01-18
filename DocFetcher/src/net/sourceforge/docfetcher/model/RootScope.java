@@ -49,7 +49,7 @@ public class RootScope extends Scope {
 	static final long serialVersionUID = 2;
 	
 	/** The Lucene Analyzer used. */
-	public static final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_CURRENT);
+	public static final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_CURRENT, new HashSet<String> ());
 	
 	/** The Lucene IndexWriter used. */
 	private transient IndexWriter writer;
@@ -635,7 +635,7 @@ public class RootScope extends Scope {
 			MultiReader multiReader = new MultiReader(readers);
 			ResultDocument[] rootScopeDocs = new ResultDocument[multiReader.numDocs()];
 			for (int i = 0; i < multiReader.numDocs(); i++)
-				rootScopeDocs[i] = new ResultDocument(multiReader.document(i), 0);
+				rootScopeDocs[i] = new ResultDocument(multiReader.document(i), 0, null);
 			multiReader.close();
 			
 			/*

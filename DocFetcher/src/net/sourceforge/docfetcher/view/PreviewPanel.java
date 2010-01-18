@@ -12,8 +12,6 @@
 package net.sourceforge.docfetcher.view;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +20,7 @@ import net.sourceforge.docfetcher.enumeration.Font;
 import net.sourceforge.docfetcher.enumeration.Icon;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
+import net.sourceforge.docfetcher.model.Document;
 import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.parse.HTMLParser;
 import net.sourceforge.docfetcher.parse.ParseException;
@@ -31,11 +30,15 @@ import net.sourceforge.docfetcher.parse.TextParser;
 import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
-import net.sourceforge.docfetcher.util.UtilList;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
+import org.apache.lucene.analysis.Token;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.highlight.Formatter;
+import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.NullFragmenter;
+import org.apache.lucene.search.highlight.QueryScorer;
+import org.apache.lucene.search.highlight.TokenGroup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.ProgressAdapter;
@@ -86,11 +89,8 @@ public class PreviewPanel extends Composite {
 	/** The parser that has been used to parse the currently displayed file. */
 	private Parser parser;
 	
-	/** A list of terms that should be highlighted in the text-only preview. */
-	private String[] terms = new String[0];
-	
-	/** Whether the internal list of terms to highlight has already been accessed. */
-	private boolean termsInUse;
+	/** The query used to obtain the results. */
+	private Query query;
 	
 	/**
 	 * A list of pairs of start indices and lengths that indicate which
@@ -212,7 +212,7 @@ public class PreviewPanel extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				Pref.Bool.PreviewHTML.setValue(htmlPreviewBt.getSelection());
 				if (parser instanceof HTMLParser) // Only refresh preview panel for HTML documents
-					setFile(file, parser, true);
+					setFile(file, parser, query, true);
 			}
 		});
 		
@@ -271,12 +271,12 @@ public class PreviewPanel extends Composite {
 	public void setActive(boolean active) {
 		this.isActive = active;
 		if (active)
-			setFile(file, parser);
+			setFile(file, parser, query);
 		else {
 			// Set blank page
 			showViewer(textViewerContainer);
 			textViewer.setText(""); //$NON-NLS-1$
-			termsInUse = false;
+			ranges = new int[0];
 			BrowserPanel browser = browserProvider.getBrowser(previewPanel, browserToolBar, ParserRegistry.getHTMLParser());
 			if (browser != null) // Is null on KDE desktops
 				browser.setText("<html><head></head><body></body></html>"); //$NON-NLS-1$
@@ -284,23 +284,12 @@ public class PreviewPanel extends Composite {
 	}
 	
 	/**
-	 * Sets the search terms used to highlight words in the text preview.
-	 */
-	public void setTerms(String[] terms) {
-		if (terms == null)
-			throw new IllegalArgumentException();
-		if (terms == this.terms) return; 
-		this.terms = terms;
-		termsInUse = false;
-	}
-	
-	/**
 	 * Sets the file to be displayed in the preview panel. The <tt>parser</tt>
 	 * parameter is the parser instance with which the file was parsed. This
 	 * method does nothing if the given file is null.
 	 */
-	public void setFile(File file, Parser parser) {
-		setFile(file, parser, false);
+	public void setFile(File file, Parser parser, Query query) {
+		setFile(file, parser, query, false);
 	}
 
 	/**
@@ -310,19 +299,20 @@ public class PreviewPanel extends Composite {
 	 * preview should be updated even if neither the file nor the search terms
 	 * have changed in the meantime.
 	 */
-	private void setFile(final File file, final Parser parser, boolean force) {
+	private void setFile(final File file, final Parser parser, final Query query, boolean force) {
 		File lastFile = this.file;
+		Query lastQuery = this.query;
 		this.file = file;
 		this.parser = parser;
+		this.query = query;
 		
 		// Check input
 		if (file == null) return;
 		if (parser == null) // Allowed to be null if file is null, too
 			throw new IllegalArgumentException();
 		if (! isActive) return;
-		if (file.equals(lastFile) && termsInUse & ! force)
+		if (file.equals(lastFile) && query.equals(lastQuery) && ! force)
 			return;
-		termsInUse = true;
 		
 		if (file.isDirectory())
 			throw new IllegalStateException("File expected for preview, got directory instead."); //$NON-NLS-1$
@@ -331,10 +321,6 @@ public class PreviewPanel extends Composite {
 			showViewer(textViewerContainer);
 			return;
 		}
-		
-		// Enable or disable up and down buttons
-		upBt.setEnabled(terms.length != 0);
-		downBt.setEnabled(terms.length != 0);
 
 		// Use the HTML browser
 		if (file.getAbsolutePath().equals(Const.HELP_FILE) || Pref.Bool.PreviewHTML.getValue()) {
@@ -420,31 +406,44 @@ public class PreviewPanel extends Composite {
 				 * highlight.
 				 */
 				ranges = new int[0];
-				if (fileParsed && terms.length != 0) {
-					List<Integer> rangesList = new ArrayList<Integer> ();
+				if (fileParsed && query != null) {
+					final List<Integer> rangesList = new ArrayList<Integer> ();
 					Analyzer analyzer = RootScope.analyzer;
-					TokenStream tokenStream = analyzer.tokenStream("", new StringReader(text)); //$NON-NLS-1$
-					OffsetAttribute offsetAttr = tokenStream.getAttribute(OffsetAttribute.class);
 					
+					/*
+					 * A formatter is supposed to return formatted text, but
+					 * since we're only interested in the start and end offsets
+					 * of the search terms, we return null and store the offsets
+					 * in a list.
+					 */
+					Formatter nullFormatter = new Formatter() {
+						public String highlightTerm(String originalText, TokenGroup tokenGroup) {
+							for (int i = 0; i < tokenGroup.getNumTokens(); i++) {
+								Token token = tokenGroup.getToken(i);
+								if (tokenGroup.getScore(i) == 0)
+									continue;
+								int start = token.startOffset();
+								int end = token.endOffset();
+								rangesList.add(start);
+								rangesList.add(end - start);
+							}
+							return null;
+						}
+					};
+					
+					Highlighter highlighter = new Highlighter(nullFormatter, new QueryScorer(query, Document.contents));
+					highlighter.setMaxDocCharsToAnalyze(Integer.MAX_VALUE);
+					highlighter.setTextFragmenter(new NullFragmenter());
 					try {
 						/*
-						 * Read one token after another from the token stream.
-						 * If a token is in the set of words to be highlighted,
-						 * create an (int, int) pair to remember the start and
-						 * length of the token, then put the integer pair into a
-						 * list.
+						 * This has a return value, but we ignore it since we
+						 * only want the offsets.
 						 */
-						while (tokenStream.incrementToken()) {
-							int start = offsetAttr.startOffset();
-							int end = offsetAttr.endOffset();
-							String word = text.substring(start, end).toLowerCase();
-							if (! UtilList.containsEquality(terms, word)) continue;
-							rangesList.add(start);
-							rangesList.add(end - start);
-						}
-					} catch (IOException e) {
+						highlighter.getBestFragment(analyzer, Document.contents, fText);
+					} catch (Exception e) {
 						// We can do without the search term highlighting
 					}
+					
 					// List to array (will be used by the method 'setHighlighting(..)')
 					ranges = new int[rangesList.size()];
 					for (int i = 0; i < ranges.length; i++)
@@ -455,6 +454,10 @@ public class PreviewPanel extends Composite {
 				final boolean fFileParsed = fileParsed;
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
+						// Enable or disable up and down buttons
+						upBt.setEnabled(ranges.length != 0);
+						downBt.setEnabled(ranges.length != 0);
+						
 						textViewer.setText(fText);
 						setHighlighting(fFileParsed && Pref.Bool.HighlightSearchTerms.getValue());
 						occurrenceCounter.setText(Integer.toString(ranges.length / 2));
@@ -471,7 +474,7 @@ public class PreviewPanel extends Composite {
 	 * preferences.
 	 */
 	private void setHighlighting(boolean highlight) {
-		if (terms.length != 0) {
+		if (ranges.length != 0) {
 			Color col = null;
 			if (highlight) {
 				if (highlightColor == null) { // lazy instantiation
@@ -545,6 +548,7 @@ public class PreviewPanel extends Composite {
 				occurrenceCounter.setText("0"); //$NON-NLS-1$
 			}
 		});
+		query = null;
 		browser.setFile(file);
 		return true;
 	}
