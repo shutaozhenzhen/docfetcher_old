@@ -156,10 +156,12 @@ public class IndexingDialog {
 		directoryDialog = new DirectoryDialog(tabFolder.getShell(), SWT.PRIMARY_MODAL);
 		directoryDialog.setText(Msg.scope_folder_title.value());
 		directoryDialog.setMessage(Msg.scope_folder_msg.value());
+		directoryDialog.setFilterPath(Pref.Str.LastIndexedFolder.getValue());
 		String path = directoryDialog.open();
 		directoryDialog = null;
 		if (path == null)
 			return false;
+		Pref.Str.LastIndexedFolder.setValue(path);
 		File dir = new File(path);
 		RootScope newScope = new RootScope(dir);
 

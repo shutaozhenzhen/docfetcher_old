@@ -18,9 +18,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.eclipse.swt.SWT;
-
 import net.sourceforge.docfetcher.util.UtilFile;
+
+import org.eclipse.swt.SWT;
 
 /**
  * A collection of system-wide constants.
@@ -93,6 +93,11 @@ public class Const {
 	 * A file representing the current working directory.
 	 */
 	public static final File USER_DIR_FILE = new File(USER_DIR).getAbsoluteFile();
+	
+	/**
+	 * The user's home directory.
+	 */
+	public static final String USER_HOME = System.getProperty("user.home"); //$NON-NLS-1$
 	
 	/**
 	 * Each time DocFetcher starts, a new file is used to write the stacktrace

@@ -311,8 +311,9 @@ public class PreviewPanel extends Composite {
 		if (parser == null) // Allowed to be null if file is null, too
 			throw new IllegalArgumentException();
 		if (! isActive) return;
-		if (file.equals(lastFile) && query.equals(lastQuery) && ! force)
-			return;
+		if (file.equals(lastFile) && ! force)
+			if (query != null && query.equals(lastQuery))
+				return;
 		
 		if (file.isDirectory())
 			throw new IllegalStateException("File expected for preview, got directory instead."); //$NON-NLS-1$

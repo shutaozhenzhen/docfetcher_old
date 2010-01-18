@@ -147,6 +147,7 @@ public class Pref {
 		PreviewFontMonoWin ("Courier New"), //$NON-NLS-1$
 		PreviewFontLinux ("Sans"), //$NON-NLS-1$
 		PreviewFontMonoLinux ("Monospace"), //$NON-NLS-1$
+		LastIndexedFolder (Const.IS_LINUX ? Const.USER_HOME : ""), //$NON-NLS-1$
 		;
 
 		public final Event<String> evtChanged = new Event<String> ();
