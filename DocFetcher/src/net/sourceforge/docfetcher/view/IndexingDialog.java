@@ -156,7 +156,10 @@ public class IndexingDialog {
 		directoryDialog = new DirectoryDialog(tabFolder.getShell(), SWT.PRIMARY_MODAL);
 		directoryDialog.setText(Msg.scope_folder_title.value());
 		directoryDialog.setMessage(Msg.scope_folder_msg.value());
-		directoryDialog.setFilterPath(Pref.Str.LastIndexedFolder.getValue());
+		String lastPath = Pref.Str.LastIndexedFolder.getValue();
+		if (! new File(lastPath).exists())
+			lastPath = Pref.Str.LastIndexedFolder.defaultValue;
+		directoryDialog.setFilterPath(lastPath);
 		String path = directoryDialog.open();
 		directoryDialog = null;
 		if (path == null)
