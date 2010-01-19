@@ -60,8 +60,8 @@
 			<Filename_Generic/>
 			<Filename_Long/>
 			<File_Size_Bytes>20718371</File_Size_Bytes>
-			<File_Size_K>20232.78</File_Size_K>
-			<File_Size_MB>19.76</File_Size_MB>
+			<File_Size_K>20233</File_Size_K>
+			<File_Size_MB>20</File_Size_MB>
 		</File_Info>
 		<Expire_Info>
 			<Has_Expire_Info>N</Has_Expire_Info>
@@ -77,7 +77,7 @@
 		<English>
 			<Keywords>Document Search Indexing</Keywords>
 			<Char_Desc_45>Fast document search</Char_Desc_45>
-			<Char_Desc_80>Google-style access to documents on the computer</Char_Desc_80>
+			<Char_Desc_80>Search the contents of documents on your computer.</Char_Desc_80>
 			<Char_Desc_250>DocFetcher is an Open Source desktop search application: It allows you to search the contents of documents on your computer. - You can think of it as Google for your local document repository.</Char_Desc_250>
 			<Char_Desc_450>DocFetcher is an Open Source desktop search application: It allows you to search the contents of documents on your computer. - You can think of it as Google for your local document repository. The program provides a preview panel with search term highlighting. The results can be sorted and filtered. The following document formats are supported: MS Office, OpenOffice.org, PDF, HTML, plain text, RTF, </Char_Desc_450>
 			<Char_Desc_2000>DocFetcher is an Open Source desktop search application: It allows you to  search the contents of documents on your computer. - You can think of it as Google for your local document repository. The program provides a preview panel with search term highlighting. The results can be sorted and filtered. The following document formats are supported: MS Office, OpenOffice.org, PDF, HTML, plain text, RTF, AbiWord, CHM files.</Char_Desc_2000>
