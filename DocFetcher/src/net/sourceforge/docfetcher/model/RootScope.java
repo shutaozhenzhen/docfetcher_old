@@ -146,7 +146,7 @@ public class RootScope extends Scope {
 			
 			// Delete missing files from Lucene index
 			try {
-				reader = IndexReader.open(luceneIndexDir);
+				reader = IndexReader.open(luceneIndexDir, false);
 				
 				/*
 				 * Do not use 'reader.numDocs()' in the for-loop header; it will
