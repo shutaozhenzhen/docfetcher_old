@@ -1,6 +1,29 @@
 @DATE@ - DocFetcher @VERSION@
 ---------------------------------------------
 Features:
+  * Support for the old Excel format (BIFF5 from Excel 5.0/7.0) added. Earlier versions of DocFetcher skipped them with an "Unknown file format" error message.
+  * Support for macro-enabled MS Office 2007 formats added (docm, xlsm, pptm).
+  * The highlighting in the preview panel is now fully implemented.
+  * DocFetcher now indexes some PDF files on which it used to fail with a "No permission to extract text" error message.
+  * The default search includes filenames and a searchable field "filename" has been added (e.g. filename:"dog cat").
+  * Leading wildcards (i.e. search strings starting with * or ?) are allowed.
+
+Bugfixes:
+  * On Linux, there was a subtle window focus problem after the user pressed Enter in the search box.
+  * On Linux, clicking certain buttons didn't work.
+  * Crash window appears while indexing MS Office files (bug #2929639).
+  * Temporary MS Word files are now silently skipped during indexing (bug #2927439).
+  * DocFetcher was unable to display the HTML preview for HTML files (including the DocFetcher manual) if the filepath contained special characters (e.g. ! or ').
+
+Changes:
+  * Deletion of documents via Search Scope context menu disabled by default. You can bring it back by setting AllowRepositoryModification=true in the user.properties file.
+  * The file chooser in the "Create Index..." menu entry now remembers the previously selected folder.
+  * Upgraded indexing library (Apache Lucene).
+
+
+2009-01-06 - DocFetcher 1.0.1
+---------------------------------------------
+Features:
   * French GUI translation.
   * German manual translation.
   * DocFetcher now runs on KDE.
