@@ -725,9 +725,8 @@ public class DocFetcher extends ApplicationWindow {
 		searchPanel.setSearchBoxEnabled(false);
 		new Thread() {
 			public void run() {
-				final List<String> terms = new ArrayList<String> ();
 				try {
-					final ResultDocument[] results = scopeReg.search(searchString, terms);
+					final ResultDocument[] results = scopeReg.search(searchString);
 					Display.getDefault().syncExec(new Runnable() {
 						public void run() {
 							resultPanel.setResults(results);

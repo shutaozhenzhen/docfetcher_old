@@ -17,7 +17,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,7 +28,6 @@ import net.sourceforge.docfetcher.util.Event;
 import net.sourceforge.docfetcher.util.UtilFile;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
@@ -523,7 +521,7 @@ public class ScopeRegistry implements Serializable {
 	 *             <tt>searchString</tt> is invalid, or if an IOException
 	 *             occurred.
 	 */
-	public ResultDocument[] search(String searchString, List<String> terms) throws SearchException {
+	public ResultDocument[] search(String searchString) throws SearchException {
 		MultiSearcher multiSearcher = null;
 		try {
 			// Build a lucene query object
@@ -563,15 +561,6 @@ public class ScopeRegistry implements Serializable {
 						hits[i].score,
 						query
 				);
-			
-			// Get search terms (for term highlighting in the preview panel)
-			query = multiSearcher.rewrite(query);
-			
-			Set<Term> termsSet = new HashSet<Term>();
-			query = multiSearcher.rewrite(query);
-			query.extractTerms(termsSet);
-			for (Term term : termsSet)
-				terms.add(term.text());
 			
 			return results;
 		}
