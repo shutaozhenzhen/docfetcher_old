@@ -87,12 +87,12 @@
 		<Application_URLs>
 			<Application_Info_URL>http://docfetcher.sourceforge.net</Application_Info_URL>
 			<Application_Order_URL/>
-			<Application_Screenshot_URL>http://docfetcher.sourceforge.net/xp_all.png</Application_Screenshot_URL>
-			<Application_Icon_URL>http://docfetcher.sourceforge.net/docfetcher64.png</Application_Icon_URL>
+			<Application_Screenshot_URL>http://docfetcher.sourceforge.net/all/xp_all.png</Application_Screenshot_URL>
+			<Application_Icon_URL>http://docfetcher.sourceforge.net/all/docfetcher64.png</Application_Icon_URL>
 			<Application_XML_File_URL>http://docfetcher.sourceforge.net/docfetcher-pad.xml</Application_XML_File_URL>
 		</Application_URLs>
 		<Download_URLs>
-			<Primary_Download_URL>http://docfetcher.sourceforge.net/download.html</Primary_Download_URL>
+			<Primary_Download_URL>http://docfetcher.sourceforge.net/en/download.html</Primary_Download_URL>
 			<Secondary_Download_URL/>
 			<Additional_Download_URL_1/>
 			<Additional_Download_URL_2/>

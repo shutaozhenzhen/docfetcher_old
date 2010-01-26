@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,12 +13,12 @@
    height="32"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
-   sodipodi:docname="Squirrel-Kopf v3.svg"
+   inkscape:version="0.47pre4 r22446"
+   sodipodi:docname="squirrel_mascot_head.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="/home/qforce/Desktop/DocFetcher-0.9.5.1/icons/docfetcher24_pink_bg.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90"
+   inkscape:export-filename="/home/qforce/Desktop/docfetcher64.png"
+   inkscape:export-xdpi="180"
+   inkscape:export-ydpi="180"
    version="1.0">
   <defs
      id="defs4">
@@ -67,14 +68,15 @@
      inkscape:pageshadow="2"
      inkscape:zoom="7.9195959"
      inkscape:cx="29.748656"
-     inkscape:cy="13.798489"
+     inkscape:cy="13.545951"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="729"
      inkscape:window-x="0"
-     inkscape:window-y="25" />
+     inkscape:window-y="25"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
