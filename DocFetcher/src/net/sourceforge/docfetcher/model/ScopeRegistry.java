@@ -532,6 +532,8 @@ public class ScopeRegistry implements Serializable {
 			);
 			queryParser.setAllowLeadingWildcard(true);
 			queryParser.setMultiTermRewriteMethod(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
+			if (! Pref.Bool.UseOrOperator.getValue())
+				queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
 			Query query = queryParser.parse(searchString);
 
 			// Check that all indexes still exist

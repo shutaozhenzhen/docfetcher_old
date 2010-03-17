@@ -67,7 +67,8 @@ public class Pref {
 		CloseIndexingTabs (true),
 		AllowRepositoryModification (false),
 		ClearSearchHistoryOnExit (true),
-		LeadingWildcardMessageShown (false);
+		LeadingWildcardMessageShown (false),
+		UseOrOperator (true),
 		;
 
 		public final Event<Boolean> evtChanged = new Event<Boolean> ();

@@ -122,6 +122,10 @@ public class PrefDialog {
 				Pref.Bool.WatchFS
 		);
 		createCheckButton(container,
+				Msg.pref_use_or_operator.value(),
+				Pref.Bool.UseOrOperator
+		);
+		createCheckButton(container,
 				Msg.pref_hide_in_systray.value(),
 				Pref.Bool.HideOnOpen
 		);

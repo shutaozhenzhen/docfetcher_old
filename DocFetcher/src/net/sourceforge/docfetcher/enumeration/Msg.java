@@ -154,6 +154,7 @@ public enum Msg {
 	pref_manual_on_startup,
 	pref_close_tabs,
 	pref_watch_fs,
+	pref_use_or_operator,
 	pref_hide_in_systray,
 	pref_highlight,
 	pref_clear_search_history_on_exit,
