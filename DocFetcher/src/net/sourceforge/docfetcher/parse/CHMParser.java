@@ -88,7 +88,7 @@ public class CHMParser extends Parser {
 								"utf8" // Just guessing... //$NON-NLS-1$
 						)
 				);
-				StringBuffer entryBuffer = new StringBuffer();
+				StringBuilder entryBuffer = new StringBuilder();
 				String line = null;
 				while ((line = reader.readLine()) != null)
 					entryBuffer.append(line).append("\n\n"); //$NON-NLS-1$
@@ -98,7 +98,7 @@ public class CHMParser extends Parser {
 				 * between binary files (such as images) and HTML files. Therefore
 				 * we use regex matching to select the HTML files.
 				 */
-				if (entryBuffer.toString().matches("(?s).*<html>.*</html>.*|.*<HTML>.*</HTML>.*")) { //$NON-NLS-1$
+				if (isHTML(entryBuffer)) {
 					Source source = new Source(entryBuffer);
 					source.setLogger(null);
 					if (renderText)
@@ -115,6 +115,43 @@ public class CHMParser extends Parser {
 					reader.close();
 			}
 		}
+	}
+	
+	/**
+	 * Returns true if the given StringBuilder appears to contain HTML. This is
+	 * determined by parsing the input with a simple finite state machine that
+	 * checks whether the input contains an html start tag, followed by an html
+	 * end tag.
+	 */
+	private boolean isHTML(StringBuilder input) {
+		final int OUTSIDE = 0;
+		final int INSIDE = 1;
+		int state = OUTSIDE;
+		for (int i = 0; i < input.length(); i++) {
+			char c = input.charAt(i);
+			if (state == OUTSIDE) {
+				/*
+				 * Note that we're checking for the occurrence of <html, not
+				 * <html>, since in some HTML documents the html start tag
+				 * contains additional attributes, e.g. <html attr="value">.
+				 */
+				if (c == 'l' || c == 'L') { // last char in 'html'
+					if (i >= 4) {
+						String substring = input.substring(i - 4, i + 1);
+						if (substring.toLowerCase().equals("<html"))
+							state = INSIDE;
+					}
+				}
+			}
+			else if (state == INSIDE) {
+				if (c == '>') {
+					String substring = input.substring(i - 6, i + 1);
+					if (substring.toLowerCase().equals("</html>"))
+						return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public String[] getExtensions() {
