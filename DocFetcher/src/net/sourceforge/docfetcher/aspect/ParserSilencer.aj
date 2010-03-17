@@ -12,6 +12,7 @@
 package net.sourceforge.docfetcher.aspect;
 
 import net.sourceforge.docfetcher.DocFetcher;
+import net.sourceforge.docfetcher.parse.MSExcelParser;
 
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.apache.poi.poifs.eventfilesystem.POIFSReader;
@@ -31,7 +32,8 @@ public aspect ParserSilencer {
 		call(POIOLE2TextExtractor+.new(..)) ||
 		call(POIFSFileSystem+.new(..)) ||
 		call(void POIFSReader.read(..)) ||
-		call(* PDFTextStripper.writeText(..));
+		call(* PDFTextStripper.writeText(..)) ||
+		call(* MSExcelParser.extractWithJexcelAPI(..));
 	
 	before(): parsing() {
 		DocFetcher docFetcher = DocFetcher.getInstance();
