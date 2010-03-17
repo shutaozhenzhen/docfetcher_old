@@ -7,11 +7,6 @@
 	</classpathentry>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/jnotify-0.91.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="DocFetcher/lib"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl1_3.2.0.v200606220026.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl2_3.2.0.v200606220026.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swt.nl2a_3.2.0.v200606220026.jar"/>
@@ -58,5 +53,6 @@
 	<classpathentry kind="lib" path="lib/lucene-core-3.0.0.jar" sourcepath="/media/Data/Dev/Software/Java Libraries/lucene-3.0.0-src.zip"/>
 	<classpathentry kind="lib" path="lib/lucene-highlighter-3.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-memory-3.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/jnotify-0.92.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
