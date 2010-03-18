@@ -1,6 +1,27 @@
 @DATE@ - DocFetcher @VERSION@
 ---------------------------------------------
 Features:
+  * Preferences entry for changing the default operator to concatenate query terms (OR vs. AND).
+
+Bugfixes:
+  * Non-lethal crash while parsing Excel files in the old Excel format (BIFF5 from Excel 5.0/7.0).
+  * The CHM parser could crash with a stack overflow; also, it omitted text in CHM files that had a particular format.
+  * If one of the parsers crashes badly, the user is asked to send the problematic file to docfetcher@users.sourceforge.net for debugging (bug #2948903 and #2944552).
+  * Indexing-related crash that shows a "ThreadInterruptedException" (bug #2971390 and #2953613).
+  * Crash on older Windows versions where no graphics library (GDI+) is installed (temporary fix for bug #2943966).
+  * Crash if the user clicks on the column header "Author" (bug #2956392).
+  * Crash if the user lets DocFetcher index itself and then selects "List Documents" on the created index.
+  * Fixed some minor errors in the manual.
+  * Fixed some errors in the French GUI translation.
+
+Changes:
+  * PDF parser library upgraded (PDFBox 0.8.0 -> 1.0.0).
+  * Folder watching library upgraded (JNotify 0.91 -> 0.92).
+
+
+2010-01-19 - DocFetcher 1.0.2
+---------------------------------------------
+Features:
   * Support for the old Excel format (BIFF5 from Excel 5.0/7.0) added. Earlier versions of DocFetcher skipped them with an "Unknown file format" error message.
   * Support for macro-enabled MS Office 2007 formats added (docm, xlsm, pptm).
   * The highlighting in the preview panel is now fully implemented.
@@ -21,7 +42,7 @@ Changes:
   * Upgraded indexing library (Apache Lucene).
 
 
-2009-01-06 - DocFetcher 1.0.1
+2010-01-06 - DocFetcher 1.0.1
 ---------------------------------------------
 Features:
   * French GUI translation.

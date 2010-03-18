@@ -34,9 +34,9 @@
 	</Company_Info>
 	<Program_Info>
 		<Program_Name>DocFetcher</Program_Name>
-		<Program_Version>1.0.2</Program_Version>
-		<Program_Release_Month>01</Program_Release_Month>
-		<Program_Release_Day>19</Program_Release_Day>
+		<Program_Version>1.0.3</Program_Version>
+		<Program_Release_Month>03</Program_Release_Month>
+		<Program_Release_Day>18</Program_Release_Day>
 		<Program_Release_Year>2010</Program_Release_Year>
 		<Program_Cost_Dollars/>
 		<Program_Cost_Other_Code/>
@@ -59,8 +59,8 @@
 			<Filename_Previous/>
 			<Filename_Generic/>
 			<Filename_Long/>
-			<File_Size_Bytes>20718371</File_Size_Bytes>
-			<File_Size_K>20233</File_Size_K>
+			<File_Size_Bytes>21078256</File_Size_Bytes>
+			<File_Size_K>20584</File_Size_K>
 			<File_Size_MB>20</File_Size_MB>
 		</File_Info>
 		<Expire_Info>
