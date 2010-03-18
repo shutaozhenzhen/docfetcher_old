@@ -5,7 +5,7 @@
 ;
 ; When building a new release, remember to update the version number in the next command.
 
-!define VERSION 1.0.2
+!define VERSION 1.0.3
 
 SetCompress force
 SetCompressor /SOLID lzma
