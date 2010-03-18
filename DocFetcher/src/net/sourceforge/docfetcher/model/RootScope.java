@@ -36,6 +36,7 @@ import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.ThreadInterruptedException;
 import org.apache.lucene.util.Version;
 
 /**
@@ -192,7 +193,11 @@ public class RootScope extends Scope {
 			if (! Thread.currentThread().isInterrupted()) {
 				writer = new IndexWriter(luceneIndexDir, analyzer, MaxFieldLength.UNLIMITED);
 				indexNewFiles(this);
-				writer.optimize();
+				try {
+					writer.optimize();
+				} catch (ThreadInterruptedException e) {
+					// Ignore, see bug report #2971390 and #2953613
+				}
 			}
 		} finally {
 			ParserRegistry.resetExtensions();
@@ -200,6 +205,8 @@ public class RootScope extends Scope {
 				try {
 					writer.close();
 					writer = null;
+				} catch (ThreadInterruptedException e) {
+					// Ignore, see bug report #2971390 and #2953613
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
