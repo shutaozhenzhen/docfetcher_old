@@ -15,6 +15,7 @@ import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.util.UtilGUI;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
@@ -73,31 +74,39 @@ public class ThinArrowButton extends Canvas {
 		// Draw the arrow
 		addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
-				int style = ThinArrowButton.this.style;
-				int[] coords = null;
-				
-				if (UtilGUI.contains(style, SWT.LEFT))
-					coords = new int[] {-a, 0, a, b, a, -b};
-				else if (UtilGUI.contains(style, SWT.RIGHT))
-					coords = new int[] {a, 0, -a, -b, -a, b};
-				else if (UtilGUI.contains(style, SWT.UP))
-					coords = new int[] {0, -a, -b, a, b, a};
-				else if (UtilGUI.contains(style, SWT.DOWN))
-					coords = new int[] {0, a, b, -a, -b, -a};
-				
-				for (int i = 0; i < coords.length - 1; i = i + 2)
-					coords[i] += btWidth / 2;
-				for (int i = 1; i < coords.length; i = i + 2)
-					coords[i] += btHeight / 2;
-				
-				if (useCustomBorder())
-					e.gc.fillRectangle(2, 2, btWidth - 4, btHeight - 4);
-				else
-					e.gc.fillRectangle(0, 0, btWidth, btHeight);
-				
-				e.gc.setBackground(UtilGUI.getColor(SWT.COLOR_WIDGET_FOREGROUND));
-				e.gc.setAntialias(SWT.ON);
-				e.gc.fillPolygon(coords);
+				try {
+					int style = ThinArrowButton.this.style;
+					int[] coords = null;
+
+					if (UtilGUI.contains(style, SWT.LEFT))
+						coords = new int[] {-a, 0, a, b, a, -b};
+					else if (UtilGUI.contains(style, SWT.RIGHT))
+						coords = new int[] {a, 0, -a, -b, -a, b};
+					else if (UtilGUI.contains(style, SWT.UP))
+						coords = new int[] {0, -a, -b, a, b, a};
+					else if (UtilGUI.contains(style, SWT.DOWN))
+						coords = new int[] {0, a, b, -a, -b, -a};
+
+					for (int i = 0; i < coords.length - 1; i = i + 2)
+						coords[i] += btWidth / 2;
+					for (int i = 1; i < coords.length; i = i + 2)
+						coords[i] += btHeight / 2;
+
+					if (useCustomBorder())
+						e.gc.fillRectangle(2, 2, btWidth - 4, btHeight - 4);
+					else
+						e.gc.fillRectangle(0, 0, btWidth, btHeight);
+
+					e.gc.setBackground(UtilGUI.getColor(SWT.COLOR_WIDGET_FOREGROUND));
+					e.gc.setAntialias(SWT.ON);
+					e.gc.fillPolygon(coords);
+				} catch (SWTException ex) {
+					/*
+					 * FIXME This happens when no graphics library is found
+					 * (GDI+), probably on an older Windows 2000 OS. This is
+					 * only a temporary workaround. See bug #2943966.
+					 */
+				}
 			}
 		});
 	}
