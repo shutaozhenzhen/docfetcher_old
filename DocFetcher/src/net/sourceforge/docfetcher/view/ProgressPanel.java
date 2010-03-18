@@ -287,8 +287,10 @@ public class ProgressPanel extends Composite {
 		return addErrorMenuItem(Msg.open_parent.value(), false, new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				TableItem[] items = errorTable.getSelection();
-				for (TableItem item : items)
-					UtilFile.launch(new File(item.getText(1)).getParent());
+				for (TableItem item : items) {
+					File file = new File(item.getText(1));
+					UtilFile.launch(UtilFile.getParent(file));
+				}
 			}
 		});
 	}

@@ -59,6 +59,11 @@ public aspect CodeConventions {
 	&& !withincode(* UtilFile.listFolders(..)):
 		"Use the UtilFile.list*(..) methods instead, since they don't return null, thus avoiding NullPointerExceptions."; //$NON-NLS-1$
 	
+	declare warning: (call(* File.getParent()) || call(* File.getParentFile()))
+	&& !withincode(* UtilFile.getParent(File))
+	&& !withincode(* UtilFile.getParentFile(File)):
+		"Use the UtilFile.getParent*() methods instead, since they don't return null, thus avoiding NullPointerExceptions."; //$NON-NLS-1$
+	
 	declare warning: call(* Program.launch(..)) && !withincode(* UtilFile.launch(..)):
 		"Use the UtilFile.launch(..) method instead, it will also work on KDE."; //$NON-NLS-1$
 

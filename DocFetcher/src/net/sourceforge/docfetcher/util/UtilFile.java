@@ -26,13 +26,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.swt.program.Program;
-
 import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.FileAlreadyExistsException;
 import net.sourceforge.docfetcher.parse.ParserRegistry;
+
+import org.eclipse.swt.program.Program;
 
 /**
  * File operation related utility methods
@@ -140,6 +140,28 @@ public class UtilFile {
 	}
 
 	/**
+	 * Returns the parent file of the given file. Unlike
+	 * {@link File#getParentFile}, this method will never return null.
+	 */
+	public static File getParentFile(File file) {
+		File parent = file.getParentFile();
+		if (parent == null)
+			parent = file.getAbsoluteFile().getParentFile();
+		return parent;
+	}
+	
+	/**
+	 * Returns the parent of the given file. Unlike {@link File#getParent}, this
+	 * method will never return null.
+	 */
+	public static String getParent(File file) {
+		String parent = file.getParent();
+		if (parent == null)
+			parent = file.getAbsoluteFile().getParent();
+		return parent;
+	}
+
+	/**
 	 * Returns whether the given file is a link. Returns true if the file
 	 * doesn't exists or if an IOException occured. The link detection is based
 	 * on the comparison of the absolute and canonical path of a link: If those
@@ -213,7 +235,7 @@ public class UtilFile {
 			if (file.isDirectory()) {
 				String baseName = UtilFile.getHTMLDirBasename(file);
 				if (baseName == null) continue;
-				File[] candidates = listAll(file.getParentFile(), new FileFilter() {
+				File[] candidates = listAll(getParentFile(file), new FileFilter() {
 					public boolean accept(File candidate) {
 						return candidate.isFile() && ParserRegistry.isHTMLFile(candidate);
 					}
@@ -227,7 +249,7 @@ public class UtilFile {
 			}
 			else if (file.isFile() && ParserRegistry.isHTMLFile(file)) {
 				String baseName = UtilFile.getNameNoExt(file);
-				File[] candidates = listAll(file.getParentFile(), new FileFilter() {
+				File[] candidates = listAll(getParentFile(file), new FileFilter() {
 					public boolean accept(File candidate) {
 						if (! candidate.isDirectory()) return false;
 						String baseName = UtilFile.getHTMLDirBasename(candidate);
@@ -657,7 +679,7 @@ public class UtilFile {
 		Set<File> output = new HashSet<File> (existingDirs.size()); 
 		for (int i = 0; i < existingDirs.size(); i++) {
 			boolean foundParent = false;
-			File parent = existingDirs.get(i).getParentFile();
+			File parent = getParentFile(existingDirs.get(i));
 			for (int j = 0; j < existingDirs.size(); j++) {
 				if (parent.equals(existingDirs.get(j))) {
 					foundParent = true;

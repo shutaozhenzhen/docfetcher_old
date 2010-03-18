@@ -733,7 +733,8 @@ public class ScopeGroup extends GroupWrapper {
 			if (targetFolder.getName().equals(input)) return;
 			
 			// Try to rename file
-			File newFile = new File(targetFolder.getParentFile().getAbsolutePath(), input);
+			File parentFile = UtilFile.getParentFile(targetFolder);
+			File newFile = new File(parentFile.getAbsolutePath(), input);
 			DocFetcher.getInstance().setWatchEnabled(false, rootScope);
 			boolean success = targetFolder.renameTo(newFile);
 			DocFetcher.getInstance().setWatchEnabled(Pref.Bool.WatchFS.getValue(), rootScope);

@@ -89,7 +89,7 @@ public class Scope extends Indexable {
 	 * directory. Returns null if no representation object is found.
 	 */
 	public FileWrapper getFileWrapperDeep(File file) {
-		if (file.getParentFile().equals(this.file)) {
+		if (UtilFile.getParentFile(file).equals(this.file)) {
 			if (ParserRegistry.isHTMLFile(getRootScope(), file)) {
 				for (HTMLPair candidate : subHTMLPairs)
 					if (candidate.getFile().equals(file))

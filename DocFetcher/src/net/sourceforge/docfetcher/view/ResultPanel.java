@@ -456,7 +456,7 @@ public class ResultPanel extends Composite {
 		Iterator<?> it = sel.iterator();
 		while(it.hasNext()) {
 			ResultDocument doc = (ResultDocument) it.next();
-			dirsToOpen.add(doc.getFile().getParentFile().getAbsolutePath());
+			dirsToOpen.add(UtilFile.getParentFile(doc.getFile()).getAbsolutePath());
 		}
 		int openLimit = Pref.Int.OpenLimit.getValue();
 		if (dirsToOpen.size() > openLimit) {
@@ -530,7 +530,7 @@ public class ResultPanel extends Composite {
 		
 		// Delete files
 		for (File file : filesToDelete) {
-			File parent = file.getParentFile();
+			File parent = UtilFile.getParentFile(file);
 			UtilFile.delete(file, true);
 			File[] neighbors = UtilFile.listAll(parent);
 			if (neighbors.length == 0)
@@ -756,7 +756,7 @@ public class ResultPanel extends Composite {
 			
 			List<ResultDocument> selected = new ArrayList<ResultDocument> (docs.size());
 			for (ResultDocument doc : docs) {
-				String path = doc.getFile().getParentFile().getAbsolutePath();
+				String path = UtilFile.getParentFile(doc.getFile()).getAbsolutePath();
 				Boolean checkState = checkStates.get(path);
 				if (checkState != null && checkState)
 					selected.add(doc);
