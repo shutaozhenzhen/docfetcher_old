@@ -822,7 +822,11 @@ public class ResultPanel extends Composite {
 				String path2 = f2.getAbsolutePath();
 				return UtilList.compareToIgnoreCaseWithNumbers(path1, path2) * inverted;
 			case AUTHOR:
-				return UtilList.compareToIgnoreCaseWithNumbers(r1.getAuthor(), r2.getAuthor()) * inverted;
+				String author1 = r1.getAuthor();
+				String author2 = r2.getAuthor();
+				if (author1 == null) author1 = "";
+				if (author2 == null) author2 = "";
+				return UtilList.compareToIgnoreCaseWithNumbers(author1, author2) * inverted;
 			case LAST_MODIFIED:
 				long lmod1 = f1.lastModified();
 				long lmod2 = f2.lastModified();
