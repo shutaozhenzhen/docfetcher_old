@@ -212,6 +212,7 @@ public enum Msg {
 	parser_error,
 	wordperfect_expected,
 	wordperfect_parser_not_installed,
+	send_file_for_debugging,
 	
 	// Result panel
 	open,

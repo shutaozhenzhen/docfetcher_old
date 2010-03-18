@@ -358,6 +358,9 @@ public class RootScope extends Scope {
 				catch (OutOfMemoryError e) {
 					throw new ParseException(subFile, Msg.out_of_jvm_memory.value());
 				}
+				catch (StackOverflowError e) {
+					throw new ParseException(subFile, Msg.send_file_for_debugging.value());
+				}
 				scope.subFiles.add(wrapper);
 			}
 			catch (ParseException e) {
@@ -378,6 +381,9 @@ public class RootScope extends Scope {
 				}
 				catch (OutOfMemoryError e) {
 					throw new ParseException(subHTMLPair.file, Msg.out_of_jvm_memory.value());
+				}
+				catch (StackOverflowError e) {
+					throw new ParseException(subHTMLPair.file, Msg.send_file_for_debugging.value());
 				}
 				scope.subHTMLPairs.add(subHTMLPair);
 			} catch (ParseException e) {
