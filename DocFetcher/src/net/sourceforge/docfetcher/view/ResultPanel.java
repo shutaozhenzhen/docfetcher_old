@@ -808,8 +808,6 @@ public class ResultPanel extends Composite {
 				return UtilList.compareToIgnoreCaseWithNumbers(r1.getTitle(), r2.getTitle()) * inverted;
 			case NAME:
 				return UtilList.compareToIgnoreCaseWithNumbers(f1.getName(), f2.getName()) * inverted;
-			case SCORE:
-				return r1.compareTo(r2) * inverted; // Descending order
 			case SIZE:
 				long length1 = f1.length();
 				long length2 = f2.length();
@@ -823,13 +821,16 @@ public class ResultPanel extends Composite {
 				String path1 = f1.getAbsolutePath();
 				String path2 = f2.getAbsolutePath();
 				return UtilList.compareToIgnoreCaseWithNumbers(path1, path2) * inverted;
+			case AUTHOR:
+				return UtilList.compareToIgnoreCaseWithNumbers(r1.getAuthor(), r2.getAuthor()) * inverted;
 			case LAST_MODIFIED:
 				long lmod1 = f1.lastModified();
 				long lmod2 = f2.lastModified();
 				if (lmod1 == lmod2) return 0;
 				return ((lmod1 > lmod2) ? 1 : -1) * inverted;
+			default: // sort by score
+				return r1.compareTo(r2) * inverted; // Descending order
 			}
-			throw new IllegalStateException("Unknown result property."); //$NON-NLS-1$
 		}
 		
 		/**
@@ -889,6 +890,12 @@ public class ResultPanel extends Composite {
 	 */
 	public static enum ResultProperty {
 		
+		/*
+		 * FIXME This is bad design because everytime a new result property
+		 * (i.e. a new column in the result panel) is added to this list, one
+		 * must remember to add another case to the switch-case construct in the
+		 * ResultSorter.compare(..) method. See bug #2956392.
+		 */
 		TITLE (Msg.property_title.value(), 250, SWT.LEFT),
 		SCORE (Msg.property_score.value(), 75, SWT.RIGHT),
 		SIZE (Msg.property_size.value(), 75, SWT.RIGHT),
