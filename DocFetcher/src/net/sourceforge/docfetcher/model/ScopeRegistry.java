@@ -513,8 +513,7 @@ public class ScopeRegistry implements Serializable {
 	
 	/**
 	 * Performs a search on all indexes for <tt>searchString</tt> and returns an
-	 * array of results. Term strings for highlighting in the preview panel will
-	 * be inserted into the provided <tt>terms</tt> list.
+	 * array of results.
 	 * 
 	 * @throws SearchException
 	 *             Thrown if no indexes have been created yet, if the

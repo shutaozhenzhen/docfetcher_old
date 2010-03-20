@@ -122,6 +122,10 @@ public class CHMParser extends Parser {
 	 * determined by parsing the input with a simple finite state machine that
 	 * checks whether the input contains an html start tag, followed by an html
 	 * end tag.
+	 * <p>
+	 * Note: This is better than using regular expressions because the latter
+	 * can crash the program with a StackOverflowError, as seen in bug report
+	 * #2948903.
 	 */
 	private boolean isHTML(StringBuilder input) {
 		final int OUTSIDE = 0;
@@ -145,9 +149,11 @@ public class CHMParser extends Parser {
 			}
 			else if (state == INSIDE) {
 				if (c == '>') {
-					String substring = input.substring(i - 6, i + 1);
-					if (substring.toLowerCase().equals("</html>"))
-						return true;
+					if (i >= 6) {
+						String substring = input.substring(i - 6, i + 1);
+						if (substring.toLowerCase().equals("</html>"))
+							return true;
+					}
 				}
 			}
 		}
