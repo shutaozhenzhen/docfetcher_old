@@ -52,6 +52,8 @@ import net.sourceforge.docfetcher.view.ResultPanel;
 import net.sourceforge.docfetcher.view.SashWeightHandler;
 import net.sourceforge.docfetcher.view.ScopeGroup;
 import net.sourceforge.docfetcher.view.SearchPanel;
+import net.sourceforge.docfetcher.webinterface.server.WebserverException;
+import net.sourceforge.docfetcher.webinterface.server.WebserverFactory;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.ApplicationWindow;
@@ -108,8 +110,10 @@ public class DocFetcher extends ApplicationWindow {
 	private FilesizeGroup filesizeGroup;
 	private ParserGroup parserGroup;
 	private ScopeGroup scopeGroup;
-
+	
 	public static void main(String[] args) {
+		final int serverPort = 8080;
+		
 		Pref.load(); // Preferences must be loaded before invoking the command line handler
 		if (! CommandLineHandler.handle(args))
 			return;
@@ -117,6 +121,15 @@ public class DocFetcher extends ApplicationWindow {
 		startParams = args;
 		docFetcher = new DocFetcher();
 		docFetcher.setBlockOnOpen(true);
+        
+		try {
+			WebserverFactory.getWebserver(serverPort);
+		}
+		catch (WebserverException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        		
 		docFetcher.open();
 		Display.getCurrent().dispose();
 		
@@ -130,6 +143,14 @@ public class DocFetcher extends ApplicationWindow {
 			} catch (IOException e) {
 				// Ignore
 			}
+		}
+		
+		try {
+			WebserverFactory.getWebserver(serverPort).stopServer();
+		}
+		catch (WebserverException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
