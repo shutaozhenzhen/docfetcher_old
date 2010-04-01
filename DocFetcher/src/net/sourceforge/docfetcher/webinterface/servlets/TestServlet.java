@@ -85,7 +85,7 @@ public class TestServlet extends ServletBase {
 	 *            appended to
 	 */
 	protected void insertForm(final StringBuilder sb) {
-		sb.append("\t\t<FORM action=\"/net.sourceforge.docfetcher.webinterface.TestServlet\" method=\"GET\">\n"); //$NON-NLS-1$
+		sb.append("\t\t<FORM action=\"/docfetcher\" method=\"GET\">\n"); //$NON-NLS-1$
 		sb.append("\t\t\t<INPUT type=\"text\" id=\"" + //$NON-NLS-1$
 					TestServlet.PARAM_SEARCHSTRING
 					+ "\" NAME=\"" + //$NON-NLS-1$

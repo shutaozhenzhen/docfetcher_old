@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) ${year} Andreas Kalender
+ * Copyright (c) 2010 Andreas Kalender
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,6 +67,8 @@ public class JettyWebserver implements IWebserver {
 
 				context.addServlet(	new ServletHolder(new TestServlet()),
 									"/*"); //$NON-NLS-1$
+				context.addServlet(	new ServletHolder(new TestServlet()),
+									"/docfetcher"); //$NON-NLS-1$
 				try {
 					JettyWebserver.this.server.start();
 					JettyWebserver.this.server.join();
