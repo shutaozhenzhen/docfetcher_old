@@ -2,7 +2,8 @@
 <?
 $sites = array(
 	"en" => "en/index.html",
-	"de" => "de/index.html"
+	"de" => "de/index.html",
+	"fr" => "fr/index.html"
 );
 
 $langs = explode(",", $_SERVER['HTTP_ACCEPT_LANGUAGE']);
