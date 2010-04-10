@@ -88,6 +88,8 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class DocFetcher extends ApplicationWindow {
 	
+	private static final int WEB_SERVER_PORT = 8080; 
+	
 	private static DocFetcher docFetcher;
 	private static String[] startParams;
 	private HotkeyHandler hotkeyHandler;
@@ -112,8 +114,6 @@ public class DocFetcher extends ApplicationWindow {
 	private ScopeGroup scopeGroup;
 	
 	public static void main(String[] args) {
-		final int serverPort = 8080;
-		
 		Pref.load(); // Preferences must be loaded before invoking the command line handler
 		if (! CommandLineHandler.handle(args))
 			return;
@@ -123,7 +123,7 @@ public class DocFetcher extends ApplicationWindow {
 		docFetcher.setBlockOnOpen(true);
         
 		try {
-			WebserverFactory.getWebserver(serverPort);
+			WebserverFactory.getWebserver(DocFetcher.WEB_SERVER_PORT);
 		}
 		catch (WebserverException e1) {
 			// TODO Auto-generated catch block
@@ -143,14 +143,6 @@ public class DocFetcher extends ApplicationWindow {
 			} catch (IOException e) {
 				// Ignore
 			}
-		}
-		
-		try {
-			WebserverFactory.getWebserver(serverPort).stopServer();
-		}
-		catch (WebserverException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
@@ -651,6 +643,17 @@ public class DocFetcher extends ApplicationWindow {
 	}
 
 	public boolean close() {
+		/*
+		 * Shuts the webserver down 
+		 */
+		try {
+			WebserverFactory.getWebserver(DocFetcher.WEB_SERVER_PORT).stopServer();
+		}
+		catch (WebserverException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		/*
 		 * If an indexing process is running in the background, ask the user
 		 * before terminating it and exiting.
