@@ -1,0 +1,186 @@
+/*******************************************************************************
+ * Copyright (c) 2010 Andreas Kalender
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Andreas Kalender - initial API and implementation
+ *******************************************************************************/
+
+package net.sourceforge.docfetcher.webinterface.managedBeans;
+
+import java.net.MalformedURLException;
+
+import net.sourceforge.docfetcher.model.ResultDocument;
+import net.sourceforge.docfetcher.util.UtilFile;
+
+/**
+ * A class that offers the access to all relevant data of a
+ * <code>SearchResultDocument</code> in a JavaBean style. This class could be
+ * used to provide the access to searchresults by JSFs respectively JSPs
+ * 
+ * @author Andreas Kalender
+ */
+public class SearchResultBean {
+
+	private final String author;
+	private final String fileName;
+	private final String fileType;
+	private final String lastModified;
+	private final String path;
+	private final int score;
+	private final String size;
+	private final String title;
+	private String url;
+
+	/**
+	 * Constructor Creates a <code>SearchResultBean</code> which encapsulates
+	 * the data of a <code>ResultDocument</code> in a JavaBean way (getters and
+	 * setters)
+	 * 
+	 * @param document
+	 *            The <code>ResultDocument</code> the created
+	 *            <code>SearchResultBean</code> should correspond to
+	 */
+	public SearchResultBean(final ResultDocument document) {
+		this.title = document.getTitle();
+		this.score = Math.round(document.getScore() * 100);
+		this.size = new Long(UtilFile.getSizeInKB(document.getFile())) + " KB"; //$NON-NLS-1$		
+
+		this.fileName = document.getFile().getName();
+		this.fileType = UtilFile.getExtension(document.getFile());
+		this.path = document.getFile()
+							.getAbsolutePath();
+		this.author = document.getAuthor();
+		this.lastModified = UtilFile.getLastModified(document.getFile());
+		
+		try {
+			this.url = document	.getFile()
+								.toURI()
+								.toURL()
+								.getFile();
+		}
+		catch (final MalformedURLException e) {
+			// If the URL could not extracted/created 
+			// no link will Be available
+			// So the URL is set to an empty string
+			this.url = ""; //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Converts a given filesize in byte into a string. Thereby the size is
+	 * converted into terrabyte, gigabyte, megabyte or kilobyte this is
+	 * appropriate for the given date
+	 * 
+	 * @param size
+	 *            The size to convert
+	 * @return The String representing the converted size
+	 */
+	protected String convertSize(final long size) {
+		if (size > (1024 * 1024 * 1024 * 1024)) {
+			final float convertedSize = (float) size / (float) (1024 * 1024 * 1024 * 1024);
+			return String.format(	"%.2f TB", convertedSize); //$NON-NLS-1$
+		}
+
+		if (size > (1024 * 1024 * 1024)) {
+			final float convertedSize = (float) size / (float) (1024 * 1024 * 1024);
+			return String.format(	"%.2f GB", convertedSize); //$NON-NLS-1$
+		}
+
+		if (size > (1024 * 1024)) {
+			final float convertedSize = (float) size / (float) (1024 * 1024);
+			return String.format(	"%.2f MB", convertedSize); //$NON-NLS-1$
+		}
+
+		if (size > (1024)) {
+			final float convertedSize = (float) size / (float) (1024);
+			return String.format(	"%.2f KB", convertedSize); //$NON-NLS-1$
+		}
+
+		return String.format(	"%d B", size); //$NON-NLS-1$
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The author
+	 */
+	public String getAuthor() {
+		return this.author;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The fileName
+	 */
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The fileType
+	 */
+	public String getFileType() {
+		return this.fileType;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The lastModified
+	 */
+	public String getLastModified() {
+		return this.lastModified;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The path
+	 */
+	public String getPath() {
+		return this.path;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The score
+	 */
+	public int getScore() {
+		return this.score;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The size
+	 */
+	public String getSize() {
+		return this.size;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The title
+	 */
+	public String getTitle() {
+		return this.title;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The url
+	 */
+	public String getUrl() {
+		return this.url;
+	}
+}

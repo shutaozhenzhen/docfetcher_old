@@ -11,11 +11,10 @@
 
 package net.sourceforge.docfetcher.webinterface.server;
 
-import net.sourceforge.docfetcher.webinterface.servlets.TestServlet;
+import net.sourceforge.docfetcher.Const;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
  * Implementation of the <code>IWebserver</code> Interface This implementation
@@ -61,14 +60,12 @@ public class JettyWebserver implements IWebserver {
 			 */
 			@Override
 			public void run() {
-				final ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-				context.setContextPath("/"); //$NON-NLS-1$
-				JettyWebserver.this.server.setHandler(context);
+				final WebAppContext wac = new WebAppContext();
+				wac.setWar(".." + //$NON-NLS-1$
+				           Const.FS +
+				           "webinterface"); //$NON-NLS-1$
+				JettyWebserver.this.server.setHandler(wac);		
 
-				context.addServlet(	new ServletHolder(new TestServlet()),
-									"/*"); //$NON-NLS-1$
-				context.addServlet(	new ServletHolder(new TestServlet()),
-									"/docfetcher"); //$NON-NLS-1$
 				try {
 					JettyWebserver.this.server.start();
 					JettyWebserver.this.server.join();

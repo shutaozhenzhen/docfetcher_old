@@ -1,0 +1,229 @@
+<!--
+ * Copyright (c) 2010 Andreas Kalender
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Andreas Kalender - initial API and implementation
+-->
+
+<f:view xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:ice="http://www.icesoft.com/icefaces/component">
+<f:loadBundle basename="lang/Resource" var="msg"/>
+
+<ice:outputDeclaration doctypeRoot="HTML"
+                       doctypePublic="-//W3C//DTD XHTML 1.0 Transitional//EN"
+                       doctypeSystem="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>
+
+<html>
+<head>
+    <title>DocFetcher Webinterface</title>
+    
+    <style type="text/css">
+      #btnStartSearch { position:absolute; 
+                        left:10px; 
+                        margin-left:10px; }
+      .iceDatPgrScrCol {  background-color:#cdcdc1; 
+                          opacity:0.5; }
+      .iceCmdLnk-dis { opacity:0.3; }
+      .iceDatTblCol1, .iceDatTblCol2 { text-align:center; 
+                                       border-left:2px solid #CCCCCC; }
+      .iceDatTblColHdr1, .iceDatTblColHdr2 { text-align:center;                                               
+                                             border-left:2px solid #CCCCCC; }       
+                                             
+      .iceCmdSrtHdrAsc { text-align:center; }
+      .iceCmdSrtHdrDes { text-align:center; }                                                                                                                         
+  </style>
+</head>
+<body>
+  <h:form id="docfetcher">
+  <ice:panelGroup id="pnlLeft" style="position:absolute; left:0px; top:0px; width:18%; height:97%; margin:5px; border:1px solid #888;">
+    <ice:panelGroup id="pnlFilter" style="position:absolute; top:0%; width:98%; height:8%; margin:2px; padding:5px; ">
+      <ice:panelGroup style="position:absolute; height:48%; padding:5px;">
+        <h:outputLabel value="#{msg.filesize_group_label}" />
+      </ice:panelGroup>
+      <ice:panelGroup style="position:absolute; top:50%; height:48%; padding:5px;">
+        <ice:inputText size="5" value="#{searchRequest.minFileSize}" partialSubmit="false" required="false" />
+        <ice:selectOneMenu value="#{searchRequest.minFileSizeUnit}" partialSubmit="false">
+          <f:selectItems value="#{searchRequest.selectableItems}"/>
+        </ice:selectOneMenu>
+        <ice:inputText size="5" value="#{searchRequest.maxFileSize}" partialSubmit="false" required="false" />
+        <ice:selectOneMenu value="#{searchRequest.maxFileSizeUnit}" partialSubmit="false">
+          <f:selectItems value="#{searchRequest.selectableItems}"/>
+        </ice:selectOneMenu>
+      </ice:panelGroup>                
+    </ice:panelGroup>
+      
+    <ice:panelGroup id="pnlTypes" style="position:absolute; top:10%; width:98%; height:38%; margin:2px;">
+      FileTypes
+    </ice:panelGroup>
+    
+    <ice:panelGroup id="pnlSearchScope" style="position:absolute; top:50%; width:98%; height:48%; margin:2px; overflow: auto; ">
+      <!--<ice:tree value="#{tree.model}"
+                var="item"
+                hideRootNode="false"
+                hideNavigation="false">
+        <ice:treeNode>
+          <f:facet name="content">
+            <ice:panelGroup style="display: inline">
+                <ice:outputText value="#{item.userObject.text}" />
+            </ice:panelGroup>
+          </f:facet>
+        </ice:treeNode>
+      </ice:tree>
+     -->  
+    </ice:panelGroup>  
+  </ice:panelGroup>
+    
+  <ice:panelGroup id="pnlMain" style="position:absolute; left:20%; top:0px; width:78%; height:97%; margin:5px; border:1px solid #888;">
+    <ice:panelGroup id="pnlSearchString" style="position:absolute; padding:10px; ">
+      <ice:inputText id="SearchTerm"
+                             size="45"                           
+                             value="#{searchRequest.searchString}"
+                             partialSubmit="false"
+                             required="false" 
+                             />
+      <ice:commandButton id="btnStartSearch"
+                           type="submit"
+                           value="#{msg.search}"
+                           style="position:absolute; float:left; margin-left:5px;" 
+                           action="#{searchRequest.startSearch}" />
+    </ice:panelGroup>          
+      
+    <ice:panelGroup id="pnlSearchResults" style="position:absolute; top:7%; height:37%; width:98%; margin:2px; border-top:2px grey solid; ">
+      <div style="position:absolute; width:98%; height:90%; overflow:auto; ">
+        <ice:dataTable resizable="true"
+              id="searchResults"
+              rows="5"
+              value="#{searchRequest.result}"
+              var="item"
+              style="position:absolute; height:90%; width:98%;"
+              sortColumn="#{searchRequest.sortColumnName}"
+              sortAscending="#{searchRequest.sortOrderDescending}" >
+          <h:column>
+            <f:facet name="header">
+              <ice:commandSortHeader columnName="#{headers.headerTitle}">
+                <ice:outputText value="#{msg.property_title}" />
+              </ice:commandSortHeader>
+            </f:facet>
+            <ice:outputText value="#{item.title}" style="text-align:center"/>
+          </h:column>
+          
+          <h:column>
+            <f:facet name="header">
+              <ice:commandSortHeader columnName="#{headers.headerScore}">
+                <ice:outputText value="#{msg.property_score}" />
+              </ice:commandSortHeader>
+            </f:facet>
+            <ice:outputText value="#{item.score}" />
+          </h:column>
+          
+          <h:column>
+            <f:facet name="header">
+              <ice:commandSortHeader columnName="#{headers.headerSize}">
+                <ice:outputText value="#{msg.property_size}" />
+              </ice:commandSortHeader>
+            </f:facet>
+            <ice:outputText value="#{item.size}" />
+          </h:column>
+          
+          <h:column>
+            <f:facet name="header">
+              <ice:commandSortHeader columnName="#{headers.headerName}">
+                <ice:outputText value="#{msg.property_name}" />
+              </ice:commandSortHeader>              
+            </f:facet>
+            <ice:outputLink
+                      value="file://#{item.url}"
+                      target="_blank"> 
+              <ice:outputText value="#{item.fileName}" />
+            </ice:outputLink>
+          </h:column>
+          
+          <h:column>
+            <f:facet name="header">
+              <ice:commandSortHeader columnName="#{headers.headerType}">
+                <ice:outputText value="#{msg.property_type}" />
+              </ice:commandSortHeader>
+            </f:facet>
+            <ice:outputText value="#{item.fileType}" />
+          </h:column>
+          
+          <h:column>
+            <f:facet name="header">
+              <ice:commandSortHeader columnName="#{headers.headerPath}">
+                <ice:outputText value="#{msg.property_path}" />
+              </ice:commandSortHeader>
+            </f:facet>
+            <ice:outputText value="#{item.path}" />
+          </h:column>
+          
+          <h:column>
+            <f:facet name="header">
+              <ice:commandSortHeader columnName="#{headers.headerAuthor}">
+                <ice:outputText value="#{msg.property_author}" />
+              </ice:commandSortHeader>              
+            </f:facet>
+            <ice:outputText value="#{item.author}" />
+          </h:column>
+          
+          <h:column>
+            <f:facet name="header">
+              <ice:commandSortHeader columnName="#{headers.headerLastModified}">
+                <ice:outputText value="#{msg.property_lastModified}" />
+              </ice:commandSortHeader>
+            </f:facet>
+            <ice:outputText value="#{item.lastModified}" />
+          </h:column>       
+        </ice:dataTable>            
+      </div>                  
+             
+      <ice:panelGroup style="position:absolute; top:95%; width:98%; ">
+        <ice:dataPaginator id="dataScroll_3"
+            for="searchResults"
+            paginator="true"
+            fastStep="3"
+            paginatorMaxPages="8">  
+            
+          <f:facet name="first">
+            <ice:graphicImage
+                  url="../resources/images/Arrow-First.png"
+                  style="border:none;"
+                  title="#{msg.first_page}"/>
+          </f:facet>
+            
+          <f:facet name="previous">
+            <ice:graphicImage
+                  url="../resources/images/Arrow-Left.png"
+                  style="border:none;"
+                  title="#{msg.previous_page}"/>
+          </f:facet>
+            
+          <f:facet name="next">
+            <ice:graphicImage
+                  url="../resources/images/Arrow-Right.png"
+                  style="border:none;"
+                  title="#{msg.next_page}"/>
+          </f:facet>                        
+            
+          <f:facet name="last">
+            <ice:graphicImage
+                  url="../resources/images/Arrow-Last.png"
+                  style="border:none;"
+                  title="#{msg.last_page}"/>
+          </f:facet>            
+        </ice:dataPaginator>
+       </ice:panelGroup>            
+    </ice:panelGroup>        
+    
+    <ice:panelGroup id="pnlResultPreview" style="position:absolute; top:46%; height:52%; width:98%; margin:2px; border-top:2px grey solid;">
+      Result Preview
+    </ice:panelGroup>
+  </ice:panelGroup>
+  </h:form>
+</body>
+</html>
+</f:view>
