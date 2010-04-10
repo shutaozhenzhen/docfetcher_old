@@ -35,9 +35,18 @@ public enum Filesize {
 	 * of the receiver.
 	 */
 	public long convert(long size, Filesize unit) {
-		if (unit.multiplier / multiplier == 0 && unit.multiplier != 0)
-			return (size / multiplier) * unit.multiplier;
-		return (unit.multiplier / multiplier) * size;
+		if (unit.getMultiplier() / multiplier == 0 && unit.getMultiplier() != 0)
+			return (size / multiplier) * unit.getMultiplier();
+		return (unit.getMultiplier() / multiplier) * size;
+	}
+	
+	/**
+	 * Getter
+	 * 
+	 * @return the multiplier
+	 */
+	public int getMultiplier() {
+		return this.multiplier;
 	}
 	
 	/**
