@@ -47,7 +47,7 @@ public class SearchResultBean {
 	public SearchResultBean(final ResultDocument document) {
 		this.title = document.getTitle();
 		this.score = Math.round(document.getScore() * 100);
-		this.size = new Long(UtilFile.getSizeInKB(document.getFile())) + " KB"; //$NON-NLS-1$		
+		this.size = new Long(UtilFile.getSizeInKB(document.getFile())).toString();		
 
 		this.fileName = document.getFile().getName();
 		this.fileType = UtilFile.getExtension(document.getFile());
