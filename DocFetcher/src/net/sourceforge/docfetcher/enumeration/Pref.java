@@ -115,6 +115,7 @@ public class Pref {
 		SearchBoxMaxWidth (200),
 		ErrorTypeColWidth (200),
 		ErrorPathColWidth (500),
+		MaxResultsPerWebPage (15),
 		;
 
 		public final Event<Integer> evtChanged = new Event<Integer> ();
