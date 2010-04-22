@@ -43,7 +43,6 @@ public class JettyWebserver implements IWebserver {
 	/**
 	 * @see net.sourceforge.docfetcher.webinterface.server.IWebserver#getPort()
 	 */
-	@Override
 	public int getPort() {
 		return this.port;
 	}
@@ -51,14 +50,12 @@ public class JettyWebserver implements IWebserver {
 	/**
 	 * @see net.sourceforge.docfetcher.webinterface.server.IWebserver#startServer()
 	 */
-	@Override
 	public void startServer() throws WebserverException {
 		new Thread(new Runnable() {
 
 			/**
 			 * @see java.lang.Runnable#run()
 			 */
-			@Override
 			public void run() {
 				final WebAppContext wac = new WebAppContext();
 				wac.setWar(".." + //$NON-NLS-1$
@@ -81,7 +78,6 @@ public class JettyWebserver implements IWebserver {
 	/**
 	 * @see net.sourceforge.docfetcher.webinterface.server.IWebserver#stopServer()
 	 */
-	@Override
 	public void stopServer() {
 		if (this.server != null) {
 			try {

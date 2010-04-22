@@ -138,7 +138,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getAuthorComparatorAscending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -164,7 +163,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getAuthorComparatorDescending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -208,7 +206,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getLastModifiedComparatorAscending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -234,7 +231,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getLastModifiedComparatorDescending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -260,7 +256,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getNameComparatorAscending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -286,7 +281,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getNameComparatorDescending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -312,7 +306,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getPathComparatorAscending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -338,7 +331,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getPathComparatorDescending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -364,7 +356,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getScoreComparatorAscending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -389,7 +380,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getScoreComparatorDescending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -414,7 +404,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getSizeComparatorAscending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -439,7 +428,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getSizeComparatorDescending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -465,7 +453,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getTitleComparatorAscending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -491,7 +478,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getTitleComparatorDescending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -517,7 +503,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getTypeComparatorAscending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
@@ -543,7 +528,6 @@ public class SearchResultComparatorFactory {
 	protected Comparator<SearchResultBean> getTypeComparatorDescending() {
 		return new Comparator<SearchResultBean>() {
 
-			@Override
 			public int compare(	final SearchResultBean o1,
 								final SearchResultBean o2) {
 				if (o1 == null) {
