@@ -124,29 +124,12 @@
 				id="pnlTypes"
 				style="position:absolute; top:10%; width:98%; height:38%; margin:2px;"
 			>
-				<html>
-				<body>
-				<h1>test</h1>
-				</body>
-				</html>
 			</ice:panelGroup>
 
 			<ice:panelGroup
 				id="pnlSearchScope"
 				style="position:absolute; top:50%; width:98%; height:48%; margin:2px; overflow: auto; "
 			>
-				<!--  <ice:tree value="#{tree.model}"
-                var="item"
-                hideRootNode="false"
-                hideNavigation="false">
-        <ice:treeNode>
-          <f:facet name="content">
-            <ice:panelGroup style="display: inline">
-                <ice:outputText value="#{item.userObject.text}" />
-            </ice:panelGroup>
-          </f:facet>
-        </ice:treeNode>
-      </ice:tree>-->
 			</ice:panelGroup>
 		</ice:panelGroup>
 
