@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2010 Andreas Kalender
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Andreas Kalender - initial API and implementation
+ * Copyright (c) 2010 Andreas Kalender All rights reserved. This program and the
+ * accompanying materials are made available under the terms of the Eclipse
+ * Public License v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html Contributors: Andreas Kalender -
+ * initial API and implementation
  *******************************************************************************/
 
 package net.sourceforge.docfetcher.webinterface.server;
 
+import java.io.File;
+
 import net.sourceforge.docfetcher.Const;
+import net.sourceforge.docfetcher.util.UtilFile;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -59,9 +59,9 @@ public class JettyWebserver implements IWebserver {
 			public void run() {
 				final WebAppContext wac = new WebAppContext();
 				wac.setWar(".." + //$NON-NLS-1$
-				           Const.FS +
-				           "webinterface"); //$NON-NLS-1$
-				JettyWebserver.this.server.setHandler(wac);		
+							Const.FS
+							+ "webinterface"); //$NON-NLS-1$
+				JettyWebserver.this.server.setHandler(wac);
 
 				try {
 					JettyWebserver.this.server.start();
@@ -87,6 +87,18 @@ public class JettyWebserver implements IWebserver {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+			final File file = new File(".." + Const.FS //$NON-NLS-1$
+										+ "webinterface" //$NON-NLS-1$
+										+ Const.FS
+										+ "temp"); //$NON-NLS-1$
+
+			if (file.exists()) {
+				for (final File tempFile: UtilFile.listAll(file.getAbsoluteFile())) {
+					tempFile.delete();
+				}
+			}
+
 			this.server = null;
 		}
 	}

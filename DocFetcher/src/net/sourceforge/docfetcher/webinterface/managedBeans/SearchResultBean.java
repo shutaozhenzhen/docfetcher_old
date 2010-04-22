@@ -11,9 +11,14 @@
 
 package net.sourceforge.docfetcher.webinterface.managedBeans;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.net.MalformedURLException;
 
+import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.model.ResultDocument;
+import net.sourceforge.docfetcher.parse.Parser;
 import net.sourceforge.docfetcher.util.UtilFile;
 
 /**
@@ -29,8 +34,10 @@ public class SearchResultBean {
 	private final String fileName;
 	private final String fileType;
 	private final String lastModified;
+	private final Parser parser;
 	private final String path;
 	private final int score;
+	private boolean selected;
 	private final String size;
 	private final String title;
 	private String url;
@@ -47,15 +54,16 @@ public class SearchResultBean {
 	public SearchResultBean(final ResultDocument document) {
 		this.title = document.getTitle();
 		this.score = Math.round(document.getScore() * 100);
-		this.size = new Long(UtilFile.getSizeInKB(document.getFile())).toString();		
+		this.size = new Long(UtilFile.getSizeInKB(document.getFile())).toString();
 
-		this.fileName = document.getFile().getName();
+		this.fileName = document.getFile()
+								.getName();
 		this.fileType = UtilFile.getExtension(document.getFile());
 		this.path = document.getFile()
 							.getAbsolutePath();
 		this.author = document.getAuthor();
 		this.lastModified = UtilFile.getLastModified(document.getFile());
-		
+
 		try {
 			this.url = document	.getFile()
 								.toURI()
@@ -63,11 +71,13 @@ public class SearchResultBean {
 								.getFile();
 		}
 		catch (final MalformedURLException e) {
-			// If the URL could not extracted/created 
+			// If the URL could not extracted/created
 			// no link will Be available
 			// So the URL is set to an empty string
 			this.url = ""; //$NON-NLS-1$
 		}
+
+		this.parser = document.getParser();
 	}
 
 	/**
@@ -182,5 +192,53 @@ public class SearchResultBean {
 	 */
 	public String getUrl() {
 		return this.url;
+	}
+
+	/**
+	 * Getter
+	 * 
+	 * @return The selected
+	 */
+	public boolean isSelected() {
+		return this.selected;
+	}
+
+	/**
+	 * Setter
+	 * 
+	 * @param selected
+	 *            The selected to set
+	 */
+	public void setSelected(final boolean selected) {
+		this.selected = selected;
+
+		if (selected) {
+			if (this.parser	.getFileType()
+							.equals(Msg.filetype_html.value())) {
+				try {
+					new File(this.getPath());
+					final BufferedReader reader = new BufferedReader(new FileReader(this.getPath()));
+	
+					final StringBuilder lines = new StringBuilder();
+					String line;
+	
+					while ((line = reader.readLine()) != null) {
+						lines.append(line);
+						lines.append("\n"); //$NON-NLS-1$
+					}
+	
+					ResultSelector.setParsedFile(lines.toString());
+					reader.close();
+				}
+				catch (final Exception e) {
+					// TODO Add some errorpage
+					ResultSelector.setParsedFile(""); //$NON-NLS-1$
+				}
+			}
+			else {
+				// TODO Convert file to HTML
+				ResultSelector.setParsedFile(""); //$NON-NLS-1$
+			}
+		}
 	}
 }

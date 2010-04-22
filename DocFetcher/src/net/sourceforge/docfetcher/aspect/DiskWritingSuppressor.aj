@@ -13,14 +13,15 @@ package net.sourceforge.docfetcher.aspect;
 
 import java.io.FileWriter;
 
-import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.CommandLineHandler;
+import net.sourceforge.docfetcher.Const;
 import net.sourceforge.docfetcher.DocFetcher;
 import net.sourceforge.docfetcher.ExceptionHandler;
 import net.sourceforge.docfetcher.enumeration.Msg;
 import net.sourceforge.docfetcher.enumeration.Pref;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.model.Serializer;
+import net.sourceforge.docfetcher.webinterface.managedBeans.ResultSelector;
 
 /**
  * This aspect checks if the paths DocFetcher wants to write to are writable. If
@@ -60,6 +61,7 @@ public privileged aspect DiskWritingSuppressor {
 	&& !withincode(* Pref.save())
 	&& !withincode(* ScopeRegistry.save(..))
 	&& !withincode(* ExceptionHandler.appendError(..))
+	&& !withincode(* ResultSelector.getPreview())
 	&& !within(CommandLineHandler):
 		"Don't write to disk without updating net.sourceforge.docfetcher.aspect.DiskWritingSuppressor."; //$NON-NLS-1$
 
