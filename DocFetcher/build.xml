@@ -50,6 +50,7 @@
 			sourceRootCopyFilter="**/*.java, **/*.aj">
 			<classpath>
 				<fileset dir="lib" includes="**/*.jar"/>
+				<fileset dir="webinterface/WEB-INF/lib" includes="**/*.jar"/>
 			</classpath>
 		</iajc>
 		<jar destfile="build/${jar.name}" basedir="build/tmp">
@@ -156,6 +157,9 @@
 		</copy>
 		<copy todir="${programdir}/licenses">
 			<fileset dir="${versiondir}/licenses"/>
+		</copy>
+		<copy todir="${programmdir}">
+			<fileset dir="webinterface"/>
 		</copy>
 		
 		<!-- On Linux we're calling the zip command because the built-in zip task
