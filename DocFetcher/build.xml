@@ -158,7 +158,7 @@
 		<copy todir="${programdir}/licenses">
 			<fileset dir="${versiondir}/licenses"/>
 		</copy>
-		<copy todir="${programmdir}">
+		<copy todir="${programdir}">
 			<fileset dir="webinterface"/>
 		</copy>
 		
