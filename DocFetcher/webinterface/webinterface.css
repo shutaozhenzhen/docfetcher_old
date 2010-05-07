@@ -61,9 +61,19 @@ body {
 	text-align: center;
 }
 
+.imgBranding {
+	height:100%;
+	position: relative; 
+}
+
 .paginator {
 	position:relative; 
 	top:5px;
+}
+
+.pnlBranding {
+	text-align:right; 
+	width:100%;
 }
 
 .pnlFilter {

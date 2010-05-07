@@ -124,10 +124,11 @@
 							value="#{msg.search}"
 						/>
 					</ice:panelGrid>
-					<ice:panelGroup style="text-align:right; width:100%;">
+					<ice:panelGroup id="pnlBranding" styleClass="pnlBranding">
 						<ice:graphicImage
-							style="position: relative; height:100%;"
-							title="TODO"
+							id="imgBranding"
+							styleClass="imgBranding"
+							title="Docfetcher branding"
 							url="../resources/images/logo.png"
 						/>
 					</ice:panelGroup>
