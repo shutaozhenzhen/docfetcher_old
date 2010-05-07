@@ -295,5 +295,4 @@ public class DocFetcherSearchBean {
 	public String startSearch() {
 		return DocFetcherSearchBean.FORWARD_WITH_TABLE;
 	}
-
 }

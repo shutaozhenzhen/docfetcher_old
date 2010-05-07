@@ -1,0 +1,186 @@
+body {
+	background-color: #d6d6d6;
+}
+
+.background_image_large {
+	background-image:url(../resources/images/background_gradient_large.png);
+	background-repeat:repeat-x;	
+}
+
+.background_image_small {
+	background-image:url(../resources/images/background_gradient_small.png);
+	background-repeat:repeat-x;	
+}
+
+.borderFreeElement {
+	border:none;
+}
+
+.borderedElement {	
+	border-color: #E8B953;
+	border-style: ridge;
+	border-width: 5px;
+	padding: 4px;
+}
+
+.btnStartSearch {
+	float:left;
+	margin-left:5px;
+	position:relative;  
+}
+
+.groupElement {
+	background-color: #FFFFFF;
+	overflow: auto;
+}
+
+.iceCmdLnk-dis {
+	opacity: 0.3;
+}
+
+.iceCmdSrtHdrAsc {
+	text-align: center;
+}
+
+.iceCmdSrtHdrDes {
+	text-align: center;
+}
+
+.iceDatPgrScrCol {
+	background-color: #cdcdc1;
+	opacity: 0.5;
+}
+
+.iceDatTblColHdr1,.iceDatTblColHdr2 {	
+	border-left: 2px solid #CCCCCC;
+	text-align: center;
+}
+
+.iceDatTblCol1,.iceDatTblCol2 {
+	border-left: 2px solid #CCCCCC;
+	text-align: center;
+}
+
+.paginator {
+	position:relative; 
+	top:5px;
+}
+
+.pnlFilter {
+	position:relative; 
+	top:0%; 
+	width:100%;
+}
+
+.pnlFilterCaption {
+	height:48%;
+	position:relative;
+	text-align:center; 
+	top:2px; 
+}
+
+.pnlFilterSelection {
+	position:relative;
+	text-align:center; 
+	top:2px; 
+}
+
+.pnlLeft {
+	height: 98%;
+	left:0%;
+	margin: 5px;
+	position: absolute;
+	top:0%;
+	width: 18%;
+}
+
+.pnlMain {	
+	border:1px;
+	height:98%;
+	left:20%;
+	margin:5px;
+	position:absolute;
+	solid #888888;  
+	top:0px; 
+	width:78%;    
+}
+
+.pnlResultPreview {	
+	position: relative;
+	top: 2%;		
+	height: 45%;
+	width: 98%;
+}
+
+.pnlSearchBar {
+	padding:10px;
+	position: relative;
+}
+
+.pnlSearchResults {
+	background-color: #FFFFFF;
+	height:42%;
+	width: 98%;
+	position: relative;
+	top: 5px;
+}
+
+.pnlSearchScope {
+	margin:2px;
+	overflow: auto;
+	position:relative; 
+	top:5px; 
+	width:98%;
+}
+
+.pnlTypes {
+	margin:2px;
+	position:relative; 
+	top:5px; 
+	width:98%;
+}
+
+.preview {
+	height: 100%;
+	width: 100%;
+}
+
+.searchTerm {
+	position: relative;
+	width: 100%;
+}
+
+.tableSearchResultEntry {
+	text-align:left; 
+	white-space:nowrap;
+}
+
+.tableSearchResults {
+	position: relative;		
+}
+
+.tableSearchResultsCol1 {
+	text-align:left;	
+}
+
+.tableSearchResultsCol2 {
+	text-align:left;	
+}
+
+.tableRowSelected {
+	background-color: #ADD8E6;
+}
+
+.tableRowMouseOver {
+	background-color: #E0FFFF
+}
+
+.tableSearchResultsHdr {
+	text-align:left;
+	padding:2px;
+}
+
+.tableRowUnselected {
+	background-color: #FFFFFF
+}
+

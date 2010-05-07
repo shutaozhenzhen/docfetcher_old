@@ -8,4 +8,9 @@
 		<query-param name="searchString">#{searchRequest.searchString}</query-param>
 	</url-mapping>
 	
+	<url-mapping id="empty">
+		<pattern> /search </pattern>
+		<view-id> / </view-id>
+	</url-mapping>
+	
 </pretty-config>

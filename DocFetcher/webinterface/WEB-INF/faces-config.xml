@@ -95,7 +95,7 @@
         <from-view-id>/pages/docFetcher.jspx</from-view-id>
         <navigation-case>
             <from-outcome>submit</from-outcome>
-            <to-view-id>/pages/docFetcher.iface</to-view-id>
+            <to-view-id>/</to-view-id>
             <redirect/>
         </navigation-case>
     </navigation-rule>
