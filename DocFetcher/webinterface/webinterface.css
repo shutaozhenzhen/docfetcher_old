@@ -29,6 +29,16 @@ body {
 	position:relative;  
 }
 
+.fontCaption {
+	font-family:"Times New Roman",Times,serif;
+	font-size:12pt;	
+}
+
+.fontSmallInputField {
+	font-family:"Times New Roman",Times,serif;
+	font-size:10pt;	
+}
+
 .groupElement {
 	background-color: #FFFFFF;
 	overflow: auto;

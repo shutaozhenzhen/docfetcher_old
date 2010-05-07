@@ -52,36 +52,46 @@
 					id="pnlFilterCaption"
 					styleClass="pnlFilterCaption"
 				>
-					<h:outputLabel value="#{msg.filesize_group_label}" />
+					<h:outputLabel styleClass="fontCaption" value="#{msg.filesize_group_label}" />
 				</ice:panelGroup>
 				<ice:panelGroup
 					id="pnlFilterSelection"
 					styleClass="pnlFilterSelection"
 				>
-					<ice:inputText
-						partialSubmit="false"
-						required="false"
-						size="5"
-						value="#{searchRequest.minFileSize}"
-					/>
-					<ice:selectOneMenu
-						partialSubmit="false"
-						value="#{searchRequest.minFileSizeUnit}"
-					>
-						<f:selectItems value="#{searchRequest.selectableItems}" />
-					</ice:selectOneMenu>
-					<ice:inputText
-						partialSubmit="false"
-						required="false"
-						size="5"
-						value="#{searchRequest.maxFileSize}"
-					/>
-					<ice:selectOneMenu
-						partialSubmit="false"
-						value="#{searchRequest.maxFileSizeUnit}"
-					>
-						<f:selectItems value="#{searchRequest.selectableItems}" />
-					</ice:selectOneMenu>
+					<ice:panelGrid columns="2" style="width:100%">
+						<ice:panelGroup> 
+							<ice:inputText
+								partialSubmit="false"
+								required="false"
+								size="4"
+								styleClass="fontSmallInputField"
+								value="#{searchRequest.minFileSize}"
+							/>
+							<ice:selectOneMenu
+								partialSubmit="false"
+								styleClass="fontSmallInputField"
+								value="#{searchRequest.minFileSizeUnit}"
+							>
+								<f:selectItems value="#{searchRequest.selectableItems}" />
+							</ice:selectOneMenu>
+						</ice:panelGroup>
+						<ice:panelGroup> 							
+							<ice:inputText
+								partialSubmit="false"
+								required="false"
+								size="4"
+								styleClass="fontSmallInputField"
+								value="#{searchRequest.maxFileSize}"
+							/>
+							<ice:selectOneMenu
+								partialSubmit="false"
+								styleClass="fontSmallInputField"
+								value="#{searchRequest.maxFileSizeUnit}"
+							>
+								<f:selectItems value="#{searchRequest.selectableItems}" />
+							</ice:selectOneMenu>
+						</ice:panelGroup>
+					</ice:panelGrid>					
 				</ice:panelGroup>
 			</ice:panelGroup>
 
@@ -113,13 +123,13 @@
 							partialSubmit="false"
 							required="false"
 							size="45"
-							styleClass="searchTerm"
+							styleClass="searchTerm formatedFont"
 							value="#{searchRequest.searchString}"
 						/>
 						<ice:commandButton
 							action="#{searchRequest.startSearch}"
 							id="btnStartSearch"
-							styleClass="btnStartSearch"
+							styleClass="btnStartSearch formatedFont"
 							type="submit"
 							value="#{msg.search}"
 						/>
