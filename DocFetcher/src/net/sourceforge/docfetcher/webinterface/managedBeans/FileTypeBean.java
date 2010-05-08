@@ -26,7 +26,6 @@ public class FileTypeBean implements Comparable<FileTypeBean> {
 	/**
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	@Override
 	public int compareTo(final FileTypeBean o) {
 		if (o == null) {
 			return 1;
