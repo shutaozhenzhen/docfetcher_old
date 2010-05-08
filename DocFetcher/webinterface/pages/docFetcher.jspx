@@ -97,8 +97,14 @@
 
 			<ice:panelGroup
 				id="pnlTypes"
-				styleClass="pnlTypes"
+				styleClass="background_image_large borderedElement fileType groupElement pnlTypes"
 			>
+				<ice:panelSeries id="fileType" value="#{searchRequest.parser}" var="parser">
+					<ice:panelGroup>
+						<ice:selectBooleanCheckbox value="#{parser.checked}" />
+						<ice:outputText styleClass="fontCaption" value="#{parser.value}" />
+					</ice:panelGroup>						
+				</ice:panelSeries>
 			</ice:panelGroup>
 
 			<ice:panelGroup
@@ -341,7 +347,7 @@
 				<iframe
 					id="notrefresh"
 					src="#{resultSelector.preview}"
-					class="borderedElement preview"
+					class="borderedElement preview background_image_large"
 				> </iframe>
 			</ice:panelGroup>
 		</ice:panelGroup>

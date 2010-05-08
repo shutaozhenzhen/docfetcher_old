@@ -20,13 +20,18 @@ body {
 	border-color: #E8B953;
 	border-style: ridge;
 	border-width: 5px;
-	padding: 4px;
 }
 
 .btnStartSearch {
 	float:left;
 	margin-left:5px;
 	position:relative;  
+}
+
+.fileType {
+	position: relative;
+	top: 5px;
+	height: 40%;
 }
 
 .fontCaption {
@@ -111,17 +116,15 @@ body {
 	margin: 5px;
 	position: absolute;
 	top:0%;
-	width: 18%;
+	width: 20%;
 }
 
 .pnlMain {	
-	border:1px;
+	margin: 5px;
 	height:98%;
-	left:20%;
-	margin:5px;
+	left:22%;
 	position:absolute;
-	solid #888888;  
-	top:0px; 
+	top:0%; 
 	width:78%;    
 }
 
@@ -133,8 +136,9 @@ body {
 }
 
 .pnlSearchBar {
-	padding:10px;
 	position: relative;
+	top: 0%;
+	width: 98%;	
 }
 
 .pnlSearchResults {
@@ -157,7 +161,7 @@ body {
 	margin:2px;
 	position:relative; 
 	top:5px; 
-	width:98%;
+	width:100%;
 }
 
 .preview {

@@ -89,7 +89,16 @@
       <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
     
-    
+    <managed-bean>
+      <description>
+          Bean to access the file type filter
+      </description>
+      <managed-bean-name>fileTypeFilter</managed-bean-name>
+      <managed-bean-class>
+          net.sourceforge.docfetcher.webinterface.managedBeans.FilteTypeBean
+      </managed-bean-class>      
+      <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>    
     
     <navigation-rule>
         <from-view-id>/pages/docFetcher.jspx</from-view-id>
