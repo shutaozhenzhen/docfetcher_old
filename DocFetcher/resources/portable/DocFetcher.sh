@@ -12,6 +12,11 @@ do
    CLASSPATH=${CLASSPATH}:${FILE}
 done
 
+for FILE in `ls ./../webinterface/WEB-INF/lib/*.jar`
+do
+   CLASSPATH=${CLASSPATH}:${FILE}
+done
+
 for FILE in `ls ./lib/linux/*.jar`
 do
    CLASSPATH=${CLASSPATH}:${FILE}

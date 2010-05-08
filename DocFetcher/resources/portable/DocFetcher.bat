@@ -4,6 +4,7 @@ set libclasspath=
 
 for %%f in (.\lib\*.jar) do (call :append_classpath %%f)
 for %%f in (.\lib\windows\*.jar) do (call :append_classpath %%f)
+for %%f in (..\webinterface\WEB-INF\lib\*.jar) do (call :append_classpath %%f)
 goto :proceed
 
 :append_classpath
