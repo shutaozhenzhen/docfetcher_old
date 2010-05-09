@@ -1,15 +1,5 @@
 body {
-	background-color: #d6d6d6;
-}
-
-.background_image_large {
-	background-image:url(../resources/images/background_gradient_large.png);
-	background-repeat:repeat-x;	
-}
-
-.background_image_small {
-	background-image:url(../resources/images/background_gradient_small.png);
-	background-repeat:repeat-x;	
+	background-color: #FFFFFF;
 }
 
 .borderFreeElement {
@@ -17,9 +7,9 @@ body {
 }
 
 .borderedElement {	
-	border-color: #E8B953;
-	border-style: ridge;
-	border-width: 5px;
+	border-color: #BDBDFF;
+	border-style: solid;
+	border-width: 1px;
 }
 
 .btnStartSearch {
@@ -35,12 +25,12 @@ body {
 }
 
 .fontCaption {
-	font-family:"Times New Roman",Times,serif;
-	font-size:12pt;	
+	font-family:"Verdana",Geneva,sans-serif;
+	font-size:10pt;	
 }
 
 .fontSmallInputField {
-	font-family:"Times New Roman",Times,serif;
+	font-family:"Verdana",Geneva,sans-serif;
 	font-size:10pt;	
 }
 

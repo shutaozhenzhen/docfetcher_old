@@ -119,6 +119,13 @@ public class SearchResultBean {
 	 * @return The author
 	 */
 	public String getAuthor() {
+		// Ensure that null is not returned
+		// A null value could cause trouble when 
+		// sorting the results
+		if (this.author == null) {
+			return ""; //$NON-NLS-1$
+		}
+		
 		return this.author;
 	}
 
@@ -128,6 +135,13 @@ public class SearchResultBean {
 	 * @return The fileName
 	 */
 	public String getFileName() {
+		// Ensure that null is not returned
+		// A null value could cause trouble when 
+		// sorting the results
+		if (this.fileName == null) {
+			return ""; //$NON-NLS-1$
+		}
+		
 		return this.fileName;
 	}
 
@@ -137,6 +151,13 @@ public class SearchResultBean {
 	 * @return The fileType
 	 */
 	public String getFileType() {
+		// Ensure that null is not returned
+		// A null value could cause trouble when 
+		// sorting the results
+		if (this.fileType == null) {
+			return ""; //$NON-NLS-1$
+		}
+		
 		return this.fileType;
 	}
 
@@ -146,6 +167,13 @@ public class SearchResultBean {
 	 * @return The lastModified
 	 */
 	public String getLastModified() {
+		// Ensure that null is not returned
+		// A null value could cause trouble when 
+		// sorting the results
+		if (this.lastModified == null) {
+			return ""; //$NON-NLS-1$
+		}
+		
 		return this.lastModified;
 	}
 
@@ -155,6 +183,13 @@ public class SearchResultBean {
 	 * @return The path
 	 */
 	public String getPath() {
+		// Ensure that null is not returned
+		// A null value could cause trouble when 
+		// sorting the results
+		if (this.path == null) {
+			return ""; //$NON-NLS-1$
+		}
+		
 		return this.path;
 	}
 
@@ -173,6 +208,13 @@ public class SearchResultBean {
 	 * @return The size
 	 */
 	public String getSize() {
+		// Ensure that null is not returned
+		// A null value could cause trouble when 
+		// sorting the results
+		if (this.size == null) {
+			return ""; //$NON-NLS-1$
+		}
+		
 		return this.size;
 	}
 
@@ -182,6 +224,13 @@ public class SearchResultBean {
 	 * @return The title
 	 */
 	public String getTitle() {
+		// Ensure that null is not returned
+		// A null value could cause trouble when 
+		// sorting the results
+		if (this.title == null) {
+			return ""; //$NON-NLS-1$
+		}
+		
 		return this.title;
 	}
 
@@ -191,6 +240,13 @@ public class SearchResultBean {
 	 * @return The url
 	 */
 	public String getUrl() {
+		// Ensure that null is not returned
+		// A null value could cause trouble when 
+		// sorting the results
+		if (this.url == null) {
+			return ""; //$NON-NLS-1$
+		}
+		
 		return this.url;
 	}
 
