@@ -129,13 +129,13 @@
 							partialSubmit="false"
 							required="false"
 							size="45"
-							styleClass="searchTerm formatedFont"
+							styleClass="searchTerm fontCaption"
 							value="#{searchRequest.searchString}"
 						/>
 						<ice:commandButton
 							action="#{searchRequest.startSearch}"
 							id="btnStartSearch"
-							styleClass="btnStartSearch formatedFont"
+							styleClass="btnStartSearch fontCaption"
 							type="submit"
 							value="#{msg.search}"
 						/>
@@ -173,11 +173,11 @@
 						/>
 						<f:facet name="header">
 							<ice:commandSortHeader columnName="#{headers.headerTitle}">
-								<ice:outputText value="#{msg.property_title}" />
+								<ice:outputText styleClass="fontCaption" value="#{msg.property_title}" />
 							</ice:commandSortHeader>
 						</f:facet>
 						<ice:outputText
-							styleClass="tableSearchResultEntry"
+							styleClass="tableSearchResultEntry fontCaption"
 							value="#{item.title}"
 						/>
 					</h:column>
@@ -185,11 +185,11 @@
 					<h:column>
 						<f:facet name="header">
 							<ice:commandSortHeader columnName="#{headers.headerScore}">
-								<ice:outputText value="#{msg.property_score}" />
+								<ice:outputText styleClass="fontCaption" value="#{msg.property_score}" />
 							</ice:commandSortHeader>
 						</f:facet>
 						<ice:outputText
-							styleClass="tableSearchResultEntry"
+							styleClass="tableSearchResultEntry fontCaption"
 							value="#{item.score}"
 						/>
 					</h:column>
@@ -197,11 +197,11 @@
 					<h:column>
 						<f:facet name="header">
 							<ice:commandSortHeader columnName="#{headers.headerSize}">
-								<ice:outputText value="#{msg.property_size} [KB]" />
+								<ice:outputText styleClass="fontCaption" value="#{msg.property_size} [KB]" />
 							</ice:commandSortHeader>
 						</f:facet>
 						<ice:outputText
-							styleClass="tableSearchResultEntry"
+							styleClass="tableSearchResultEntry fontCaption"
 							value="#{item.size}"
 						/>
 					</h:column>
@@ -210,7 +210,7 @@
 						<f:facet name="header">
 							<ice:commandSortHeader columnName="#{headers.headerName}">
 								<ice:outputText
-									styleClass="tableSearchResultEntry"
+									styleClass="tableSearchResultEntry fontCaption"
 									value="#{msg.property_name}"
 								/>
 							</ice:commandSortHeader>
@@ -220,7 +220,7 @@
 							value="file://#{item.url}"
 						>
 							<ice:outputText
-								styleClass="tableSearchResultEntry"
+								styleClass="tableSearchResultEntry fontCaption"
 								value="#{item.fileName}"
 							/>
 						</ice:outputLink>
@@ -229,11 +229,11 @@
 					<h:column>
 						<f:facet name="header">
 							<ice:commandSortHeader columnName="#{headers.headerType}">
-								<ice:outputText value="#{msg.property_type}" />
+								<ice:outputText styleClass="fontCaption" value="#{msg.property_type}" />
 							</ice:commandSortHeader>
 						</f:facet>
 						<ice:outputText
-							styleClass="tableSearchResultEntry"
+							styleClass="tableSearchResultEntry fontCaption"
 							value="#{item.fileType}"
 						/>
 					</h:column>
@@ -241,11 +241,11 @@
 					<h:column>
 						<f:facet name="header">
 							<ice:commandSortHeader columnName="#{headers.headerPath}">
-								<ice:outputText value="#{msg.property_path}" />
+								<ice:outputText styleClass="fontCaption" value="#{msg.property_path}" />
 							</ice:commandSortHeader>
 						</f:facet>
 						<ice:outputText
-							styleClass="tableSearchResultEntry"
+							styleClass="tableSearchResultEntry fontCaption"
 							value="#{item.path}"
 						/>
 					</h:column>
@@ -253,11 +253,11 @@
 					<h:column>
 						<f:facet name="header">
 							<ice:commandSortHeader columnName="#{headers.headerAuthor}">
-								<ice:outputText value="#{msg.property_author}" />
+								<ice:outputText styleClass="fontCaption" value="#{msg.property_author}" />
 							</ice:commandSortHeader>
 						</f:facet>
 						<ice:outputText
-							styleClass="tableSearchResultEntry"
+							styleClass="tableSearchResultEntry fontCaption"
 							value="#{item.author}"
 						/>
 					</h:column>
@@ -265,11 +265,11 @@
 					<h:column>
 						<f:facet name="header">
 							<ice:commandSortHeader columnName="#{headers.headerLastModified}">
-								<ice:outputText value="#{msg.property_lastModified}" />
+								<ice:outputText styleClass="fontCaption" value="#{msg.property_lastModified}" />
 							</ice:commandSortHeader>
 						</f:facet>
 						<ice:outputText
-							styleClass="tableSearchResultEntry"
+							styleClass="tableSearchResultEntry fontCaption"
 							value="#{item.lastModified}"
 						/>
 					</h:column>
