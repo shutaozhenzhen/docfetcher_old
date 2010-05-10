@@ -97,7 +97,7 @@
 
 			<ice:panelGroup
 				id="pnlTypes"
-				styleClass="borderedElement fileType groupElement pnlTypes"
+				styleClass="borderedElement groupElement pnlTypes"
 			>
 				<ice:panelSeries id="fileType" value="#{searchRequest.parser}" var="parser">
 					<ice:panelGroup>
@@ -109,7 +109,7 @@
 
 			<ice:panelGroup
 				id="pnlSearchScope"
-				styleClass="pnlSearchScope"
+				styleClass="pnlSearchScope borderedElement groupElement"
 			>
 			</ice:panelGroup>
 		</ice:panelGroup>
@@ -176,10 +176,15 @@
 								<ice:outputText styleClass="fontCaption" value="#{msg.property_title}" />
 							</ice:commandSortHeader>
 						</f:facet>
-						<ice:outputText
-							styleClass="tableSearchResultEntry fontCaption"
-							value="#{item.title}"
-						/>
+						<ice:outputLink
+							styleClass="fontResultEntry"
+							value="file://#{item.url}"
+						>
+							<ice:outputText
+								styleClass="tableSearchResultEntry fontResultEntry"
+								value="#{item.title}"
+							/>
+						</ice:outputLink>
 					</h:column>
 
 					<h:column>
@@ -188,10 +193,15 @@
 								<ice:outputText styleClass="fontCaption" value="#{msg.property_score}" />
 							</ice:commandSortHeader>
 						</f:facet>
-						<ice:outputText
-							styleClass="tableSearchResultEntry fontCaption"
-							value="#{item.score}"
-						/>
+						<ice:outputLink
+							styleClass="fontResultEntry"
+							value="file://#{item.url}"
+						>
+							<ice:outputText
+								styleClass="tableSearchResultEntry fontResultEntry"
+								value="#{item.score}"
+							/>
+						</ice:outputLink>
 					</h:column>
 
 					<h:column>
@@ -200,10 +210,15 @@
 								<ice:outputText styleClass="fontCaption" value="#{msg.property_size} [KB]" />
 							</ice:commandSortHeader>
 						</f:facet>
-						<ice:outputText
-							styleClass="tableSearchResultEntry fontCaption"
-							value="#{item.size}"
-						/>
+						<ice:outputLink
+							styleClass="fontResultEntry"
+							value="file://#{item.url}"
+						>
+							<ice:outputText
+								styleClass="tableSearchResultEntry fontResultEntry"
+								value="#{item.size}"
+							/>
+						</ice:outputLink>
 					</h:column>
 
 					<h:column>
@@ -216,11 +231,11 @@
 							</ice:commandSortHeader>
 						</f:facet>
 						<ice:outputLink
-							target="_blank"
+							styleClass="fontResultEntry"
 							value="file://#{item.url}"
 						>
 							<ice:outputText
-								styleClass="tableSearchResultEntry fontCaption"
+								styleClass="tableSearchResultEntry fontCaption fontLink"
 								value="#{item.fileName}"
 							/>
 						</ice:outputLink>
@@ -232,10 +247,15 @@
 								<ice:outputText styleClass="fontCaption" value="#{msg.property_type}" />
 							</ice:commandSortHeader>
 						</f:facet>
-						<ice:outputText
-							styleClass="tableSearchResultEntry fontCaption"
-							value="#{item.fileType}"
-						/>
+						<ice:outputLink
+							styleClass="fontResultEntry"
+							value="file://#{item.url}"
+						>
+							<ice:outputText
+								styleClass="tableSearchResultEntry fontResultEntry"
+								value="#{item.fileType}"
+							/>
+						</ice:outputLink>
 					</h:column>
 
 					<h:column>
@@ -244,10 +264,15 @@
 								<ice:outputText styleClass="fontCaption" value="#{msg.property_path}" />
 							</ice:commandSortHeader>
 						</f:facet>
-						<ice:outputText
-							styleClass="tableSearchResultEntry fontCaption"
-							value="#{item.path}"
-						/>
+						<ice:outputLink
+							styleClass="fontResultEntry"
+							value="file://#{item.url}"
+						>
+							<ice:outputText
+								styleClass="tableSearchResultEntry fontResultEntry"
+								value="#{item.path}"
+							/>
+						</ice:outputLink>
 					</h:column>
 
 					<h:column>
@@ -256,10 +281,15 @@
 								<ice:outputText styleClass="fontCaption" value="#{msg.property_author}" />
 							</ice:commandSortHeader>
 						</f:facet>
-						<ice:outputText
-							styleClass="tableSearchResultEntry fontCaption"
-							value="#{item.author}"
-						/>
+						<ice:outputLink
+							styleClass="fontResultEntry"
+							value="file://#{item.url}"
+						>
+							<ice:outputText
+								styleClass="tableSearchResultEntry fontResultEntry"
+								value="#{item.author}"
+							/>
+						</ice:outputLink>
 					</h:column>
 
 					<h:column>
@@ -268,10 +298,15 @@
 								<ice:outputText styleClass="fontCaption" value="#{msg.property_lastModified}" />
 							</ice:commandSortHeader>
 						</f:facet>
-						<ice:outputText
-							styleClass="tableSearchResultEntry fontCaption"
-							value="#{item.lastModified}"
-						/>
+						<ice:outputLink
+							styleClass="fontResultEntry"
+							value="file://#{item.url}"
+						>
+							<ice:outputText
+								styleClass="tableSearchResultEntry fontResultEntry"
+								value="#{item.lastModified}"
+							/>
+						</ice:outputLink>
 					</h:column>
 				</ice:dataTable>
 
