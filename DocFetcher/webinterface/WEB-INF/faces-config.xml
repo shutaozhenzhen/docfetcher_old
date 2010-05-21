@@ -100,6 +100,17 @@
       <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>    
     
+    <managed-bean>
+      <description>
+          Bean to access the registered scopes
+      </description>
+      <managed-bean-name>scopesBean</managed-bean-name>
+      <managed-bean-class>
+          net.sourceforge.docfetcher.webinterface.managedBeans.RegisteredScopesBean
+      </managed-bean-class>      
+      <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>        
+    
     <navigation-rule>
         <from-view-id>/pages/docFetcher.jspx</from-view-id>
         <navigation-case>

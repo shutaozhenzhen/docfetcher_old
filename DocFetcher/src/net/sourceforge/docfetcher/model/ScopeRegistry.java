@@ -510,7 +510,7 @@ public class ScopeRegistry implements Serializable {
 		}
 		writer.close();
 	}
-	
+
 	/**
 	 * Performs a search on all indexes for <tt>searchString</tt> and returns an
 	 * array of results.
@@ -521,48 +521,76 @@ public class ScopeRegistry implements Serializable {
 	 *             occurred.
 	 */
 	public ResultDocument[] search(String searchString) throws SearchException {
+		return this.search(searchString, 
+		                    null);
+	}
+	
+	/**
+	 * Performs a search on the given list of indexes for <tt>searchString</tt>
+	 * and returns an array of results.
+	 * 
+	 * @param searchString
+	 *            The search string
+	 * @param searchScopes
+	 *            The list of indexes to use
+	 * @return An array of results
+	 * @throws SearchException
+	 *             Thrown if no indexes have been created yet, if the
+	 *             <tt>searchString</tt> is invalid, or if an IOException
+	 *             occurred.
+	 */
+	public ResultDocument[] search(	final String searchString,
+									List<RootScope> searchScopes) throws SearchException {
 		MultiSearcher multiSearcher = null;
 		try {
+			if (searchScopes == null) {
+				searchScopes = new ArrayList<RootScope>();
+
+				for (final RootScope rootScope : rootScopes) {
+					searchScopes.add(rootScope);
+				}
+			}
+
 			// Build a lucene query object
-			QueryParser queryParser = new QueryParser(
-					Version.LUCENE_CURRENT,
-					Document.contents,
-					RootScope.analyzer
-			);
+			QueryParser queryParser = new QueryParser(	Version.LUCENE_CURRENT,
+														Document.contents,
+														RootScope.analyzer);
 			queryParser.setAllowLeadingWildcard(true);
 			queryParser.setMultiTermRewriteMethod(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
-			if (! Pref.Bool.UseOrOperator.getValue())
+			if (!Pref.Bool.UseOrOperator.getValue())
 				queryParser.setDefaultOperator(QueryParser.AND_OPERATOR);
 			Query query = queryParser.parse(searchString);
 
 			// Check that all indexes still exist
-			for (RootScope rootScope : rootScopes)
-				if (! rootScope.getIndexDir().exists())
+			for (RootScope rootScope : searchScopes)
+				if (!rootScope	.getIndexDir()
+								.exists())
 					throw new SearchException(Msg.folders_not_found.value() + "\n" + //$NON-NLS-1$
-							rootScope.getIndexDir().getAbsolutePath());
-			
+												rootScope	.getIndexDir()
+															.getAbsolutePath());
+
 			// Perform search
-			Searchable[] searchables = new Searchable[rootScopes.size()];
+			Searchable[] searchables = new Searchable[searchScopes.size()];
 			int i = 0;
-			for (RootScope rootScope : rootScopes) {
+			for (RootScope rootScope : searchScopes) {
 				Directory luceneIndexDir = new SimpleFSDirectory(rootScope.getIndexDir());
 				searchables[i++] = new IndexSearcher(luceneIndexDir);
 			}
 			multiSearcher = new MultiSearcher(searchables);
-			
-			TopScoreDocCollector collector = TopScoreDocCollector.create(Pref.Int.MaxResultsTotal.getValue(), false);
-			multiSearcher.search(query, collector);
+
+			TopScoreDocCollector collector = TopScoreDocCollector.create(	Pref.Int.MaxResultsTotal.getValue(),
+																			false);
+			multiSearcher.search(	query,
+									collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;
-			
-			// Process results 
+
+			// Process results
 			final ResultDocument[] results = new ResultDocument[hits.length];
 			for (i = 0; i < results.length; i++)
-				results[i] = new ResultDocument(
-						multiSearcher.doc(hits[i].doc),
-						hits[i].score,
-						query
-				);
-			
+				results[i] = new ResultDocument(multiSearcher.doc(hits[i].doc),
+												hits[i].score,
+												query);
+
 			return results;
 		}
 		catch (final ParseException e) {
@@ -575,7 +603,8 @@ public class ScopeRegistry implements Serializable {
 			if (multiSearcher != null) {
 				try {
 					multiSearcher.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -588,5 +617,4 @@ public class ScopeRegistry implements Serializable {
 			super(msg);
 		}
 	}
-	
 }

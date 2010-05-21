@@ -18,6 +18,7 @@ import javax.faces.model.SelectItem;
 
 import net.sourceforge.docfetcher.enumeration.Filesize;
 import net.sourceforge.docfetcher.model.ResultDocument;
+import net.sourceforge.docfetcher.model.RootScope;
 import net.sourceforge.docfetcher.model.ScopeRegistry;
 import net.sourceforge.docfetcher.model.ScopeRegistry.SearchException;
 import net.sourceforge.docfetcher.parse.Parser;
@@ -73,6 +74,34 @@ public class DocFetcherSearchBean {
 	}
 
 	/**
+	 * TODO Extract this method into a new and independent class (original code
+	 * was taken from net.sourceforge.docfetcher.view.ResultPanel.ParserFilter)
+	 * 
+	 * @param results
+	 *            The results without filtering
+	 * @return The list of the elements that are selected by the checked file
+	 *         type filters
+	 */
+	protected List<ResultDocument> filterDocuments(final ResultDocument[] results) {
+		final Map<String, Boolean> checkStates = new HashMap<String, Boolean>();
+		for (final Parser parser : ParserRegistry.getParsers()) {
+			checkStates.put(parser	.getClass()
+									.getSimpleName(),
+							parser.isChecked());
+		}
+
+		final List<ResultDocument> selected = new ArrayList<ResultDocument>(results.length);
+		for (final ResultDocument doc : results) {
+			final Boolean checkState = checkStates.get(doc.getParserName());
+			if ((checkState != null) && checkState) {
+				selected.add(doc);
+			}
+		}
+
+		return selected;
+	}
+
+	/**
 	 * Getter
 	 * 
 	 * @return The maxFileSize
@@ -119,13 +148,13 @@ public class DocFetcherSearchBean {
 		// Creates one instance of the <code>FileTypeBean</code> per
 		// parser
 		final FileTypeBeanFactory factory = FileTypeBeanFactory.getInstance();
-		
+
 		for (final Parser parser : ParserRegistry.getParsers()) {
 			final FileTypeBean bean = factory.getOrCreateFileTypeBean(parser);
 
 			result.add(bean);
 		}
-		
+
 		// Sorts the list of given parsers in alphabetic order
 		Collections.sort(result);
 
@@ -141,13 +170,17 @@ public class DocFetcherSearchBean {
 		this.result.clear();
 
 		try {
+			final List<RootScope> selectedScopes = RegisteredScopeBeanFactory	.getInstance()
+																				.getAllSelectedScopes();
+
 			if ((this.searchString != null) && !this.searchString	.trim()
-																	.equals("")) { //$NON-NLS-1$
+																	.equals("") && (selectedScopes.size() > 0)) { //$NON-NLS-1$				
 				final ResultDocument[] results = ScopeRegistry	.getInstance()
-																.search(this.searchString);
-				
+																.search(this.searchString,
+																		selectedScopes);
+
 				final List<ResultDocument> selected = this.filterDocuments(results);
-				
+
 				// TODO Validate filesizes
 				final boolean filterBySize = (this.getMinFileSize() != 0) && (this.getMaxFileSize() != 0);
 
@@ -299,7 +332,7 @@ public class DocFetcherSearchBean {
 	 *            The unsorted list of the search results
 	 * @return The ordered list of the search results
 	 */
-	protected List<SearchResultBean> sortResults(final List<SearchResultBean> result) {		
+	protected List<SearchResultBean> sortResults(final List<SearchResultBean> result) {
 		if (this.getSortColumnName() != null) {
 			final Comparator<SearchResultBean> comparator = SearchResultComparatorFactory	.getInstance()
 																							.getComparator(	this.getSortColumnName(),
@@ -321,26 +354,5 @@ public class DocFetcherSearchBean {
 	 */
 	public String startSearch() {
 		return DocFetcherSearchBean.FORWARD_WITH_TABLE;
-	}
-	
-	/**
-	 * TODO Extract this method into a new and independent class (original code was taken from net.sourceforge.docfetcher.view.ResultPanel.ParserFilter)
-	 * 
-	 * @param results The results without filtering
-	 * @return The list of the elements that are selected by the checked file type filters
-	 */
-	protected List<ResultDocument> filterDocuments(final ResultDocument[] results) {
-		Map<String, Boolean> checkStates = new HashMap<String, Boolean> ();
-		for (Parser parser : ParserRegistry.getParsers())
-			checkStates.put(parser.getClass().getSimpleName(), parser.isChecked());
-		
-		List<ResultDocument> selected = new ArrayList<ResultDocument> (results.length);
-		for (ResultDocument doc : results) {
-			Boolean checkState = checkStates.get(doc.getParserName());
-			if (checkState != null && checkState)
-				selected.add(doc);
-		}
-		
-		return selected;
 	}
 }

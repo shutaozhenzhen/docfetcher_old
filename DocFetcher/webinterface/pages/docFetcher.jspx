@@ -111,6 +111,12 @@
 				id="pnlSearchScope"
 				styleClass="pnlSearchScope borderedElement groupElement"
 			>
+				<ice:panelSeries id="searchScopes" value="#{scopesBean.registeredScopes}" var="scope">
+					<ice:panelGroup>
+						<ice:selectBooleanCheckbox value="#{scope.selected}" />
+						<ice:outputText styleClass="fontCaption" value="#{scope.id}" />
+					</ice:panelGroup>						
+				</ice:panelSeries>							
 			</ice:panelGroup>
 		</ice:panelGroup>
 
