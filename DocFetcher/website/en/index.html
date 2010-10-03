@@ -47,32 +47,42 @@ e.g. "fourier analysis" and
 hit Enter. Then&nbsp;DocFetcher will list all documents inside the
 selected folders that contain these&nbsp;words - most of the time
 in
-less than a second.</li></ul><h1>But There's More To It...</h1><ul>
+less than a second.</li></ul>
+
+<h1>But There's More To It...</h1>
+<ul>
 <li><span style="font-weight: bold;">Automatic index updates</span>:
 Indexes are updated automatically when files in the corresponding
 folders are modified, even when DocFetcher isn't running. This is done
 via a&nbsp;daemon that waits in the background and watches all indexed
 folders. The daemon has very low CPU usage,
 because, rather than indexing&nbsp;files itself, it only remembers
-which indexes need to be updated the next time DocFetcher is launched.</li><li><span style="font-weight: bold;">A portable version</span>:
+which indexes need to be updated the next time DocFetcher is launched.</li>
+<li><span style="font-weight: bold;">A portable version</span>:
 Runs on both Windows and Linux.
 You can put all your documents in it and then freely move&nbsp;the
 entire folder around (i.e., DocFetcher + indexes + documents). Possible
 destinations include other computers, encrypted volumes (<a href="http://www.truecrypt.org/">TrueCrypt</a>),
 CD-ROMs and USB drives. The portable version can also be used for sharing an indexed
 document repository across a local area network, or across the OS'ses of a
-Windows/Linux dual boot system.</li><li><span style="font-weight: bold;">Detection of HTML pairs</span>,
+Windows/Linux dual boot system.</li>
+<li><span style="font-weight: bold;">Detection of HTML pairs</span>,
 e.g. "foo.htm" and a folder named
 "foo_files".
 Each pair will be treated as a single document. This feature may seem
 rather useless on first sight, but it turned out that this dramatically
 increases the quality of the search results when you're searching for
 HTML files, since all the "clutter" inside the HTML folders disappears
-from the results.</li><li><span style="font-weight: bold;">Search in source code files</span>:
+from the results.</li>
+<li><span style="font-weight: bold;">Search in source code files</span>:
 The file extensions by which DocFetcher recognizes plain text and HTML
 files can be fully customized. Therefore you can use DocFetcher to
 search in any kind of source code.</li>
-</ul><h1>Other Notable Features<br></h1><ul><li>Regular expression based exclusion of files from indexing.</li><li>Various
+<li><span style="font-weight: bold;">Unicode support</span>:
+DocFetcher has rock-solid Unicode support, thereby allowing you to search in documents written in Russian, Greek, Chinese, etc. See <a href="http://sourceforge.net/project/screenshots.php?group_id=197779&ssid=137028">screenshot</a>.</li>
+</ul>
+
+<h1>Other Notable Features<br></h1><ul><li>Regular expression based exclusion of files from indexing.</li><li>Various
 file operations on the document repository&nbsp;can be performed through DocFetcher's interface (e.g. creating folders,
 inserting new files).</li><li>Preview panel with search-term highlighting and a simple
 built-in web browser.</li><li>Search results can be sorted and filtered by different
